@@ -1,4 +1,4 @@
-timeskip: Example Using Multiple Java EE 7 Technologies Deployed as an EAR
+Timeskip: Example Using Multiple Java EE 7 Technologies Deployed as an EAR
 ==============================================================================================
 Author: Pete Muir
 Level: Intermediate
@@ -125,3 +125,10 @@ If you want to debug the source code or look at the Javadocs of any library in t
 
         mvn dependency:sources
         mvn dependency:resolve -Dclassifier=javadoc
+        
+## Release Notes
+
+
+### v0.1
+
+Initial release
