@@ -16,3 +16,7 @@
 hs_err_pid*
 *.iml
 .idea/*
+timeskip-ear/target/*
+timeskip-web/target/*
+timeskip-ejb/target/*
+timeskip-ear/target
