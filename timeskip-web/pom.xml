@@ -62,7 +62,7 @@
          <artifactId>cdi-api</artifactId>
          <scope>provided</scope>
       </dependency>
-      
+
       <!-- Import the JSF API, we use provided scope as the API is included in JBoss WildFly -->
       <dependency>
          <groupId>org.jboss.spec.javax.faces</groupId>
@@ -77,20 +77,40 @@
          <scope>provided</scope>
       </dependency>
 
-       <!-- JSR-303 (Bean Validation) Implementation -->
-       <!-- Provides portable constraints such as @Email -->
-       <!-- Hibernate Validator is shipped in JBoss WildFly -->
-       <dependency>
-           <groupId>org.hibernate</groupId>
-           <artifactId>hibernate-validator</artifactId>
-           <scope>provided</scope>
-           <exclusions>
-               <exclusion>
-                   <groupId>org.slf4j</groupId>
-                   <artifactId>slf4j-api</artifactId>
-               </exclusion>
-           </exclusions>
-       </dependency>
+      <!-- JSR-303 (Bean Validation) Implementation -->
+      <!-- Provides portable constraints such as @Email -->
+      <!-- Hibernate Validator is shipped in JBoss WildFly -->
+      <dependency>
+         <groupId>org.hibernate</groupId>
+         <artifactId>hibernate-validator</artifactId>
+         <scope>provided</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>org.slf4j</groupId>
+               <artifactId>slf4j-api</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
+      <dependency>
+         <groupId>io.swagger</groupId>
+         <artifactId>swagger-jaxrs</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>io.swagger</groupId>
+         <artifactId>swagger-core</artifactId>
+      </dependency>
+
+      <!--Swagger parser-->
+      <dependency>
+         <groupId>io.swagger</groupId>
+         <artifactId>swagger-parser</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.spec.javax.servlet</groupId>
+         <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+      </dependency>
 
    </dependencies>
 
