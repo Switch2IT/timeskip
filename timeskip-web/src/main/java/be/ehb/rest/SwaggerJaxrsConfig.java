@@ -1,9 +1,6 @@
 package be.ehb.rest;
 
-import io.swagger.config.ScannerFactory;
-import io.swagger.config.SwaggerConfig;
 import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.models.*;
 
 import javax.servlet.ServletConfig;

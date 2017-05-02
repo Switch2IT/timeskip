@@ -13,6 +13,8 @@ public class ErrorResponse implements Serializable {
 
     private String message;
     private int errorCode;
+    private int httpCode;
+    private String type;
 
     public String getMessage() {
         return message;
@@ -28,5 +30,31 @@ public class ErrorResponse implements Serializable {
 
     public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public int getHttpCode() {
+        return httpCode;
+    }
+
+    public void setHttpCode(int httpCode) {
+        this.httpCode = httpCode;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "ErrorResponse{" +
+                "message='" + message + '\'' +
+                ", errorCode=" + errorCode +
+                ", httpCode=" + httpCode +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

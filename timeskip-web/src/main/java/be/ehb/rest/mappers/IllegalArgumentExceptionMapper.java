@@ -31,7 +31,7 @@ public class IllegalArgumentExceptionMapper implements ExceptionMapper<IllegalAr
             //TODO - Use resource bundle for internationalization
             error.setMessage("Invalid Input");
         }
-        error.setErrorCode(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT);
+        error.setHttpCode(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT);
         Response.ResponseBuilder builder = Response.status(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT).header("X-Timeskip-Error", "true");
         builder.type(MediaType.APPLICATION_JSON_TYPE);
         return builder.entity(error).build();
