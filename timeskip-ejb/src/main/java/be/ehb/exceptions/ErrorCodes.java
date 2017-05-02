@@ -18,4 +18,8 @@ public class ErrorCodes {
     // ORGANIZATION RELATED
 
     public static final int UNAUTHORIZED_FOR_ORGANIZATION   = 1003;
+
+    // SYSTEM RELATED
+
+    public static final int SYSTEM_ERROR = -1;
 }

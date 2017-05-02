@@ -1,6 +1,6 @@
 package be.ehb.facades;
 
-import be.ehb.security.Permission;
+import be.ehb.security.PermissionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class SecurityFacade implements ISecurityFacade {
     private static final Logger log = LoggerFactory.getLogger(SecurityFacade.class);
 
     @Override
-    public boolean hasPermission(Permission permission, String entityId) {
+    public boolean hasPermission(PermissionType permissionType, String entityId) {
         return false;
     }
 }

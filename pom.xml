@@ -15,7 +15,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <name>timeskip</name>
     <modelVersion>4.0.0</modelVersion>
@@ -89,6 +89,10 @@
         <jaxrs-api.version>3.0.10.Final</jaxrs-api.version>
         <cdi-api.version>1.2</cdi-api.version>
         <servlet-api.version>2.5</servlet-api.version>
+        <mail-api.version>1.5.3</mail-api.version>
+
+        <version.keycloak>2.5.0.Final</version.keycloak>
+        <version.resteasy>3.1.1.Final</version.resteasy>
     </properties>
 
     <dependencyManagement>
@@ -264,6 +268,34 @@
                 <groupId>org.jboss.spec.javax.servlet</groupId>
                 <artifactId>jboss-servlet-api_3.0_spec</artifactId>
                 <version>${version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec}</version>
+            </dependency>
+
+            <!--Mail Api-->
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>javax.mail-api</artifactId>
+                <version>${mail-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Keycloak -->
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-core</artifactId>
+                <version>${version.keycloak}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-admin-client -->
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-admin-client</artifactId>
+                <version>${version.keycloak}</version>
+            </dependency>
+
+            <!-- Resteasy -->
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-client</artifactId>
+                <version>${version.resteasy}</version>
             </dependency>
 
         </dependencies>
