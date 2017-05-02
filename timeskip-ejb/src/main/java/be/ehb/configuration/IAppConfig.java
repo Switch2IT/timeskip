@@ -17,9 +17,11 @@ public interface IAppConfig {
 
     String getIdpRealm();
 
-    String getIdpClientId();
+    String getIdpAdminClientId();
 
-    String getIdpClientSecret();
+    String getIdpAdminClientSecret();
 
     String getIdpKeystoreId();
+
+    String getIdpClient();
 }

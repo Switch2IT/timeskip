@@ -93,6 +93,8 @@
 
         <version.keycloak>2.5.0.Final</version.keycloak>
         <version.resteasy>3.1.1.Final</version.resteasy>
+
+        <buildNumber>${maven.build.timestamp}</buildNumber>
     </properties>
 
     <dependencyManagement>

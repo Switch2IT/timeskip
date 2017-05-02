@@ -6,6 +6,10 @@ package be.ehb.exceptions;
  */
 public class ErrorCodes {
 
+    // SYSTEM RELATED
+
+    public static final int SYSTEM_ERROR = -1;
+
     // HTTP CODES
 
     public static final int HTTP_STATUS_CODE_INVALID_INPUT  = 400;
@@ -19,7 +23,7 @@ public class ErrorCodes {
 
     public static final int UNAUTHORIZED_FOR_ORGANIZATION   = 1003;
 
-    // SYSTEM RELATED
+    // USER RELATED
 
-    public static final int SYSTEM_ERROR = -1;
+    public static final int USER_NOT_FOUND = 2001;
 }

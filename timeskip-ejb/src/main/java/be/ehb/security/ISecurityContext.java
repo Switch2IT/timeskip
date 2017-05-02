@@ -13,7 +13,7 @@ public interface ISecurityContext {
 
     String getCurrentUser();
 
-    String setCurrentUser(JwtClaims claims) throws MalformedClaimException;
+    String setCurrentUser(JwtClaims claims);
 
     String setCurrentUser(String userName);
 

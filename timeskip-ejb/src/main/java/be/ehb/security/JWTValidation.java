@@ -56,10 +56,10 @@ public class JWTValidation {
                 .serverUrl(config.getIdpServerUrl())
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .realm(MASTER_REALM)
-                .clientId(config.getIdpClientId())
+                .clientId(config.getIdpAdminClientId())
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10)
                         .build())
-                .clientSecret(config.getIdpClientSecret())
+                .clientSecret(config.getIdpAdminClientSecret())
                 .build();
     }
 

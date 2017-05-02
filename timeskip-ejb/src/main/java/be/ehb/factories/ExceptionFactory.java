@@ -3,6 +3,7 @@ package be.ehb.factories;
 import be.ehb.exceptions.StorageException;
 import be.ehb.exceptions.SystemErrorException;
 import be.ehb.exceptions.UnauthorizedException;
+import be.ehb.exceptions.UserNotFoundException;
 
 /**
  * @author Guillaume Vandecasteele
@@ -24,6 +25,10 @@ public class ExceptionFactory {
 
     public static StorageException storageException(String message) {
         return new StorageException(message);
+    }
+
+    public static UserNotFoundException userNotFoundException(String userId) {
+        return new UserNotFoundException(userId);
     }
 
 }

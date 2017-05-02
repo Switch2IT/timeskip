@@ -53,7 +53,7 @@ public class AppConfig implements Serializable, IAppConfig {
         Path configPath = Paths.get(defaultConfig.getConfigPath());
         log.info("Config path loaded:{}", configPath.toAbsolutePath());
 
-        InputStream is = getClass().getClassLoader().getResourceAsStream("application.conf");
+        InputStream is = getClass().getClassLoader().getResourceAsStream("application.properties");
         properties = new Properties();
         if (is != null) {
             try {
@@ -73,7 +73,16 @@ public class AppConfig implements Serializable, IAppConfig {
         } else {
             try {
                 log.info("============================== Timeskip Configuration ==============================");
-                log.info("Notifications: mail will be send from {}", getNotificationMailFrom());
+                log.info("Version: {}", getVersion());
+                log.info("Build date: {}", getBuildDate());
+                log.info("Configuration file: {}", getConfigurationFile());
+                log.info("IDP server URL: {}", getIdpServerUrl());
+                log.info("IDP realm: {}", getIdpRealm());
+                log.info("IDP admin client: {}", getIdpAdminClientId());
+                log.info("IDP admin secret: ***************{}", getIdpAdminClientSecret().substring(getIdpAdminClientSecret().length() - 5));
+                log.info("IDP keystore ID: {}", getIdpKeystoreId());
+                log.info("IDP Client: {}", getIdpClient());
+                log.info("Notification mail will be send from: {}", getNotificationMailFrom());
                 log.info("====================================================================================");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -103,26 +112,31 @@ public class AppConfig implements Serializable, IAppConfig {
 
     @Override
     public String getIdpServerUrl() {
-        return null;
+        return config.getString(IConfig.IDP_SERVER_URL);
     }
 
     @Override
     public String getIdpRealm() {
-        return null;
+        return config.getString(IConfig.IDP_REALM);
     }
 
     @Override
-    public String getIdpClientId() {
-        return null;
+    public String getIdpAdminClientId() {
+        return config.getString(IConfig.IDP_CLIENT_ID);
     }
 
     @Override
-    public String getIdpClientSecret() {
-        return null;
+    public String getIdpAdminClientSecret() {
+        return config.getString(IConfig.IDP_CLIENT_SECRET);
     }
 
     @Override
     public String getIdpKeystoreId() {
-        return null;
+        return config.getString(IConfig.IDP_KEYSTORE_ID);
+    }
+
+    @Override
+    public String getIdpClient() {
+        return config.getString(IConfig.IDP_CLIENT);
     }
 }

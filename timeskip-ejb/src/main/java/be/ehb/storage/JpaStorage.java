@@ -1,6 +1,7 @@
 package be.ehb.storage;
 
 import be.ehb.entities.config.ConfigBean;
+import be.ehb.entities.identity.UserBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,5 +27,10 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             log.error("No results found: {}", ex.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public UserBean getUser(String userId) {
+        return super.get(userId, UserBean.class);
     }
 }
