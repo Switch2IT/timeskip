@@ -10,10 +10,18 @@ import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.Stateless;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
+import javax.enterprise.inject.Default;
+
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
+@Stateless
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@Default
 public class UserFacade implements IUserFacade {
 
     private static final Logger log = LoggerFactory.getLogger(UserFacade.class);

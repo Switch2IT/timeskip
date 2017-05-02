@@ -24,7 +24,7 @@ public class TokenClaimsResponse implements Serializable {
 
     @Override
     public String toString() {
-        return "UserDTO{" +
+        return "TokenClaimsResponse{" +
                 "userInfo=" + userInfo +
                 '}';
     }
