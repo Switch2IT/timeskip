@@ -26,4 +26,5 @@ public class ErrorCodes {
     // USER RELATED
 
     public static final int USER_NOT_FOUND = 2001;
+    public static final int JWT_VALIDATION_ERROR = 2002;
 }

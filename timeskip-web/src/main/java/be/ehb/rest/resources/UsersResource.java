@@ -1,5 +1,6 @@
 package be.ehb.rest.resources;
 
+import be.ehb.entities.identity.UserBean;
 import be.ehb.facades.IUserFacade;
 import be.ehb.model.requests.JWTParseRequest;
 import be.ehb.model.responses.ErrorResponse;
@@ -12,10 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -47,6 +45,21 @@ public class UsersResource {
         Preconditions.checkNotNull(jwt, "Request must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(jwt.getJwt()), "JWT String required");
         return userFacade.parseJWT(jwt);
+    }
+
+    @ApiOperation(value = "Get current user",
+            notes = "Get the current user")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = UserBean.class, message = "User info"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/current")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public UserBean getCurrentUser() {
+        //TODO - Use resource bundle for internationalization
+        return userFacade.getCurrentUser();
     }
 
 }

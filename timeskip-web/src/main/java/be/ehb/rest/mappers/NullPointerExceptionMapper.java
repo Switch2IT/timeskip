@@ -30,6 +30,7 @@ public class NullPointerExceptionMapper implements ExceptionMapper<NullPointerEx
         } else {
             //TODO - Use resource bundle for internationalization
             error.setMessage("Missing input");
+            throw data;
         }
         error.setHttpCode(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT);
         Response.ResponseBuilder builder = Response.status(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT).header("X-Timeskip-Error", "true");

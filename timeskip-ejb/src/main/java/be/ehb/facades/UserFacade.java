@@ -4,6 +4,8 @@ import be.ehb.entities.identity.UserBean;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.model.requests.JWTParseRequest;
 import be.ehb.model.responses.TokenClaimsResponse;
+import be.ehb.security.ISecurityContext;
+import be.ehb.security.JWTConstants;
 import be.ehb.security.JWTValidation;
 import be.ehb.storage.IStorageService;
 import org.apache.commons.lang3.StringUtils;
@@ -13,9 +15,7 @@ import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
+import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.Serializable;
@@ -35,6 +35,8 @@ public class UserFacade implements IUserFacade, Serializable {
     private JWTValidation jwtValidation;
     @Inject
     private IStorageService storage;
+    @Inject
+    private ISecurityContext securityContext;
 
     @Override
     public UserBean get(String userId) {
@@ -64,5 +66,34 @@ public class UserFacade implements IUserFacade, Serializable {
         return rVal;
     }
 
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public UserBean initNewUser(JwtClaims claims) {
+        log.info("Init new user with attributes:{}", claims);
+        try {
+            //create user
+            UserBean newUser = new UserBean();
+            newUser.setId(claims.getSubject());
+            if (!claims.hasClaim(JWTConstants.NAME) && claims.hasClaim(JWTConstants.GIVEN_NAME) && claims.hasClaim(JWTConstants.SURNAME)) {
+                newUser.setFullName(claims.getStringClaimValue(JWTConstants.GIVEN_NAME) + " " + claims.getStringClaimValue(JWTConstants.SURNAME));
+            } else if (claims.hasClaim(JWTConstants.NAME)) {
+                newUser.setFullName(claims.getStringClaimValue(JWTConstants.NAME));
+            }
+            if (claims.hasClaim(JWTConstants.EMAIL)) {
+                newUser.setEmail(claims.getStringClaimValue(JWTConstants.EMAIL));
+            }
+            newUser.setAdmin(false);
 
+            storage.createUser(newUser);
+            return newUser;
+        } catch (MalformedClaimException e) {
+            log.error("Invalid claims in JWT: {}", e.getMessage());
+            throw ExceptionFactory.unauthorizedException();
+        }
+    }
+
+    @Override
+    public UserBean getCurrentUser() {
+        return get(securityContext.getCurrentUser());
+    }
 }

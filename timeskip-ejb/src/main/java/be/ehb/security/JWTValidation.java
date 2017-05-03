@@ -1,20 +1,17 @@
 package be.ehb.security;
 
 import be.ehb.configuration.IAppConfig;
-import be.ehb.utils.CustomCollectors;
-import be.ehb.utils.KeyUtils;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import be.ehb.factories.ExceptionFactory;
+import be.ehb.security.idp.IIdpClient;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.jwt.consumer.JwtContext;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
+import java.security.Key;
 
 /**
  * @author Guillaume Vandecasteele
@@ -24,10 +21,10 @@ import javax.inject.Inject;
 @Default
 public class JWTValidation {
 
-    private static final String MASTER_REALM = "master";
-
     @Inject
     private IAppConfig config;
+    @Inject
+    private IIdpClient idpClient;
 
     public JwtContext getUnvalidatedContext(String jwt) throws InvalidJwtException, MalformedClaimException {
         return new JwtConsumerBuilder()
@@ -39,28 +36,18 @@ public class JWTValidation {
     }
 
     public JwtContext getValidatedContext(String jwt) throws InvalidJwtException, MalformedClaimException {
-        //Get the IDP public key
-
-        return new JwtConsumerBuilder()
-                .setSkipAllValidators()
-                .setVerificationKey(KeyUtils.getPublicKey(createKeycloakClient().realm(config.getIdpRealm()).keys().getKeyMetadata().getKeys().stream()
-                        .filter(key -> key.getKid().equals(config.getIdpKeystoreId()))
-                        .collect(CustomCollectors.getSingleResult())
-                        .getPublicKey()))
-                .build()
-                .process(jwt);
-    }
-
-    private Keycloak createKeycloakClient() {
-        return KeycloakBuilder.builder()
-                .serverUrl(config.getIdpServerUrl())
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .realm(MASTER_REALM)
-                .clientId(config.getIdpAdminClientId())
-                .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10)
-                        .build())
-                .clientSecret(config.getIdpAdminClientSecret())
-                .build();
+        Key publicKey = idpClient.getPublicKey(config.getIdpRealm(), config.getIdpKeystoreId());
+        if (publicKey != null) {
+            return new JwtConsumerBuilder()
+                    .setAllowedClockSkewInSeconds(10)
+                    .setExpectedAudience(config.getIdpClient())
+                    .setVerificationKey(idpClient.getPublicKey(config.getIdpRealm(), config.getIdpKeystoreId()))
+                    .build()
+                    .process(jwt);
+        }
+        else {
+            throw ExceptionFactory.jwtValidationException("Could not retrieve public key for signature validation");
+        }
     }
 
 }

@@ -112,11 +112,6 @@
          <artifactId>jboss-servlet-api_3.0_spec</artifactId>
       </dependency>
 
-       <dependency>
-           <groupId>javax.ws.rs</groupId>
-           <artifactId>javax.ws.rs-api</artifactId>
-       </dependency>
-
    </dependencies>
 
    <build>

@@ -82,6 +82,7 @@ public class AppConfig implements Serializable, IAppConfig {
                 log.info("IDP admin secret: ***************{}", getIdpAdminClientSecret().substring(getIdpAdminClientSecret().length() - 5));
                 log.info("IDP keystore ID: {}", getIdpKeystoreId());
                 log.info("IDP Client: {}", getIdpClient());
+                log.info("Validate JWT: {}", getValidateJWT());
                 log.info("Notification mail will be send from: {}", getNotificationMailFrom());
                 log.info("====================================================================================");
             } catch (Exception ex) {
@@ -138,5 +139,10 @@ public class AppConfig implements Serializable, IAppConfig {
     @Override
     public String getIdpClient() {
         return config.getString(IConfig.IDP_CLIENT);
+    }
+
+    @Override
+    public boolean getValidateJWT() {
+        return config.getBoolean(IConfig.SECURITY_JWT_VALIDATION);
     }
 }

@@ -2,19 +2,14 @@ package be.ehb.security;
 
 import be.ehb.entities.identity.UserBean;
 import be.ehb.facades.IUserFacade;
-import be.ehb.facades.UserFacade;
+import be.ehb.factories.ExceptionFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import java.io.Serializable;
-import java.util.Set;
 
 /**
  * @author Guillaume Vandecasteele
@@ -22,9 +17,7 @@ import java.util.Set;
  */
 @SessionScoped
 @Default
-public class SecurityContext implements ISecurityContext, Serializable {
-
-    private static final Logger log = LoggerFactory.getLogger(SecurityContext.class);
+public class SecurityContext extends AbstractSecurityContext {
 
     @Inject
     private IUserFacade userFacade;
@@ -36,45 +29,59 @@ public class SecurityContext implements ISecurityContext, Serializable {
             UserBean userName = userFacade.get(currentUser);
             if (userName == null) {
                 currentUser = "";
+                clearPermissions();
             }
         } else {
             currentUser = "";
+            clearPermissions();
         }
         return currentUser;
     }
 
     @Override
     public String setCurrentUser(JwtClaims claims) {
-        return null;
+        try {
+            this.currentUser = claims.getSubject() != null ? claims.getSubject() : "";
+            //calling get to perform a validation
+            try {
+                return getCurrentUser();
+            }
+            catch (Exception ex) {
+                try {
+                    userFacade.initNewUser(claims);
+                    return currentUser;
+                }
+                catch (Exception e) {
+                    log.error("Unable to create new user: {}", e.getMessage());
+                    throw ExceptionFactory.userNotFoundException(currentUser);
+                }
+            }
+        }
+        catch (MalformedClaimException ex) {
+            throw ExceptionFactory.jwtValidationException("Invalid JWT claims");
+        }
     }
 
     @Override
     public String setCurrentUser(String userName) {
-        return null;
-    }
-
-    @Override
-    public String getFullName() {
-        return null;
+        this.currentUser = userName;
+        return getCurrentUser();
     }
 
     @Override
     public String getEmail() {
-        return null;
+        return userFacade.get(currentUser).getEmail();
     }
 
     @Override
     public boolean isAdmin() {
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(PermissionType permission, String organizationId) {
-        return false;
-    }
-
-    @Override
-    public Set<String> getPermittedOrganizations(PermissionType permission) {
-        return null;
+        boolean rval = false;
+        if (StringUtils.isNotEmpty(currentUser)) {
+            UserBean user = userFacade.get(currentUser);
+            if (user != null && user.getAdmin() != null) {
+                rval = user.getAdmin();
+            }
+        }
+        return rval;
     }
 }

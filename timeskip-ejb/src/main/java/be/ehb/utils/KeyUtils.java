@@ -1,13 +1,9 @@
 package be.ehb.utils;
 
-import org.bouncycastle.util.io.pem.PemReader;
+import org.bouncycastle.util.encoders.Base64;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
@@ -16,15 +12,17 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class KeyUtils {
 
-    public static PublicKey getPublicKey(String pubKey) {
-        try {
-            PemReader pemReader = new PemReader(new StringReader(pubKey));
-            byte[] content = pemReader.readPemObject().getContent();
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(content);
+    public static PublicKey getPublicKey(String key){
+        try{
+            byte[] byteKey = Base64.decode(key.getBytes());
+            //byte[] byteKey = Base64.decode(key.getBytes(), Base64.DEFAULT);
+            X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
-            return kf.generatePublic(spec);
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            return null;
+            return kf.generatePublic(X509publicKey);
         }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 }

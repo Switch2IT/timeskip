@@ -24,4 +24,6 @@ public interface IAppConfig {
     String getIdpKeystoreId();
 
     String getIdpClient();
+
+    boolean getValidateJWT();
 }

@@ -6,15 +6,25 @@ package be.ehb.model.activities;
  */
 public class ActivityDTO {
 
-    private String id;
+    private Long id;
+    private String name;
     private String description;
+    private String projectId;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -23,6 +33,14 @@ public class ActivityDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 
     @Override
@@ -43,8 +61,10 @@ public class ActivityDTO {
     @Override
     public String toString() {
         return "ActivityDTO{" +
-                "id='" + id + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", projectId='" + projectId + '\'' +
                 '}';
     }
 }

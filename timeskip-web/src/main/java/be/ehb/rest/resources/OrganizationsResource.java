@@ -72,6 +72,9 @@ public class OrganizationsResource {
     public OrganizationDTO createOrganization(@ApiParam OrganizationDTO organization) {
         Preconditions.checkNotNull(organization, "Organization request must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(organization.getName()), "Organization name must be provided");
+        if (!securityContext.isAdmin()) {
+            throw ExceptionFactory.unauthorizedException();
+        }
         return orgFacade.createOrganization(organization);
     }
 
@@ -124,7 +127,7 @@ public class OrganizationsResource {
     @Path("/{organizationId}")
     public void deleteOrganization(@PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        if (!securityContext.hasPermission(PermissionType.ORG_ADMIN, organizationId)) {
+        if (!securityContext.isAdmin()) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         orgFacade.deleteOrganization(organizationId);

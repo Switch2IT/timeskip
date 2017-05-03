@@ -46,6 +46,12 @@ INSERT INTO permissions (role_id, permissions) VALUES ('hr', 7);
 
 INSERT INTO permissions (role_id, permissions) VALUES ('hr', 8);
 
+INSERT INTO permissions (role_id, permissions) VALUES ('hr', 9);
+
+INSERT INTO permissions (role_id, permissions) VALUES ('hr', 10);
+
+INSERT INTO permissions (role_id, permissions) VALUES ('hr', 11);
+
 INSERT INTO permissions (role_id, permissions) VALUES ('manager', 0);
 
 INSERT INTO permissions (role_id, permissions) VALUES ('manager', 1);
@@ -64,10 +70,17 @@ INSERT INTO permissions (role_id, permissions) VALUES ('manager', 7);
 
 INSERT INTO permissions (role_id, permissions) VALUES ('manager', 8);
 
+INSERT INTO permissions (role_id, permissions) VALUES ('manager', 9);
+
+INSERT INTO permissions (role_id, permissions) VALUES ('manager', 10);
+
+INSERT INTO permissions (role_id, permissions) VALUES ('manager', 11);
+
 INSERT INTO permissions (role_id, permissions) VALUES ('consultant', 0);
 
 INSERT INTO permissions (role_id, permissions) VALUES ('consultant', 3);
 
 INSERT INTO permissions (role_id, permissions) VALUES ('consultant', 6);
 
-INSERT INTO permissions (role_id, permissions) VALUES ('consultant', 7);
+INSERT INTO permissions (role_id, permissions) VALUES ('consultant', 9);
+
