@@ -1,8 +1,5 @@
 package be.ehb.model.users;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
@@ -11,7 +8,8 @@ public class UserDTO {
 
     private String id;
     private String email;
-    private String name;
+    private String fullName;
+    private Boolean admin;
 
     public String getId() {
         return id;
@@ -29,12 +27,20 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
     }
 
     @Override
@@ -57,7 +63,8 @@ public class UserDTO {
         return "UserDTO{" +
                 "id='" + id + '\'' +
                 ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", admin=" + admin +
                 '}';
     }
 }

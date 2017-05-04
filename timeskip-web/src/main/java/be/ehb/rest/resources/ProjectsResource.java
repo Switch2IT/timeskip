@@ -1,19 +1,16 @@
 package be.ehb.rest.resources;
 
 import be.ehb.facades.IProjectFacade;
-import be.ehb.facades.ISecurityFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.model.activities.ActivityDTO;
-import be.ehb.model.organizations.OrganizationDTO;
 import be.ehb.model.projects.ProjectDTO;
 import be.ehb.model.responses.ErrorResponse;
-import be.ehb.security.Permission;
+import be.ehb.security.ISecurityContext;
+import be.ehb.security.PermissionType;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -33,7 +30,7 @@ public class ProjectsResource {
     @Inject
     private IProjectFacade projectFacade;
     @Inject
-    private ISecurityFacade securityFacade;
+    private ISecurityContext securityContext;
 
     @ApiOperation(value = "List projects",
             notes = "Return a list of projects")
@@ -58,7 +55,7 @@ public class ProjectsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public ProjectDTO getProject(@PathParam("projectId") String projectId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(projectId), "Project ID must be provided");
-        if (!securityFacade.hasPermission(Permission.PROJECT_VIEW, projectId)) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, projectId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
         return projectFacade.getProject(projectId);
@@ -78,7 +75,8 @@ public class ProjectsResource {
         Preconditions.checkArgument(StringUtils.isNotEmpty(project.getName()), "Project name must be provided");
         Preconditions.checkArgument(project.getOrganizations() != null && !project.getOrganizations().isEmpty(), "At least one organiztion must be provided");
         project.getOrganizations().forEach(org -> {
-            if (!securityFacade.hasPermission(Permission.ORG_EDIT, org.getId())) throw ExceptionFactory.unauthorizedException(org.getId());
+            if (!securityContext.hasPermission(PermissionType.ORG_EDIT, org.getId()))
+                throw ExceptionFactory.unauthorizedException(org.getId());
         });
         return projectFacade.createProject(project);
     }
@@ -95,13 +93,14 @@ public class ProjectsResource {
     public ProjectDTO updateProject(@ApiParam ProjectDTO project) {
         Preconditions.checkNotNull(project, "Request body must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(project.getId()), "Project ID must be provided");
-        if (!securityFacade.hasPermission(Permission.PROJECT_EDIT, project.getId())) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, project.getId())) {
             throw ExceptionFactory.unauthorizedException(project.getId());
         }
         Preconditions.checkArgument(StringUtils.isNotEmpty(project.getName()), "Project name must be provided");
         Preconditions.checkArgument(project.getOrganizations() != null && !project.getOrganizations().isEmpty(), "At least one organiztion must be provided");
         project.getOrganizations().forEach(org -> {
-            if (!securityFacade.hasPermission(Permission.ORG_EDIT, org.getId())) throw ExceptionFactory.unauthorizedException(org.getId());
+            if (!securityContext.hasPermission(PermissionType.ORG_EDIT, org.getId()))
+                throw ExceptionFactory.unauthorizedException(org.getId());
         });
         return projectFacade.updateProject(project);
     }
@@ -118,10 +117,10 @@ public class ProjectsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public ProjectDTO patchProject(@PathParam("projectId") String projectId, @ApiParam ProjectDTO project) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(projectId), "Project ID must be provided");
-        if (!securityFacade.hasPermission(Permission.PROJECT_EDIT, projectId)) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, projectId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
-        Preconditions.checkNotNull(project,"Request body must not be empty");
+        Preconditions.checkNotNull(project, "Request body must not be empty");
         project.setId(projectId);
         return projectFacade.updateProject(project);
     }
@@ -137,7 +136,7 @@ public class ProjectsResource {
     @Path("/{projectId}")
     public void deleteProject(@PathParam("projectId") String projectId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(projectId));
-        if (!securityFacade.hasPermission(Permission.PROJECT_ADMIN, projectId)) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_ADMIN, projectId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
         projectFacade.deleteProject(projectId);
@@ -154,7 +153,7 @@ public class ProjectsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<ActivityDTO> listProjectActivities(@PathParam("projectId") String projectId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(projectId), "Project ID must be provided");
-        if (!securityFacade.hasPermission(Permission.PROJECT_VIEW, projectId)) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, projectId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
         return projectFacade.listProjectActivities(projectId);
@@ -172,10 +171,9 @@ public class ProjectsResource {
     public ActivityDTO getActivity(@PathParam("projectId") String projectId, @PathParam("activityId") String activityId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(projectId), "Project ID must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(activityId), "Activity ID must be provided");
-        if (!securityFacade.hasPermission(Permission.PROJECT_VIEW, projectId)) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, projectId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
-        }
-        else if (!securityFacade.hasPermission(Permission.ACTIVITY_VIEW, activityId)) {
+        } else if (!securityContext.hasPermission(PermissionType.ACTIVITY_VIEW, activityId)) {
             throw ExceptionFactory.unauthorizedException(activityId);
         }
         return projectFacade.getActivity(projectId, activityId);
@@ -193,7 +191,7 @@ public class ProjectsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public ActivityDTO createActivity(@PathParam("projectId") String projectID, @ApiParam ActivityDTO activity) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(projectID), "Project ID must be provided");
-        if (!securityFacade.hasPermission(Permission.PROJECT_EDIT, projectID)) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, projectID)) {
             throw ExceptionFactory.unauthorizedException(projectID);
         }
         Preconditions.checkNotNull(activity, "Request body must not be empty");

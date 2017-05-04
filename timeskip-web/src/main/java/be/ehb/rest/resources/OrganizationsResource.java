@@ -1,17 +1,15 @@
 package be.ehb.rest.resources;
 
 import be.ehb.facades.IOrganizationFacade;
-import be.ehb.facades.ISecurityFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.model.organizations.OrganizationDTO;
 import be.ehb.model.responses.ErrorResponse;
-import be.ehb.security.Permission;
+import be.ehb.security.ISecurityContext;
+import be.ehb.security.PermissionType;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -31,7 +29,7 @@ public class OrganizationsResource {
     @Inject
     private IOrganizationFacade orgFacade;
     @Inject
-    private ISecurityFacade securityFacade;
+    private ISecurityContext securityContext;
 
     @ApiOperation(value = "List organizations",
             notes = "Return a list of organizations")
@@ -56,7 +54,7 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OrganizationDTO getOrganization(@PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        if (!securityFacade.hasPermission(Permission.ORG_VIEW, organizationId)) {
+        if (!securityContext.hasPermission(PermissionType.ORG_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         return orgFacade.getOrganization(organizationId);
@@ -74,6 +72,9 @@ public class OrganizationsResource {
     public OrganizationDTO createOrganization(@ApiParam OrganizationDTO organization) {
         Preconditions.checkNotNull(organization, "Organization request must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(organization.getName()), "Organization name must be provided");
+        if (!securityContext.isAdmin()) {
+            throw ExceptionFactory.unauthorizedException();
+        }
         return orgFacade.createOrganization(organization);
     }
 
@@ -89,7 +90,7 @@ public class OrganizationsResource {
     public OrganizationDTO updateOrganization(@ApiParam OrganizationDTO organization) {
         Preconditions.checkNotNull(organization, "Organization request must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(organization.getId()), "Organization ID must be provided");
-        if (!securityFacade.hasPermission(Permission.ORG_EDIT, organization.getId())) {
+        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organization.getId())) {
             throw ExceptionFactory.unauthorizedException(organization.getId());
         }
         Preconditions.checkArgument(StringUtils.isNotEmpty(organization.getName()), "Organization name must be provided");
@@ -108,7 +109,7 @@ public class OrganizationsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public OrganizationDTO patchOrganization(@PathParam("organizationId") String organizationId, @ApiParam OrganizationDTO organization) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        if (!securityFacade.hasPermission(Permission.ORG_EDIT, organizationId)) {
+        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         organization.setId(organizationId);
@@ -126,7 +127,7 @@ public class OrganizationsResource {
     @Path("/{organizationId}")
     public void deleteOrganization(@PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        if (!securityFacade.hasPermission(Permission.ORG_ADMIN, organizationId)) {
+        if (!securityContext.isAdmin()) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         orgFacade.deleteOrganization(organizationId);

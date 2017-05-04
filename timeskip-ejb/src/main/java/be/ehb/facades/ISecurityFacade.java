@@ -1,6 +1,6 @@
 package be.ehb.facades;
 
-import be.ehb.security.Permission;
+import be.ehb.security.PermissionType;
 
 /**
  * @author Guillaume Vandecasteele
@@ -8,6 +8,6 @@ import be.ehb.security.Permission;
  */
 public interface ISecurityFacade {
 
-    boolean hasPermission(Permission permission, String entityId);
+    boolean hasPermission(PermissionType permissionType, String entityId);
 
 }
