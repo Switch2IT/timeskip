@@ -29,12 +29,10 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.Set;
 
-//import be.ehb.servlets.CORSFilter;
-
 /**
  * A class extending {@link Application} and annotated with @ApplicationPath is the Java EE 7 "no XML" approach to activating
  * JAX-RS.
- * 
+ * <p>
  * <p>
  * Resources are served relative to the servlet path specified in the {@link ApplicationPath} annotation.
  * </p>
@@ -46,7 +44,7 @@ public class JaxRsActivator extends Application {
      * We based ourselves on http://jmchung.github.io/blog/2013/12/14/integrating-swagger-into-jax-rs-with-java-ee-6-specification/
      * for the integration of swagger with the web app maven archetype
      *
-     * @return
+     * @return Set of classes
      */
     @Override
     public Set<Class<?>> getClasses() {

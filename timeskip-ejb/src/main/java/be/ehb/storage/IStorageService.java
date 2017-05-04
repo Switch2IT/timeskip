@@ -7,6 +7,7 @@ import be.ehb.entities.organizations.OrganizationMembershipBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.security.PermissionBean;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,6 +31,9 @@ public interface IStorageService {
     //Update
 
     //Delete
+
+    //List
+    List<UserBean> listUsers();
 
     //Queries
 

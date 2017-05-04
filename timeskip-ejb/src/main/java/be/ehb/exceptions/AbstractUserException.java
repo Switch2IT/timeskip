@@ -1,20 +1,20 @@
 package be.ehb.exceptions;
 
-public abstract class AbstractUserException extends AbstractRestException {
+abstract class AbstractUserException extends AbstractRestException {
 
 
-    public AbstractUserException() {
+    AbstractUserException() {
     }
 
-    public AbstractUserException(String message) {
+    AbstractUserException(String message) {
         super(message);
     }
 
-    public AbstractUserException(Throwable cause) {
+    AbstractUserException(Throwable cause) {
         super(cause);
     }
 
-    public AbstractUserException(String message, Throwable cause) {
+    AbstractUserException(String message, Throwable cause) {
         super(message, cause);
     }
 

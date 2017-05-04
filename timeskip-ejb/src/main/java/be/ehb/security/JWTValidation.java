@@ -44,8 +44,7 @@ public class JWTValidation {
                     .setVerificationKey(idpClient.getPublicKey(config.getIdpRealm(), config.getIdpKeystoreId()))
                     .build()
                     .process(jwt);
-        }
-        else {
+        } else {
             throw ExceptionFactory.jwtValidationException("Could not retrieve public key for signature validation");
         }
     }

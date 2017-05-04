@@ -12,15 +12,14 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class KeyUtils {
 
-    public static PublicKey getPublicKey(String key){
-        try{
+    public static PublicKey getPublicKey(String key) {
+        try {
             byte[] byteKey = Base64.decode(key.getBytes());
             //byte[] byteKey = Base64.decode(key.getBytes(), Base64.DEFAULT);
             X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
             return kf.generatePublic(X509publicKey);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

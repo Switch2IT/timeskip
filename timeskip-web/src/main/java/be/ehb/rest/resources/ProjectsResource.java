@@ -120,7 +120,7 @@ public class ProjectsResource {
         if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, projectId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
-        Preconditions.checkNotNull(project,"Request body must not be empty");
+        Preconditions.checkNotNull(project, "Request body must not be empty");
         project.setId(projectId);
         return projectFacade.updateProject(project);
     }

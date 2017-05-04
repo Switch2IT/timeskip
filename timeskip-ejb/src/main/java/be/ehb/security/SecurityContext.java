@@ -41,24 +41,17 @@ public class SecurityContext extends AbstractSecurityContext {
     @Override
     public String setCurrentUser(JwtClaims claims) {
         try {
-            this.currentUser = claims.getSubject() != null ? claims.getSubject() : "";
-            //calling get to perform a validation
-            try {
-                return getCurrentUser();
-            }
-            catch (Exception ex) {
-                try {
-                    userFacade.initNewUser(claims);
-                    return currentUser;
-                }
-                catch (Exception e) {
-                    log.error("Unable to create new user: {}", e.getMessage());
-                    throw ExceptionFactory.userNotFoundException(currentUser);
-                }
-            }
-        }
-        catch (MalformedClaimException ex) {
+            return setCurrentUser(claims.getSubject() != null ? claims.getSubject() : "");
+        } catch (MalformedClaimException ex) {
             throw ExceptionFactory.jwtValidationException("Invalid JWT claims");
+        } catch (Exception ex) {
+            try {
+                userFacade.initNewUser(claims);
+                return currentUser;
+            } catch (Exception e) {
+                log.error("Unable to create new user: {}", e.getMessage());
+                throw ExceptionFactory.userNotFoundException(currentUser);
+            }
         }
     }
 

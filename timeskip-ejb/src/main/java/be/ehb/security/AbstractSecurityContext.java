@@ -15,25 +15,23 @@ import java.util.HashSet;
  */
 public abstract class AbstractSecurityContext implements ISecurityContext, Serializable {
 
-    protected static Logger log = LoggerFactory.getLogger(AbstractSecurityContext.class);
+    static Logger log = LoggerFactory.getLogger(AbstractSecurityContext.class);
 
-    protected IndexedPermissions permissions;
+    private IndexedPermissions permissions;
 
     @Inject
     private IStorageService storage;
 
     @Override
     public boolean hasPermission(PermissionType permission, String organizationId) {
-        if (isAdmin())
-            return true;
-        return getPermissions().hasQualifiedPermission(permission, organizationId);
+        return isAdmin() || getPermissions().hasQualifiedPermission(permission, organizationId);
     }
 
     private IndexedPermissions getPermissions() {
         IndexedPermissions rval = permissions;
         if (rval == null) {
             rval = loadPermissions();
-            permissions=rval;
+            permissions = rval;
         }
         return rval;
     }
@@ -43,16 +41,16 @@ public abstract class AbstractSecurityContext implements ISecurityContext, Seria
         try {
             return new IndexedPermissions(getStorage().getPermissions(userId));
         } catch (StorageException e) {
-            log.error("Error loading permissions for user: {}; cause: {}",userId, e);
+            log.error("Error loading permissions for user: {}; cause: {}", userId, e);
             return new IndexedPermissions(new HashSet<>());
         }
     }
 
-    protected void clearPermissions() {
+    void clearPermissions() {
         permissions = null;
     }
 
-    public IStorageService getStorage() {
+    private IStorageService getStorage() {
         return storage;
     }
 

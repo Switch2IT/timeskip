@@ -12,34 +12,39 @@ public interface IOrganizationFacade {
 
     /**
      * Retrieve a list of all organizations
-     * @return
+     *
+     * @return List of organizations
      */
     List<OrganizationDTO> listOrganizations();
 
     /**
      * Get an organization by id
-     * @param organizationId
-     * @return
+     *
+     * @param organizationId the organization ID
+     * @return Organization
      */
     OrganizationDTO getOrganization(String organizationId);
 
     /**
      * Get or create an organization
-     * @param organization
-     * @return
+     *
+     * @param organization the organization
+     * @return Organization
      */
     OrganizationDTO createOrganization(OrganizationDTO organization);
 
     /**
      * Update an organization
-     * @param organization
-     * @return
+     *
+     * @param organization the organization
+     * @return Organization
      */
     OrganizationDTO updateOrganization(OrganizationDTO organization);
 
     /**
      * Delete an organization
-     * @param organizationId
+     *
+     * @param organizationId the organization id
      */
     void deleteOrganization(String organizationId);
 

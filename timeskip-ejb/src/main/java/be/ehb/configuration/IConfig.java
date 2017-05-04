@@ -4,7 +4,7 @@ package be.ehb.configuration;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public interface IConfig {
+interface IConfig {
 
     String PROP_FILE_DATE = "date";
     String PROP_FILE_VERSION = "version";

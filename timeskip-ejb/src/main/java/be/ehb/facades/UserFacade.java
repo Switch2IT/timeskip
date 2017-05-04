@@ -1,9 +1,11 @@
 package be.ehb.facades;
 
 import be.ehb.entities.identity.UserBean;
+import be.ehb.factories.DtoFactory;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.model.requests.JWTParseRequest;
 import be.ehb.model.responses.TokenClaimsResponse;
+import be.ehb.model.users.UserDTO;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.JWTConstants;
 import be.ehb.security.JWTValidation;
@@ -19,6 +21,8 @@ import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Guillaume Vandecasteele
@@ -37,6 +41,11 @@ public class UserFacade implements IUserFacade, Serializable {
     private IStorageService storage;
     @Inject
     private ISecurityContext securityContext;
+
+    @Override
+    public List<UserDTO> listUsers() {
+        return storage.listUsers().stream().map(DtoFactory::createUserDTO).collect(Collectors.toList());
+    }
 
     @Override
     public UserBean get(String userId) {
@@ -93,7 +102,7 @@ public class UserFacade implements IUserFacade, Serializable {
     }
 
     @Override
-    public UserBean getCurrentUser() {
-        return get(securityContext.getCurrentUser());
+    public UserDTO getCurrentUser() {
+        return DtoFactory.createUserDTO(get(securityContext.getCurrentUser()));
     }
 }

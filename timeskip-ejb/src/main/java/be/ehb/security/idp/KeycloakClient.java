@@ -28,8 +28,6 @@ public class KeycloakClient implements IIdpClient {
 
     private static final Logger log = LoggerFactory.getLogger(KeycloakClient.class);
 
-    private static final String MASTER_REALM = "master";
-
     @Inject
     private IAppConfig config;
 
@@ -40,8 +38,7 @@ public class KeycloakClient implements IIdpClient {
                     .filter(key -> key != null && StringUtils.isNotEmpty(key.getKid()) && key.getKid().equals(keystoreId))
                     .collect(CustomCollectors.getSingleResult())
                     .getPublicKey());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             log.error("Could not retrieve IDP public key {} for realm {}", keystoreId, realm);
             return null;
@@ -52,7 +49,7 @@ public class KeycloakClient implements IIdpClient {
         return KeycloakBuilder.builder()
                 .serverUrl(config.getIdpServerUrl())
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .realm(MASTER_REALM)
+                .realm(config.getIdpRealm())
                 .clientId(config.getIdpAdminClientId())
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10)
                         .build())

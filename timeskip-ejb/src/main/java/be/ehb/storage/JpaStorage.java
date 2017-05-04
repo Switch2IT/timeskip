@@ -14,6 +14,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.persistence.NoResultException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,6 +45,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public UserBean createUser(UserBean user) {
         return super.create(user);
+    }
+
+    @Override
+    public List<UserBean> listUsers() {
+        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
     }
 
     @Override

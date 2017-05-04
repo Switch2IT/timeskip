@@ -32,9 +32,12 @@ public class RequestFilter implements ContainerRequestFilter {
     private static final String SWAGGER_DOC_JSON = "/swagger.json";
     private static final String SYSTEM_PATH = "/system";
 
-    @Inject private ISecurityContext securityContext;
-    @Inject private IAppConfig config;
-    @Inject private JWTValidation jwtValidation;
+    @Inject
+    private ISecurityContext securityContext;
+    @Inject
+    private IAppConfig config;
+    @Inject
+    private JWTValidation jwtValidation;
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
@@ -43,11 +46,9 @@ public class RequestFilter implements ContainerRequestFilter {
         //Filter requests to intercept JWT. Allow calls to system info
         if (path.startsWith(BASE_PATH + SYSTEM_PATH)) {
             //complete the request
-        }
-        else if (path.startsWith(BASE_PATH + SWAGGER_DOC_JSON)) {
+        } else if (path.startsWith(BASE_PATH + SWAGGER_DOC_JSON)) {
             //complete the request
-        }
-        else {
+        } else {
             String jwt = containerRequestContext.getHeaderString(HEADER_USER_AUTHORIZATION);
             if (jwt != null) {
                 //remove Bearer prefix
@@ -57,8 +58,7 @@ public class RequestFilter implements ContainerRequestFilter {
                     JwtClaims jwtClaims;
                     if (config.getValidateJWT()) {
                         jwtClaims = jwtValidation.getValidatedContext(jwt).getJwtClaims();
-                    }
-                    else {
+                    } else {
                         jwtClaims = jwtValidation.getUnvalidatedContext(jwt).getJwtClaims();
                     }
                     validatedUser = securityContext.setCurrentUser(jwtClaims);

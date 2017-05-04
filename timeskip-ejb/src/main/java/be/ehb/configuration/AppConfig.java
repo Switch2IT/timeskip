@@ -42,7 +42,7 @@ public class AppConfig implements Serializable, IAppConfig {
         initConfig(null);
     }
 
-    public void initConfig(ConfigBean optionalConfig) {
+    private void initConfig(ConfigBean optionalConfig) {
         ConfigBean defaultConfig;
         if (optionalConfig == null) {
             defaultConfig = storage.getDefaultConfig();

@@ -4,18 +4,18 @@ public abstract class AbstractRestException extends RuntimeException {
 
     private transient String serverStack;
 
-    public AbstractRestException() {
+    AbstractRestException() {
     }
 
-    public AbstractRestException(String message) {
+    AbstractRestException(String message) {
         super(message);
     }
 
-    public AbstractRestException(Throwable cause) {
+    AbstractRestException(Throwable cause) {
         super(cause);
     }
 
-    public AbstractRestException(String message, Throwable cause) {
+    AbstractRestException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -23,7 +23,7 @@ public abstract class AbstractRestException extends RuntimeException {
         return serverStack;
     }
 
-   public void setServerStack(String stacktrace) {
+    public void setServerStack(String stacktrace) {
         this.serverStack = stacktrace;
     }
 

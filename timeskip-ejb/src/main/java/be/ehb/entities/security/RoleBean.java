@@ -21,8 +21,8 @@ public class RoleBean {
     private String description;
     @Column(name = "auto_grant")
     private Boolean autoGrant;
-    @ElementCollection(fetch=FetchType.EAGER)
-    @CollectionTable(name="permissions", joinColumns=@JoinColumn(name="role_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "permissions", joinColumns = @JoinColumn(name = "role_id"))
     private Set<PermissionType> permissions;
 
     public String getId() {

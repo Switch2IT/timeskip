@@ -20,11 +20,12 @@
 
 INSERT INTO config VALUES (1, '/opt/wildfly/standalone/configuration/applications.conf', TRUE);
 
-INSERT INTO roles (id, auto_grant, description, name) VALUES ('consultant', true, 'Automatically granted to a new user.', 'Consultant');
+INSERT INTO roles (id, auto_grant, description, name)
+VALUES ('consultant', TRUE, 'Automatically granted to a new user.', 'Consultant');
 
-INSERT INTO roles (id, auto_grant, description, name) VALUES ('hr', null, 'HR Personnel.', 'HR');
+INSERT INTO roles (id, auto_grant, description, name) VALUES ('hr', NULL, 'HR Personnel.', 'HR');
 
-INSERT INTO roles (id, auto_grant, description, name) VALUES ('manager', null, 'Managers.', 'Manager');
+INSERT INTO roles (id, auto_grant, description, name) VALUES ('manager', NULL, 'Managers.', 'Manager');
 
 -- PERMISSIONS
 
