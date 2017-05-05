@@ -1,7 +1,7 @@
 package be.ehb.security.idp;
 
 import be.ehb.configuration.IAppConfig;
-import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.utils.CustomCollectors;
 import be.ehb.utils.KeyUtils;
@@ -58,7 +58,7 @@ public class KeycloakClient implements IIdpClient {
         rep.setUsername(rep.getEmail());
         Keycloak client = createKeycloakClient();
         client.realm(config.getIdpRealm()).users().create(rep);
-        List<UserRepresentation> reps = client.realm(config.getIdpRealm()).users().search(user.getEmail(), user.getName(), user.getSurname(), user.getEmail(), null, null);
+        List<UserRepresentation> reps = client.realm(config.getIdpRealm()).users().search(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), null, null);
         if (reps == null || reps.isEmpty()) {
             throw ExceptionFactory.idpException();
         }

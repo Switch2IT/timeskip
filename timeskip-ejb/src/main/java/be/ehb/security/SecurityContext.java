@@ -1,6 +1,6 @@
 package be.ehb.security;
 
-import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.facades.IUserFacade;
 import be.ehb.factories.ExceptionFactory;
 import org.apache.commons.lang3.StringUtils;

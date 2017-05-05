@@ -1,6 +1,6 @@
 package be.ehb.security.idp;
 
-import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.users.UserBean;
 
 import java.security.Key;
 

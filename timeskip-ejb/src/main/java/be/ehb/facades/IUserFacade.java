@@ -1,6 +1,6 @@
 package be.ehb.facades;
 
-import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.model.requests.JWTParseRequest;
 import be.ehb.model.requests.NewUserRequest;
 import be.ehb.model.responses.TokenClaimsResponse;

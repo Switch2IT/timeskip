@@ -1,8 +1,8 @@
 package be.ehb.factories;
 
-import be.ehb.entities.identity.UserBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.model.responses.MembershipResponse;
 import be.ehb.model.responses.RoleResponse;
 import be.ehb.model.responses.UserResponse;
@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,11 +43,11 @@ public class ResponseFactory {
         if (user != null) {
             rval = new UserResponse();
             rval.setId(user.getId());
-            rval.setName(user.getName());
+            rval.setFirstName(user.getFirstName());
             rval.setEmail(user.getEmail());
-            rval.setSurname(user.getSurname());
+            rval.setLastName(user.getLastName());
             rval.setDefaultHoursPerDay(user.getDefaultHoursPerDay());
-            rval.setWorkDays(user.getWorkDays());
+            rval.setWorkDays(user.getWorkdays());
             rval.setMemberships(createMembershipResponses(user.getMemberships()));
             rval.setAdmin(user.getAdmin());
         }

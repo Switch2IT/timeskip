@@ -16,12 +16,14 @@ public class UserResponse implements Serializable {
 
     private String id;
     private String email;
-    private String name;
-    private String surname;
+    private String firstName;
+    private String lastName;
     private Boolean admin;
     private List<MembershipResponse> memberships;
+    private PayGradeResponse payGrade;
     private Double defaultHoursPerDay;
     private Set<DayOfWeek> workDays;
+    private Long defaultActivity;
 
     public String getId() {
         return id;
@@ -39,20 +41,20 @@ public class UserResponse implements Serializable {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Boolean getAdmin() {
@@ -87,17 +89,35 @@ public class UserResponse implements Serializable {
         this.workDays = workDays;
     }
 
+    public Long getDefaultActivity() {
+        return defaultActivity;
+    }
+
+    public void setDefaultActivity(Long defaultActivity) {
+        this.defaultActivity = defaultActivity;
+    }
+
+    public PayGradeResponse getPayGrade() {
+        return payGrade;
+    }
+
+    public void setPayGrade(PayGradeResponse payGrade) {
+        this.payGrade = payGrade;
+    }
+
     @Override
     public String toString() {
         return "UserResponse{" +
                 "id='" + id + '\'' +
                 ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", admin=" + admin +
                 ", memberships=" + memberships +
+                ", payGrade=" + payGrade +
                 ", defaultHoursPerDay=" + defaultHoursPerDay +
                 ", workDays=" + workDays +
+                ", defaultActivity=" + defaultActivity +
                 '}';
     }
 }

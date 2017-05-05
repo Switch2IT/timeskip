@@ -1,10 +1,10 @@
 package be.ehb.storage;
 
 import be.ehb.entities.config.ConfigBean;
-import be.ehb.entities.identity.UserBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
 import org.slf4j.Logger;

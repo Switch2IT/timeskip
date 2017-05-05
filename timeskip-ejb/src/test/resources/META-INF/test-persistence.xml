@@ -27,10 +27,28 @@
         <!-- The datasource is deployed as WEB-INF/test-ds.xml,
            you can find it in the source at src/test/resources/test-ds.xml -->
         <jta-data-source>java:jboss/datasources/timeskipTestDS</jta-data-source>
+        <class>be.ehb.entities.projects.ActivityBean</class>
+        <class>be.ehb.entities.config.ConfigBean</class>
+        <class>be.ehb.entities.organizations.MembershipBean</class>
+        <class>be.ehb.entities.organizations.OrganizationBean</class>
+        <class>be.ehb.entities.users.PaygradeBean</class>
+        <class>be.ehb.entities.projects.ProjectBean</class>
+        <class>be.ehb.entities.security.RoleBean</class>
+        <class>be.ehb.entities.users.UserBean</class>
+        <class>be.ehb.entities.projects.WorklogBean</class>
+
         <properties>
             <!-- Properties for Hibernate -->
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
             <property name="hibernate.show_sql" value="false"/>
+            <property name="toplink.jdbc.url" value="jdbc:mysql://localhost:3306/timeskip"/>
+            <property name="toplink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/timeskip"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+            <property name="openjpa.ConnectionURL" value="jdbc:mysql://localhost:3306/timeskip"/>
+            <property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver"/>
+            <property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost:3306/timeskip"/>
+            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         </properties>
     </persistence-unit>
 </persistence>

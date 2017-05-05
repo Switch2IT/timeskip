@@ -1,29 +1,33 @@
 package be.ehb.entities.security;
 
 import be.ehb.security.PermissionType;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", schema = "timeskip")
 public class RoleBean {
 
     @Id
+    @Column(name = "id", nullable = false)
     private String id;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "description")
-    private String description;
     @Column(name = "auto_grant")
     private Boolean autoGrant;
+    @Lob
+    @Column(name = "description")
+    @Type(type = "org.hibernate.type.TextType")
+    private String description;
+    @Column(name = "name")
+    private String name;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "permissions", joinColumns = @JoinColumn(name = "role_id"))
-    private Set<PermissionType> permissions;
+    private List<PermissionType> permissions;
 
     public String getId() {
         return id;
@@ -31,22 +35,6 @@ public class RoleBean {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Boolean getAutoGrant() {
@@ -57,11 +45,27 @@ public class RoleBean {
         this.autoGrant = autoGrant;
     }
 
-    public Set<PermissionType> getPermissions() {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<PermissionType> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Set<PermissionType> permissions) {
+    public void setPermissions(List<PermissionType> permissions) {
         this.permissions = permissions;
     }
 
@@ -84,9 +88,9 @@ public class RoleBean {
     public String toString() {
         return "RoleBean{" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
                 ", autoGrant=" + autoGrant +
+                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
                 ", permissions=" + permissions +
                 '}';
     }

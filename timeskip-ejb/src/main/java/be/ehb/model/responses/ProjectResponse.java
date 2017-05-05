@@ -1,12 +1,12 @@
 package be.ehb.model.responses;
 
-import be.ehb.model.AbstractBaseResponse;
+import be.ehb.model.AbstractBaseNumericIdResponse;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ProjectResponse extends AbstractBaseResponse {
+public class ProjectResponse extends AbstractBaseNumericIdResponse {
 
     private Boolean allowOvertime;
     private Boolean billOvertime;

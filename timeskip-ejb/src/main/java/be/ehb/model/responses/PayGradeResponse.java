@@ -1,20 +1,28 @@
 package be.ehb.model.responses;
 
-import be.ehb.model.AbstractBaseResponse;
+import be.ehb.model.AbstractBaseNumericIdResponse;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class PayGradeResponse extends AbstractBaseResponse {
+public class PayGradeResponse extends AbstractBaseNumericIdResponse {
 
-    private Double hourly_rate;
+    private Double hourlyRate;
+
+    public Double getHourlyRate() {
+        return hourlyRate;
+    }
+
+    public void setHourlyRate(Double hourlyRate) {
+        this.hourlyRate = hourlyRate;
+    }
 
     @Override
     public String toString() {
         return "PayGradeResponse{" +
                 super.toString() +
-                ", hourly_rate=" + hourly_rate +
+                ", hourly_rate=" + hourlyRate +
                 '}';
     }
 }

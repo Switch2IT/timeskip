@@ -9,17 +9,17 @@ import java.io.Serializable;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class AbstractBaseResponse implements Serializable {
+public abstract class AbstractBaseStringIdResponse implements Serializable {
 
-    private Long id;
+    private String id;
     private String name;
     private String description;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

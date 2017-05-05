@@ -88,8 +88,8 @@ public class UsersResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(@ApiParam NewUserRequest request) {
         Preconditions.checkNotNull(request, "Request body must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "\"name\" must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getSurname()), "\"surname\" must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getFirstName()), "\"name\" must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getLastName()), "\"surname\" must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getEmail()), "\"email\" must be provided");
         Preconditions.checkNotNull(request.getMemberships(), "\"memberships\" must be provided");
         Preconditions.checkArgument(!request.getMemberships().isEmpty(), "At least one membership must be provided");

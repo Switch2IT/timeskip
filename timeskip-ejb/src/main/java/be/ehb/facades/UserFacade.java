@@ -1,6 +1,6 @@
 package be.ehb.facades;
 
-import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.JWTParseRequest;
@@ -90,9 +90,8 @@ public class UserFacade implements IUserFacade, Serializable {
             UserBean newUser = new UserBean();
             newUser.setId(claims.getSubject());
             if (!claims.hasClaim(JWTConstants.NAME) && claims.hasClaim(JWTConstants.GIVEN_NAME) && claims.hasClaim(JWTConstants.SURNAME)) {
-                newUser.setFullName(claims.getStringClaimValue(JWTConstants.GIVEN_NAME) + " " + claims.getStringClaimValue(JWTConstants.SURNAME));
-            } else if (claims.hasClaim(JWTConstants.NAME)) {
-                newUser.setFullName(claims.getStringClaimValue(JWTConstants.NAME));
+                newUser.setFirstName(claims.getStringClaimValue(JWTConstants.GIVEN_NAME));
+                newUser.setLastName(claims.getStringClaimValue(JWTConstants.SURNAME));
             }
             if (claims.hasClaim(JWTConstants.EMAIL)) {
                 newUser.setEmail(claims.getStringClaimValue(JWTConstants.EMAIL));
@@ -116,10 +115,10 @@ public class UserFacade implements IUserFacade, Serializable {
         UserBean newUser = new UserBean();
         newUser.setAdmin(false);
         newUser.setEmail(request.getEmail());
-        newUser.setName(request.getName());
-        newUser.setSurname(request.getSurname());
+        newUser.setFirstName(request.getFirstName());
+        newUser.setLastName(request.getLastName());
         newUser.setDefaultHoursPerDay(request.getDefaultHoursPerDay());
-        newUser.setWorkDays(request.getWorkDays());
+        newUser.setWorkdays(request.getWorkDays());
 
         //Create the user on the IDP and get the ID
         newUser = idpClient.createUser(newUser);

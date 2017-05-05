@@ -1,22 +1,18 @@
 package be.ehb.entities.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
 @Entity
-@Table(name = "config")
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConfigBean implements Serializable {
+@Table(name = "config", schema = "timeskip")
+public class ConfigBean {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     private Long id;
     @Column(name = "config_path", nullable = false)
     private String configPath;
