@@ -89,9 +89,11 @@ public class UserFacade implements IUserFacade, Serializable {
             //create user
             UserBean newUser = new UserBean();
             newUser.setId(claims.getSubject());
-            if (!claims.hasClaim(JWTConstants.NAME) && claims.hasClaim(JWTConstants.GIVEN_NAME) && claims.hasClaim(JWTConstants.SURNAME)) {
+            if (claims.hasClaim(JWTConstants.GIVEN_NAME) && claims.hasClaim(JWTConstants.SURNAME)) {
                 newUser.setFirstName(claims.getStringClaimValue(JWTConstants.GIVEN_NAME));
                 newUser.setLastName(claims.getStringClaimValue(JWTConstants.SURNAME));
+            } else {
+                throw ExceptionFactory.jwtValidationException("Missing claims");
             }
             if (claims.hasClaim(JWTConstants.EMAIL)) {
                 newUser.setEmail(claims.getStringClaimValue(JWTConstants.EMAIL));
