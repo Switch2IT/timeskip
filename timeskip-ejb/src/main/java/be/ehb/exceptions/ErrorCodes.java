@@ -4,27 +4,27 @@ package be.ehb.exceptions;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ErrorCodes {
+class ErrorCodes {
 
     // SYSTEM RELATED
 
-    public static final int SYSTEM_ERROR = -1;
-
-    // HTTP CODES
-
-    public static final int HTTP_STATUS_CODE_INVALID_INPUT = 400;
-    public static final int HTTP_STATUS_CODE_FORBIDDEN = 403;
-    public static final int HTTP_STATUS_CODE_NOT_FOUND = 404;
-    public static final int HTTP_STATUS_CODE_ALREADY_EXISTS = 409;
-    public static final int HTTP_STATUS_CODE_INVALID_STATE = 409;
-    public static final int HTTP_STATUS_CODE_SYSTEM_ERROR = 500;
+    static final int SYSTEM_ERROR = -1;
 
     // ORGANIZATION RELATED
 
-    public static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
+    static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
+    static final int ORGANIZATION_NOT_FOUND = 1004;
 
     // USER RELATED
 
-    public static final int USER_NOT_FOUND = 2001;
-    public static final int JWT_VALIDATION_ERROR = 2002;
+    static final int USER_NOT_FOUND = 2001;
+    static final int JWT_VALIDATION_ERROR = 2002;
+
+    // ROLE RELATED
+
+    static final int ROLE_NOT_FOUND = 3001;
+
+    // IDP RELATED
+
+    static final int IDP_ERROR = 4000;
 }

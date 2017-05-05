@@ -36,4 +36,15 @@ public class ExceptionFactory {
         return new JwtValidationException(message);
     }
 
+    public static RoleNotFoundException roleNotFoundException(String roleId) {
+        return new RoleNotFoundException(roleId);
+    }
+
+    public static OrganizationNotFoundException organizationNotFoundException(String organizationId) {
+        return new OrganizationNotFoundException(organizationId);
+    }
+
+    public static IdpException idpException() {
+        return new IdpException();
+    }
 }

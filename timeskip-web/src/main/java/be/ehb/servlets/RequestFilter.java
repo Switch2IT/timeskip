@@ -1,6 +1,7 @@
 package be.ehb.servlets;
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.factories.ResponseFactory;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.JWTValidation;
 import org.jose4j.jwt.JwtClaims;
@@ -65,10 +66,7 @@ public class RequestFilter implements ContainerRequestFilter {
                 } catch (InvalidJwtException | MalformedClaimException ex) {
                     log.error("Unauthorized user:{}", validatedUser);
                     ex.printStackTrace();
-                    containerRequestContext.abortWith(Response
-                            .status(Response.Status.UNAUTHORIZED)
-                            .entity("User cannot access the resource:" + validatedUser)
-                            .build());
+                    containerRequestContext.abortWith(ResponseFactory.buildResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "User cannot access the resource:" + validatedUser));
                 }
             } else {
                 securityContext.setCurrentUser("");

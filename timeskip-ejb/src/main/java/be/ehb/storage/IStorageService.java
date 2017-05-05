@@ -2,8 +2,8 @@ package be.ehb.storage;
 
 import be.ehb.entities.config.ConfigBean;
 import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
-import be.ehb.entities.organizations.OrganizationMembershipBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.security.PermissionBean;
 
@@ -28,6 +28,8 @@ public interface IStorageService {
 
     UserBean createUser(UserBean user);
 
+    MembershipBean createMembership(MembershipBean membership);
+
     //Update
 
     //Delete
@@ -39,7 +41,7 @@ public interface IStorageService {
 
     ConfigBean getDefaultConfig();
 
-    Set<OrganizationMembershipBean> getMemberships(String userId);
+    Set<MembershipBean> getMemberships(String userId);
 
     Set<PermissionBean> getPermissions(String userId);
 }

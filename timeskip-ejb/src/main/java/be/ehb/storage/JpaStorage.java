@@ -2,8 +2,8 @@ package be.ehb.storage;
 
 import be.ehb.entities.config.ConfigBean;
 import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
-import be.ehb.entities.organizations.OrganizationMembershipBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
@@ -48,6 +48,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public MembershipBean createMembership(MembershipBean membership) {
+        return super.create(membership);
+    }
+
+    @Override
     public List<UserBean> listUsers() {
         return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
     }
@@ -58,10 +63,10 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public Set<OrganizationMembershipBean> getMemberships(String userId) {
-        Set<OrganizationMembershipBean> rval = new HashSet<>();
+    public Set<MembershipBean> getMemberships(String userId) {
+        Set<MembershipBean> rval = new HashSet<>();
         rval.addAll(getActiveEntityManager()
-                .createQuery("SELECT m FROM OrganizationMembershipBean m WHERE m.userId = :userId")
+                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :userId")
                 .setParameter("userId", userId)
                 .getResultList());
         return rval;
@@ -70,8 +75,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public Set<PermissionBean> getPermissions(String userId) {
         Set<PermissionBean> rval = new HashSet<>();
-        Set<OrganizationMembershipBean> memberships = getMemberships(userId);
-        for (OrganizationMembershipBean membership : memberships) {
+        Set<MembershipBean> memberships = getMemberships(userId);
+        for (MembershipBean membership : memberships) {
             RoleBean role = getRole(membership.getRoleId());
             for (PermissionType permission : role.getPermissions()) {
                 PermissionBean pb = new PermissionBean();

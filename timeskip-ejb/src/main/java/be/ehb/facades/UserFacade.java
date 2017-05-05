@@ -1,14 +1,16 @@
 package be.ehb.facades;
 
 import be.ehb.entities.identity.UserBean;
-import be.ehb.factories.DtoFactory;
 import be.ehb.factories.ExceptionFactory;
+import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.JWTParseRequest;
+import be.ehb.model.requests.NewUserRequest;
 import be.ehb.model.responses.TokenClaimsResponse;
-import be.ehb.model.users.UserDTO;
+import be.ehb.model.responses.UserResponse;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.JWTConstants;
 import be.ehb.security.JWTValidation;
+import be.ehb.security.idp.IIdpClient;
 import be.ehb.storage.IStorageService;
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.jwt.JwtClaims;
@@ -41,10 +43,14 @@ public class UserFacade implements IUserFacade, Serializable {
     private IStorageService storage;
     @Inject
     private ISecurityContext securityContext;
+    @Inject
+    private IMembershipFacade membershipFacade;
+    @Inject
+    private IIdpClient idpClient;
 
     @Override
-    public List<UserDTO> listUsers() {
-        return storage.listUsers().stream().map(DtoFactory::createUserDTO).collect(Collectors.toList());
+    public List<UserResponse> listUsers() {
+        return storage.listUsers().stream().map(ResponseFactory::createUserResponse).collect(Collectors.toList());
     }
 
     @Override
@@ -77,7 +83,7 @@ public class UserFacade implements IUserFacade, Serializable {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public UserBean initNewUser(JwtClaims claims) {
+    public void initNewUser(JwtClaims claims) {
         log.info("Init new user with attributes:{}", claims);
         try {
             //create user
@@ -93,8 +99,7 @@ public class UserFacade implements IUserFacade, Serializable {
             }
             newUser.setAdmin(false);
 
-            storage.createUser(newUser);
-            return newUser;
+            newUser = storage.createUser(newUser);
         } catch (MalformedClaimException e) {
             log.error("Invalid claims in JWT: {}", e.getMessage());
             throw ExceptionFactory.unauthorizedException();
@@ -102,7 +107,27 @@ public class UserFacade implements IUserFacade, Serializable {
     }
 
     @Override
-    public UserDTO getCurrentUser() {
-        return DtoFactory.createUserDTO(get(securityContext.getCurrentUser()));
+    public UserResponse getCurrentUser() {
+        return ResponseFactory.createUserResponse(get(securityContext.getCurrentUser()));
+    }
+
+    @Override
+    public UserResponse createUser(NewUserRequest request) {
+        UserBean newUser = new UserBean();
+        newUser.setAdmin(false);
+        newUser.setEmail(request.getEmail());
+        newUser.setName(request.getName());
+        newUser.setSurname(request.getSurname());
+        newUser.setDefaultHoursPerDay(request.getDefaultHoursPerDay());
+        newUser.setWorkDays(request.getWorkDays());
+
+        //Create the user on the IDP and get the ID
+        newUser = idpClient.createUser(newUser);
+        storage.createUser(newUser);
+        String userId = newUser.getId();
+
+        //Create the memberships
+        request.getMemberships().forEach(memReq -> membershipFacade.create(userId, memReq.getOrganizationId(), memReq.getRole()));
+        return ResponseFactory.createUserResponse(newUser);
     }
 }

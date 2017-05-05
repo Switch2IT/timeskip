@@ -1,4 +1,4 @@
-package be.ehb.model.organizations;
+package be.ehb.model.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -9,10 +9,12 @@ import java.io.Serializable;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrganizationDTO implements Serializable {
+public class RoleResponse implements Serializable {
 
     private String id;
     private String name;
+    private String description;
+    private Boolean autoGrant;
 
     public String getId() {
         return id;
@@ -30,27 +32,29 @@ public class OrganizationDTO implements Serializable {
         this.name = name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof OrganizationDTO)) return false;
-
-        OrganizationDTO that = (OrganizationDTO) o;
-
-        return id != null ? id.equals(that.id) : that.id == null;
+    public String getDescription() {
+        return description;
     }
 
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getAutoGrant() {
+        return autoGrant;
+    }
+
+    public void setAutoGrant(Boolean autoGrant) {
+        this.autoGrant = autoGrant;
     }
 
     @Override
     public String toString() {
-        return "OrganizationResponse{" +
+        return "RoleResponse{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", autoGrant=" + autoGrant +
                 '}';
     }
-
 }

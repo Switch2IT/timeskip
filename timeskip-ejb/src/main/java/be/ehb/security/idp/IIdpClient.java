@@ -1,5 +1,7 @@
 package be.ehb.security.idp;
 
+import be.ehb.entities.identity.UserBean;
+
 import java.security.Key;
 
 /**
@@ -8,4 +10,6 @@ import java.security.Key;
  */
 public interface IIdpClient {
     Key getPublicKey(String realm, String keystoreId);
+
+    UserBean createUser(UserBean user);
 }

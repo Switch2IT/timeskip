@@ -1,9 +1,8 @@
-package be.ehb.entities.identity;
+package be.ehb.model.requests;
 
-import be.ehb.entities.organizations.MembershipBean;
+import be.ehb.model.responses.MembershipResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.List;
@@ -13,43 +12,15 @@ import java.util.Set;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-@Entity
-@Table(name = "users")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserBean implements Serializable {
+public class NewUserRequest implements Serializable {
 
-    @Id
-    @Column(nullable = false)
-    private String id;
-    @Column(name = "full_name")
-    private String fullName;
-    @Column(name = "email", unique = true)
     private String email;
-    @Column(name = "admin")
-    private Boolean admin;
     private String name;
     private String surname;
-    @Transient
-    private List<MembershipBean> memberships;
+    private List<MembershipResponse> memberships;
     private Double defaultHoursPerDay;
-    @Transient
     private Set<DayOfWeek> workDays;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
 
     public String getEmail() {
         return email;
@@ -57,14 +28,6 @@ public class UserBean implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Boolean getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
     }
 
     public String getName() {
@@ -83,11 +46,11 @@ public class UserBean implements Serializable {
         this.surname = surname;
     }
 
-    public List<MembershipBean> getMemberships() {
+    public List<MembershipResponse> getMemberships() {
         return memberships;
     }
 
-    public void setMemberships(List<MembershipBean> memberships) {
+    public void setMemberships(List<MembershipResponse> memberships) {
         this.memberships = memberships;
     }
 
@@ -108,27 +71,9 @@ public class UserBean implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserBean)) return false;
-
-        UserBean userBean = (UserBean) o;
-
-        return id.equals(userBean.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
     public String toString() {
-        return "UserBean{" +
-                "id='" + id + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", email='" + email + '\'' +
-                ", admin=" + admin +
+        return "NewUserRequest{" +
+                "email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", memberships=" + memberships +

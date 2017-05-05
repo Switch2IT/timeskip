@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "organization_memberships")
-public class OrganizationMembershipBean implements Serializable {
+public class MembershipBean implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,9 +56,9 @@ public class OrganizationMembershipBean implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OrganizationMembershipBean)) return false;
+        if (!(o instanceof MembershipBean)) return false;
 
-        OrganizationMembershipBean that = (OrganizationMembershipBean) o;
+        MembershipBean that = (MembershipBean) o;
 
         return id != null ? id.equals(that.id) : that.id == null;
     }
