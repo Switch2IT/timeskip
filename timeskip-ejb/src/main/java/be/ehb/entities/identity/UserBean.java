@@ -27,13 +27,17 @@ public class UserBean implements Serializable {
     private String email;
     @Column(name = "admin")
     private Boolean admin;
+    @Transient
     private String name;
+    @Transient
     private String surname;
     @Transient
     private List<MembershipBean> memberships;
+    @Transient
     private Double defaultHoursPerDay;
     @Transient
     private Set<DayOfWeek> workDays;
+
 
     public String getId() {
         return id;

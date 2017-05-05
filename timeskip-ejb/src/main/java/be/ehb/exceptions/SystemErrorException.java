@@ -1,5 +1,7 @@
 package be.ehb.exceptions;
 
+import javax.ws.rs.core.Response;
+
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
@@ -16,7 +18,7 @@ public class SystemErrorException extends AbstractSystemException {
 
     @Override
     public int getHttpCode() {
-        return ErrorCodes.HTTP_STATUS_CODE_SYSTEM_ERROR;
+        return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
     }
 
     @Override

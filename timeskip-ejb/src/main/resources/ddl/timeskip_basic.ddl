@@ -13,14 +13,6 @@ CREATE TABLE IF NOT EXISTS activity_assignments (
   activity_id BIGINT       NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS worklogs (
-  id             BIGINT       NOT NULL,
-  user_id        VARCHAR(255) NOT NULL,
-  activity_id    BIGINT       NOT NULL,
-  day            DATE         NOT NULL,
-  logged_minutes BIGINT       NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS config (
   id             BIGINT       NOT NULL,
   config_path    VARCHAR(255) NOT NULL,
@@ -68,6 +60,15 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(255) NOT NULL,
   email     VARCHAR(255) DEFAULT NULL,
   admin     BOOLEAN      DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS worklogs (
+  id             BIGINT       NOT NULL,
+  user_id        VARCHAR(255) NOT NULL,
+  activity_id    BIGINT       NOT NULL,
+  day            DATE         NOT NULL,
+  logged_minutes BIGINT       NOT NULL,
+  confirmed      BOOLEAN      DEFAULT FALSE
 );
 
 -- Unique indexes

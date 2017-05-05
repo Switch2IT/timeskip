@@ -47,4 +47,8 @@ public class ExceptionFactory {
     public static IdpException idpException() {
         return new IdpException();
     }
+
+    public static OrganizationAlreadyExistsException organizationAlreadyExistsException(String organiztionId) {
+        return new OrganizationAlreadyExistsException(organiztionId);
+    }
 }

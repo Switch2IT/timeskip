@@ -24,7 +24,7 @@ import java.io.IOException;
 @ApplicationScoped
 public class RequestFilter implements ContainerRequestFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(be.ehb.servlets.RequestFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(RequestFilter.class);
 
     private static final String HEADER_USER_AUTHORIZATION = "Authorization"; // will contain the JWT user token
 

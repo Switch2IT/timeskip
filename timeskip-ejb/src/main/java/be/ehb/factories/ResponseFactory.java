@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,6 +78,10 @@ public class ResponseFactory {
     }
 
     private static List<MembershipResponse> createMembershipResponses(List<MembershipBean> memberships) {
-        return memberships.stream().map(ResponseFactory::createMembershipResponse).collect(Collectors.toList());
+        List<MembershipResponse> rval = null;
+        if (memberships != null) {
+            rval = memberships.stream().map(ResponseFactory::createMembershipResponse).collect(Collectors.toList());
+        }
+        return rval;
     }
 }

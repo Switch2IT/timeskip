@@ -5,6 +5,7 @@ package be.ehb.configuration;
  * @since 2017
  */
 public interface IAppConfig {
+
     String getNotificationMailFrom();
 
     String getVersion();

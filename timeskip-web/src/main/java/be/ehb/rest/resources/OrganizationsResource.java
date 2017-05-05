@@ -67,7 +67,7 @@ public class OrganizationsResource {
     @ApiOperation(value = "Create organization",
             notes = "Create an organization. A name must be provided")
     @ApiResponses({
-            @ApiResponse(code = 201, message = "Created"),
+            @ApiResponse(code = 201, response = OrganizationResponse.class, message = "Created"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @POST

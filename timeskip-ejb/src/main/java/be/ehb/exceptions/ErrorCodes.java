@@ -14,6 +14,7 @@ class ErrorCodes {
 
     static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
     static final int ORGANIZATION_NOT_FOUND = 1004;
+    static final int ORGANIZATION_ALREADY_EXISTS = 1005;
 
     // USER RELATED
 
