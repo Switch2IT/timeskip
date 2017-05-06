@@ -2,6 +2,7 @@ package be.ehb.facades;
 
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.exceptions.OrganizationNotFoundException;
 import be.ehb.factories.ExceptionFactory;
@@ -91,11 +92,14 @@ public class OrganizationFacade implements IOrganizationFacade {
     public OrganizationResponse updateOrganization(String organizationId, UpdateOrganizationRequest request) {
         OrganizationBean org = storage.getOrganization(organizationId);
         boolean changed = false;
-        if (request.getDescription() != null) {
+        if (request.getDescription() != null && !request.getDescription().equals(org.getDescription())) {
             org.setDescription(request.getDescription());
             changed = true;
         }
-        if (StringUtils.isNotEmpty(request.getName())) {
+        if (StringUtils.isNotEmpty(request.getName()) && !request.getName().equals(org.getName())) {
+            if (storage.findOrganizationByName(request.getName()) != null) {
+                throw ExceptionFactory.organizationAlreadyExistsException(request.getName());
+            }
             org.setName(request.getName());
             changed = true;
         }
@@ -119,47 +123,85 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
 
     @Override
-    public ProjectResponse getProject(String organizationId, String projectId) {
+    public ProjectResponse getProject(String organizationId, Long projectId) {
         return ResponseFactory.createProjectResponse(storage.getProject(organizationId, projectId));
     }
 
     @Override
     public ProjectResponse createProject(String organizationId, NewProjectRequest request) {
+        OrganizationBean org = storage.getOrganization(organizationId);
+        if (storage.findProjectByName(organizationId, request.getName()) != null) {
+            throw ExceptionFactory.projectAlreadyExistsException(request.getName());
+        }
+        ProjectBean newProject = new ProjectBean();
+        newProject.setName(request.getName());
+        newProject.setDescription(request.getDescription());
+        newProject.setAllowOvertime(request.getAllowOvertime() == null ? true : request.getAllowOvertime());
+        newProject.setBillOvertime(request.getBillOvertime() == null ? true : request.getAllowOvertime());
+        newProject.setOrganization(org);
+
+        return ResponseFactory.createProjectResponse(storage.createProject(newProject));
+    }
+
+    @Override
+    public ProjectResponse updateProject(String organizationId, Long projectId, UpdateProjectRequest request) {
+        ProjectBean project = storage.getProject(organizationId, projectId);
+        boolean changed = false;
+        if (request.getAllowOvertime() != null && request.getAllowOvertime() != project.getAllowOvertime()) {
+            project.setAllowOvertime(request.getAllowOvertime());
+            changed = true;
+        }
+        if (request.getBillOvertime() != null && request.getBillOvertime() != project.getBillOvertime()) {
+            project.setBillOvertime(request.getBillOvertime());
+            changed = true;
+        }
+        if (request.getDescription() != null && !request.getDescription().equals(project.getDescription())) {
+            project.setDescription(request.getDescription());
+            changed = true;
+        }
+        if (StringUtils.isNotEmpty(request.getName()) && !request.getName().equals(project.getName())) {
+            if (storage.findProjectByName(organizationId, request.getName()) != null) {
+                throw ExceptionFactory.projectAlreadyExistsException(request.getName());
+            }
+            project.setName(request.getName());
+            changed = true;
+        }
+        if (changed) {
+            return ResponseFactory.createProjectResponse(storage.updateProject(project));
+        } else return null;
+    }
+
+    @Override
+    public void deleteProject(String organizationId, Long projectId) {
+        ProjectBean project = storage.getProject(organizationId, projectId);
+        storage.deleteProject(project);
+    }
+
+    @Override
+    public List<ActivityResponse> listProjectActivities(String organizationId, Long projectId) {
+        return storage.listProjectActivities(organizationId, projectId).stream()
+                .map(ResponseFactory::createActivityResponse)
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public ActivityResponse getActivity(String organizationId, Long projectId, Long activityId) {
+        return ResponseFactory.createActivityResponse(storage.getActivity(organizationId, projectId, activityId));
+    }
+
+    @Override
+    public ActivityResponse createActivity(String organizationId, Long projectID, NewActivityRequest request) {
         return null;
     }
 
     @Override
-    public ProjectResponse updateProject(String organizationId, UpdateProjectRequest request) {
+    public ActivityResponse updateActivity(String organizationId, Long projectId, Long activityId, UpdateActivityRequest request) {
         return null;
     }
 
     @Override
-    public void deleteProject(String organizationId, String projectId) {
-
-    }
-
-    @Override
-    public List<ActivityResponse> listProjectActivities(String organizationId, String projectId) {
-        return null;
-    }
-
-    @Override
-    public ActivityResponse getActivity(String organizationId, String projectId, String activityId) {
-        return null;
-    }
-
-    @Override
-    public ActivityResponse createActivity(String organizationId, String projectID, NewActivityRequest request) {
-        return null;
-    }
-
-    @Override
-    public ActivityResponse updateActivity(String organizationId, String projectId, UpdateActivityRequest request) {
-        return null;
-    }
-
-    @Override
-    public void deleteActivity(String organizationId, String projectId, String activityId) {
+    public void deleteActivity(String organizationId, Long projectId, Long activityId) {
 
     }
 }

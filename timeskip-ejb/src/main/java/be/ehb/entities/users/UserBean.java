@@ -1,7 +1,6 @@
 package be.ehb.entities.users;
 
 import be.ehb.entities.organizations.MembershipBean;
-import be.ehb.entities.projects.ActivityBean;
 
 import javax.persistence.*;
 import java.time.DayOfWeek;

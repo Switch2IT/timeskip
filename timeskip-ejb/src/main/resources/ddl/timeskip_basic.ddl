@@ -64,11 +64,11 @@ CREATE TABLE IF NOT EXISTS users (
   id                    VARCHAR(255) NOT NULL,
   first_name            VARCHAR(255) NOT NULL,
   last_name             VARCHAR(255) NOT NULL,
-  email                 VARCHAR(255) NOT NULL,
-  admin                 BOOLEAN DEFAULT FALSE,
-  paygrade_id           BIGINT  DEFAULT NULL,
-  default_hours_per_day DOUBLE  DEFAULT 8,
-  default_activity_id   BIGINT  DEFAULT NULL
+  email                 VARCHAR(255) DEFAULT NULL,
+  admin                 BOOLEAN      DEFAULT FALSE,
+  paygrade_id           BIGINT       DEFAULT NULL,
+  default_hours_per_day DOUBLE       DEFAULT 8,
+  default_activity_id   BIGINT       DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_workdays (
@@ -87,16 +87,17 @@ CREATE TABLE IF NOT EXISTS worklogs (
 
 -- Unique indexes
 
-ALTER TABLE config
-  ADD CONSTRAINT uk_config_1
-UNIQUE (default_config);
-
-ALTER TABLE memberships
-  ADD CONSTRAINT uk_organization_memberships_1
-UNIQUE (user_id, role_id, organization_id);
-
 ALTER TABLE activities
   ADD CONSTRAINT uk_activities_1 UNIQUE (project_id, name);
+
+ALTER TABLE config
+  ADD CONSTRAINT uk_config_1 UNIQUE (default_config);
+
+ALTER TABLE memberships
+  ADD CONSTRAINT uk_organization_memberships_1 UNIQUE (user_id, role_id, organization_id);
+
+ALTER TABLE organizations
+  ADD CONSTRAINT uk_organizations_1 UNIQUE (name);
 
 ALTER TABLE projects
   ADD CONSTRAINT uk_projects_1 UNIQUE (organization_id, name);

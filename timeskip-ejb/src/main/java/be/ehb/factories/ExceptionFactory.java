@@ -12,6 +12,10 @@ public class ExceptionFactory {
         return new UnauthorizedException(entityId);
     }
 
+    public static UnauthorizedException unauthorizedException(Long entityId) {
+        return new UnauthorizedException(entityId.toString());
+    }
+
     public static UnauthorizedException unauthorizedException() {
         return new UnauthorizedException();
     }
@@ -52,7 +56,19 @@ public class ExceptionFactory {
         return new OrganizationAlreadyExistsException(organiztionId);
     }
 
-    public static ProjectNotFoundException projectNotFoundException(String projectId) {
-        return new ProjectNotFoundException(projectId);
+    public static ProjectNotFoundException projectNotFoundException(Long projectId) {
+        return new ProjectNotFoundException(projectId.toString());
+    }
+
+    public static ProjectAlreadyExistsException projectAlreadyExistsException(String projectName) {
+        return new ProjectAlreadyExistsException(projectName);
+    }
+
+    public static ActivityAlreadyExistsException activityAlreadyExistsException(String name) {
+        return new ActivityAlreadyExistsException(name);
+    }
+
+    public static ActivityNotFoundException activityNotFoundException(Long id) {
+        return new ActivityNotFoundException(id.toString());
     }
 }

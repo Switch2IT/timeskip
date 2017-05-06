@@ -2,6 +2,7 @@ package be.ehb.factories;
 
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
@@ -97,6 +98,19 @@ public class ResponseFactory {
             rval.setAllowOvertime(project.getAllowOvertime());
             rval.setBillOvertime(project.getBillOvertime());
             rval.setOrganization(createOrganizationResponse(project.getOrganization()));
+        }
+        return rval;
+    }
+
+    public static ActivityResponse createActivityResponse(ActivityBean activity) {
+        ActivityResponse rval = null;
+        if (activity != null) {
+            rval = new ActivityResponse();
+            rval.setId(activity.getId());
+            rval.setName(activity.getName());
+            rval.setDescription(activity.getDescription());
+            rval.setBillable(activity.getBillable());
+            rval.setProject(createProjectResponse(activity.getProject()));
         }
         return rval;
     }

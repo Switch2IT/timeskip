@@ -3,11 +3,11 @@ package be.ehb.storage;
 import be.ehb.entities.config.ConfigBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
-import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
-import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +30,13 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(JpaStorage.class);
 
-    @Inject
-    private ISecurityContext securityContext;
+    @Override
+    public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
+        getProject(organizationId, projectId);
+        ActivityBean a = super.get(activityId, ActivityBean.class);
+        if (a == null) throw ExceptionFactory.activityNotFoundException(activityId);
+        return a;
+    }
 
     @Override
     public OrganizationBean getOrganization(String organizationId) {
@@ -42,15 +46,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public ProjectBean getProject(String organizationId, String projectId) {
-        try {
-            return (ProjectBean) getActiveEntityManager().createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.id = :projId")
-                    .setParameter("orgId", organizationId)
-                    .setParameter("projId", projectId)
-                    .getSingleResult();
-        } catch (NoResultException ex) {
-            throw ExceptionFactory.projectNotFoundException(projectId);
-        }
+    public ProjectBean getProject(String organizationId, Long projectId) {
+        getOrganization(organizationId);
+        ProjectBean p = super.get(projectId, ProjectBean.class);
+        if (p == null) throw ExceptionFactory.projectNotFoundException(projectId);
+        return p;
     }
 
     @Override
@@ -78,6 +78,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ProjectBean createProject(ProjectBean project) {
+        return super.create(project);
+    }
+
+    @Override
     public UserBean createUser(UserBean user) {
         return super.create(user);
     }
@@ -88,8 +93,28 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ProjectBean updateProject(ProjectBean project) {
+        return super.update(project);
+    }
+
+    @Override
     public void deleteOrganization(OrganizationBean organization) {
         super.delete(organization);
+    }
+
+    @Override
+    public void deleteProject(ProjectBean project) {
+        super.delete(project);
+    }
+
+    @Override
+    public List<ActivityBean> listProjectActivities(String organizationId, Long projectId) {
+        ProjectBean proj = getProject(organizationId, projectId);
+        return getActiveEntityManager()
+                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId")
+                .setParameter("orgId", proj.getOrganization().getId())
+                .setParameter("pId", proj.getId())
+                .getResultList();
     }
 
     @Override
@@ -106,9 +131,10 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public List<ProjectBean> listProjects(String organizationId) {
+        OrganizationBean org = getOrganization(organizationId);
         return getActiveEntityManager()
                 .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId")
-                .setParameter("orgId", organizationId)
+                .setParameter("orgId", org.getId())
                 .getResultList();
     }
 
@@ -158,5 +184,31 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             }
         }
         return rval;
+    }
+
+    @Override
+    public OrganizationBean findOrganizationByName(String organizationName) {
+        try {
+            return (OrganizationBean) getActiveEntityManager()
+                    .createQuery("SELECT o FROM OrganizationBean o WHERE o.name = :orgName")
+                    .setParameter("orgName", organizationName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public ProjectBean findProjectByName(String organizationId, String projectName) {
+        try {
+            return (ProjectBean) getActiveEntityManager()
+                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.name = :pName")
+                    .setParameter("orgId", organizationId)
+                    .setParameter("pName", projectName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            log.info("No project with name \"{}\" found in organization \"{}\"", organizationId, projectName);
+            return null;
+        }
     }
 }

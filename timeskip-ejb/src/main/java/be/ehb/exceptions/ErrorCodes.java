@@ -6,6 +6,11 @@ package be.ehb.exceptions;
  */
 class ErrorCodes {
 
+    // ACTIVITY RELATED
+
+    static final int ACTIVITY_NOT_FOUND = 6004;
+    static final int ACTIVITY_ALREADY_EXISTS = 6009;
+
     // IDP RELATED
 
     static final int IDP_ERROR = 4000;
@@ -19,6 +24,7 @@ class ErrorCodes {
     // PROJECT RELATED
 
     static final int PROJECT_NOT_FOUND = 5004;
+    static final int PROJECT_ALREADY_EXISTS = 5009;
 
     // ROLE RELATED
 

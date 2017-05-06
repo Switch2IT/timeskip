@@ -1,7 +1,7 @@
 package be.ehb.entities.projects;
 
-import be.ehb.entities.users.UserBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.users.UserBean;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;

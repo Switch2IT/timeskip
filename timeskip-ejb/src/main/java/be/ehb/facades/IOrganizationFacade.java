@@ -67,7 +67,7 @@ public interface IOrganizationFacade {
      * @param projectId      the project id
      * @return Project
      */
-    ProjectResponse getProject(String organizationId, String projectId);
+    ProjectResponse getProject(String organizationId, Long projectId);
 
     /**
      * Create a project
@@ -85,7 +85,7 @@ public interface IOrganizationFacade {
      * @param request        the update request
      * @return Project
      */
-    ProjectResponse updateProject(String organizationId, UpdateProjectRequest request);
+    ProjectResponse updateProject(String organizationId, Long projectId, UpdateProjectRequest request);
 
     /**
      * Delete a project
@@ -93,7 +93,7 @@ public interface IOrganizationFacade {
      * @param organizationId the organization id
      * @param projectId      the project id
      */
-    void deleteProject(String organizationId, String projectId);
+    void deleteProject(String organizationId, Long projectId);
 
     /**
      * List activities in project
@@ -102,7 +102,7 @@ public interface IOrganizationFacade {
      * @param projectId      the project id
      * @return Activity
      */
-    List<ActivityResponse> listProjectActivities(String organizationId, String projectId);
+    List<ActivityResponse> listProjectActivities(String organizationId, Long projectId);
 
     /**
      * Get activity for given ID
@@ -112,7 +112,7 @@ public interface IOrganizationFacade {
      * @param activityId     the activity id
      * @return Activity
      */
-    ActivityResponse getActivity(String organizationId, String projectId, String activityId);
+    ActivityResponse getActivity(String organizationId, Long projectId, Long activityId);
 
     /**
      * Create an activity in a project
@@ -122,7 +122,7 @@ public interface IOrganizationFacade {
      * @param request        the activity
      * @return Activity
      */
-    ActivityResponse createActivity(String organizationId, String projectID, NewActivityRequest request);
+    ActivityResponse createActivity(String organizationId, Long projectID, NewActivityRequest request);
 
     /**
      * Update an activity
@@ -132,7 +132,7 @@ public interface IOrganizationFacade {
      * @param request        the update request
      * @return Activity
      */
-    ActivityResponse updateActivity(String organizationId, String projectId, UpdateActivityRequest request);
+    ActivityResponse updateActivity(String organizationId, Long projectId, Long activityId, UpdateActivityRequest request);
 
     /**
      * Delete an activity
@@ -141,6 +141,6 @@ public interface IOrganizationFacade {
      * @param projectId      the project id
      * @param activityId     the activity ID
      */
-    void deleteActivity(String organizationId, String projectId, String activityId);
+    void deleteActivity(String organizationId, Long projectId, Long activityId);
 
 }
