@@ -25,6 +25,7 @@ class ErrorCodes {
 
     static final int PROJECT_NOT_FOUND = 5004;
     static final int PROJECT_ALREADY_EXISTS = 5009;
+    static final int PROJEC_OVERTIME_EXCEEDED = 5000;
 
     // ROLE RELATED
 
@@ -35,8 +36,13 @@ class ErrorCodes {
     static final int USER_NOT_FOUND = 2001;
     static final int JWT_VALIDATION_ERROR = 2002;
 
+    // WORKLOG RELATED
+
+    static final int WORKLOG_NOT_FOUND = 8004;
+
     // SYSTEM RELATED
 
     static final int SYSTEM_ERROR = -1;
+    static final int INVALID_DATE = 7001;
 
 }

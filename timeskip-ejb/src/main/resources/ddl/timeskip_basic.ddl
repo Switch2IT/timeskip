@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS activities (
   id          BIGINT       NOT NULL,
   name        VARCHAR(255) NOT NULL,
-  description TEXT DEFAULT NULL,
+  description TEXT    DEFAULT NULL,
   project_id  BIGINT       NOT NULL,
   billable    BOOLEAN DEFAULT TRUE
 );
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS paygrades (
 );
 
 CREATE TABLE IF NOT EXISTS permissions (
-  role_id     VARCHAR(255) NOT NULL,
-  permissions INT          NULL
+  role_id    VARCHAR(255) NOT NULL,
+  permission INT          NULL
 );
 
 CREATE TABLE IF NOT EXISTS project_assignments (
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS worklogs (
   activity_id    BIGINT       NOT NULL,
   day            DATE         NOT NULL,
   logged_minutes BIGINT       NOT NULL,
-  confirmed      BOOLEAN      DEFAULT FALSE
+  confirmed      BOOLEAN DEFAULT FALSE
 );
 
 -- Unique indexes

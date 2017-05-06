@@ -4,6 +4,7 @@ import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.model.responses.*;
@@ -20,8 +21,8 @@ import java.util.stream.Collectors;
  */
 public class ResponseFactory {
 
-    public static Response buildResponse(int httpCode, String headerName, String headerValue, Object entity) {
-        Response.ResponseBuilder builder = Response.status(httpCode);
+    public static Response buildResponse(Response.Status httpCode, String headerName, String headerValue, Object entity) {
+        Response.ResponseBuilder builder = Response.status(httpCode.getStatusCode());
         if (StringUtils.isNotEmpty(headerName) && StringUtils.isNotEmpty(headerValue)) {
             builder.header(headerName, headerValue);
         }
@@ -31,11 +32,11 @@ public class ResponseFactory {
         return builder.type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
-    public static Response buildResponse(int httpCode) {
+    public static Response buildResponse(Response.Status httpCode) {
         return buildResponse(httpCode, null, null, null);
     }
 
-    public static Response buildResponse(int httpCode, Object entity) {
+    public static Response buildResponse(Response.Status httpCode, Object entity) {
         return buildResponse(httpCode, null, null, entity);
     }
 
@@ -111,6 +112,20 @@ public class ResponseFactory {
             rval.setDescription(activity.getDescription());
             rval.setBillable(activity.getBillable());
             rval.setProject(createProjectResponse(activity.getProject()));
+        }
+        return rval;
+    }
+
+    public static WorklogResponse createWorklogResponse(WorklogBean worklog) {
+        WorklogResponse rval = null;
+        if (worklog != null) {
+            rval = new WorklogResponse();
+            rval.setId(worklog.getId());
+            rval.setActivity(createActivityResponse(worklog.getActivity()));
+            rval.setConfirmed(worklog.getConfirmed());
+            rval.setDay(worklog.getDay());
+            rval.setLoggedMinutes(worklog.getLoggedMinutes());
+            rval.setUserId(worklog.getUserId());
         }
         return rval;
     }

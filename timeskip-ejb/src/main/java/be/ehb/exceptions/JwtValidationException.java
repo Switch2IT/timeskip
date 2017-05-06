@@ -1,12 +1,10 @@
 package be.ehb.exceptions;
 
-import javax.ws.rs.core.Response;
-
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class JwtValidationException extends AbstractUserException {
+public class JwtValidationException extends AbstractSecurityException {
 
     public JwtValidationException(String message) {
         super(message);
@@ -14,11 +12,6 @@ public class JwtValidationException extends AbstractUserException {
 
     public JwtValidationException(Throwable cause) {
         super(cause);
-    }
-
-    @Override
-    public int getHttpCode() {
-        return Response.Status.FORBIDDEN.getStatusCode();
     }
 
     @Override

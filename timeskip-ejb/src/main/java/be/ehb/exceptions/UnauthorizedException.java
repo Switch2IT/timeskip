@@ -1,14 +1,13 @@
 package be.ehb.exceptions;
 
-import javax.ws.rs.core.Response;
-
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class UnauthorizedException extends AbstractUserException {
+public class UnauthorizedException extends AbstractSecurityException {
 
     public UnauthorizedException() {
+        super();
     }
 
     public UnauthorizedException(String message) {
@@ -19,13 +18,9 @@ public class UnauthorizedException extends AbstractUserException {
         super(cause);
     }
 
+
     public UnauthorizedException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    @Override
-    public int getHttpCode() {
-        return Response.Status.FORBIDDEN.getStatusCode();
     }
 
     @Override

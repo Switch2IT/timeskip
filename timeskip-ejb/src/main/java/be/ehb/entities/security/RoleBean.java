@@ -27,6 +27,7 @@ public class RoleBean {
     private String name;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "permissions", joinColumns = @JoinColumn(name = "role_id"))
+    @Column(name = "permission")
     private List<PermissionType> permissions;
 
     public String getId() {

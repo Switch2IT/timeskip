@@ -71,4 +71,16 @@ public class ExceptionFactory {
     public static ActivityNotFoundException activityNotFoundException(Long id) {
         return new ActivityNotFoundException(id.toString());
     }
+
+    public static InvalidDateException invalidDateException(String message) {
+        return new InvalidDateException(message);
+    }
+
+    public static NoOverTimeAllowedException noOverTimeAllowedException(String projectName) {
+        return new NoOverTimeAllowedException(projectName);
+    }
+
+    public static WorklogNotFoundException worklogNotFoundException(Long worklogId) {
+        return new WorklogNotFoundException(worklogId.toString());
+    }
 }

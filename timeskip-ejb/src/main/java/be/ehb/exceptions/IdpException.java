@@ -20,8 +20,8 @@ public class IdpException extends AbstractSystemException {
     }
 
     @Override
-    public int getHttpCode() {
-        return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+    public Response.Status getHttpCode() {
+        return Response.Status.INTERNAL_SERVER_ERROR;
     }
 
     @Override
