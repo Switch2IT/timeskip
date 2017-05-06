@@ -26,7 +26,7 @@ abstract class AbstractAlreadyExistsException extends AbstractRestException {
     }
 
     @Override
-    public int getHttpCode() {
-        return Response.Status.CONFLICT.getStatusCode();
+    public Response.Status getHttpCode() {
+        return Response.Status.CONFLICT;
     }
 }

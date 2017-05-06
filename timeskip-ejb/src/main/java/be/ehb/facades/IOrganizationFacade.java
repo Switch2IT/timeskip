@@ -41,7 +41,7 @@ public interface IOrganizationFacade {
      * Update an organization
      *
      * @param organizationId the organization id
-     * @param request the update request
+     * @param request        the update request
      * @return Organization
      */
     OrganizationResponse updateOrganization(String organizationId, UpdateOrganizationRequest request);
@@ -131,7 +131,7 @@ public interface IOrganizationFacade {
      * @param organizationId the organization id
      * @param projectId      the project id
      * @param request        the update request
-     * @return Activity
+     * @return the updated activity
      */
     ActivityResponse updateActivity(String organizationId, Long projectId, Long activityId, UpdateActivityRequest request);
 
@@ -140,9 +140,29 @@ public interface IOrganizationFacade {
      *
      * @param organizationId the organization id
      * @param projectId      the project id
-     * @param activityId     the activity ID
+     * @param activityId     the activity id
      */
     void deleteActivity(String organizationId, Long projectId, Long activityId);
+
+    /**
+     * List worklogs for an activity
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param activityId     the activity id
+     */
+    List<WorklogResponse> listActivityWorklogs(String organizationId, Long projectId, Long activityId);
+
+    /**
+     * Get a worklog
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param activityId     the activity id
+     * @param worklogId      the worklog id
+     * @return the worklog
+     */
+    WorklogResponse getWorklog(String organizationId, Long projectId, Long activityId, Long worklogId);
 
     /**
      * Log work on an activity
@@ -154,4 +174,34 @@ public interface IOrganizationFacade {
      * @return Worklog response
      */
     WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewWorklogRequest request);
+
+    /**
+     * Update a worklog
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param activityId     the activity id
+     * @param request        the update request
+     * @return the updated worklog
+     */
+    WorklogResponse updateWorklog(String organizationId, Long projectId, Long activityId, UpdateWorklogRequest request);
+
+    /**
+     * Delete a worklog
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param activityId     the activity id
+     * @param worklogId      the worklog id
+     */
+    void deleteWorklog(String organizationId, Long projectId, Long activityId, Long worklogId);
+
+    /**
+     * Update/confirm a list of the current user's existing worklogs. Returns a list of updated worklogs. If confirming the
+     * worklog fails, the operation will continue until the list is exhausted.
+     *
+     * @param request list of update requests
+     * @return list of updated worklogs
+     */
+    List<WorklogResponse> updateCurrentUserWorklogs(UpdateCurrentUserWorklogRequestList request);
 }

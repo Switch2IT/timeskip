@@ -26,7 +26,7 @@ public class RequestFilter implements ContainerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(RequestFilter.class);
 
-    private static final String HEADER_USER_AUTHORIZATION = "Authorization"; // will contain the JWT user token
+    private static final String HEADER_USER_AUTHORIZATION = "Authorization";
 
     //Exclusions
     private static final String BASE_PATH = "/timeskip-web/api";
@@ -45,11 +45,7 @@ public class RequestFilter implements ContainerRequestFilter {
         log.debug("Security context - request:{}", containerRequestContext.getUriInfo().getRequestUri().getPath());
         String path = containerRequestContext.getUriInfo().getRequestUri().getPath();
         //Filter requests to intercept JWT. Allow calls to system info
-        if (path.startsWith(BASE_PATH + SYSTEM_PATH)) {
-            //complete the request
-        } else if (path.startsWith(BASE_PATH + SWAGGER_DOC_JSON)) {
-            //complete the request
-        } else {
+        if (!(path.startsWith(BASE_PATH + SYSTEM_PATH) || path.startsWith(BASE_PATH + SWAGGER_DOC_JSON))) {
             String jwt = containerRequestContext.getHeaderString(HEADER_USER_AUTHORIZATION);
             if (jwt != null) {
                 //remove Bearer prefix
@@ -66,7 +62,7 @@ public class RequestFilter implements ContainerRequestFilter {
                 } catch (InvalidJwtException | MalformedClaimException ex) {
                     log.error("Unauthorized user:{}", validatedUser);
                     ex.printStackTrace();
-                    containerRequestContext.abortWith(ResponseFactory.buildResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "User cannot access the resource:" + validatedUser));
+                    containerRequestContext.abortWith(ResponseFactory.buildResponse(Response.Status.UNAUTHORIZED, "User cannot access the resource:" + validatedUser));
                 }
             } else {
                 securityContext.setCurrentUser("");

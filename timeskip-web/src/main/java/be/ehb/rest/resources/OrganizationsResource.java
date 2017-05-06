@@ -4,10 +4,7 @@ import be.ehb.facades.IOrganizationFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.*;
-import be.ehb.model.responses.ActivityResponse;
-import be.ehb.model.responses.ErrorResponse;
-import be.ehb.model.responses.OrganizationResponse;
-import be.ehb.model.responses.ProjectResponse;
+import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionType;
 import com.google.common.base.Preconditions;
@@ -20,6 +17,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import static javax.ws.rs.core.Response.Status.*;
 
 /**
  * @author Guillaume Vandecasteele
@@ -44,7 +43,7 @@ public class OrganizationsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response listOrganizations() {
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.listOrganizations());
+        return ResponseFactory.buildResponse(OK, orgFacade.listOrganizations());
     }
 
     @ApiOperation(value = "Get organization",
@@ -61,7 +60,7 @@ public class OrganizationsResource {
         if (!securityContext.hasPermission(PermissionType.ORG_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.get(organizationId));
+        return ResponseFactory.buildResponse(OK, orgFacade.get(organizationId));
     }
 
     @ApiOperation(value = "Create organization",
@@ -76,7 +75,7 @@ public class OrganizationsResource {
     public Response createOrganization(@ApiParam NewOrganizationRequest request) {
         Preconditions.checkNotNull(request, "Organization request must be provided");
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "\"name\" must be provided");
-        return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createOrganization(request));
+        return ResponseFactory.buildResponse(CREATED, orgFacade.createOrganization(request));
     }
 
     @ApiOperation(value = "Update organization",
@@ -95,7 +94,7 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         Preconditions.checkNotNull(request, "Request body must be provided");
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.updateOrganization(organizationId, request));
+        return ResponseFactory.buildResponse(OK, orgFacade.updateOrganization(organizationId, request));
     }
 
     @ApiOperation(value = "Delete organization",
@@ -108,11 +107,11 @@ public class OrganizationsResource {
     @Path("/{organizationId}")
     public Response deleteOrganization(@PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        if (!securityContext.isAdmin()) {
+        if (!securityContext.hasPermission(PermissionType.ORG_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         orgFacade.deleteOrganization(organizationId);
-        return ResponseFactory.buildResponse(Response.Status.NO_CONTENT.getStatusCode());
+        return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     @ApiOperation(value = "List projects",
@@ -129,7 +128,7 @@ public class OrganizationsResource {
         if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.listProjects(organizationId));
+        return ResponseFactory.buildResponse(OK, orgFacade.listProjects(organizationId));
     }
 
     @ApiOperation(value = "Get project",
@@ -147,7 +146,7 @@ public class OrganizationsResource {
         if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.getProject(organizationId, projectId));
+        return ResponseFactory.buildResponse(OK, orgFacade.getProject(organizationId, projectId));
     }
 
     @ApiOperation(value = "Create project",
@@ -167,7 +166,7 @@ public class OrganizationsResource {
         if (!securityContext.hasPermission(PermissionType.PROJECT_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createProject(organizationId, request));
+        return ResponseFactory.buildResponse(CREATED, orgFacade.createProject(organizationId, request));
     }
 
     @ApiOperation(value = "Update project",
@@ -187,7 +186,7 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         Preconditions.checkNotNull(request, "Request body must not be empty");
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.updateProject(organizationId, projectId, request));
+        return ResponseFactory.buildResponse(OK, orgFacade.updateProject(organizationId, projectId, request));
     }
 
 
@@ -206,7 +205,7 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         orgFacade.deleteProject(organizationId, projectId);
-        return ResponseFactory.buildResponse(Response.Status.NO_CONTENT.getStatusCode());
+        return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     @ApiOperation(value = "List project activities",
@@ -224,7 +223,7 @@ public class OrganizationsResource {
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.listProjectActivities(organizationId, projectId));
+        return ResponseFactory.buildResponse(OK, orgFacade.listProjectActivities(organizationId, projectId));
     }
 
     @ApiOperation(value = "Get activity",
@@ -243,7 +242,7 @@ public class OrganizationsResource {
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.getActivity(organizationId, projectId, activityId));
+        return ResponseFactory.buildResponse(OK, orgFacade.getActivity(organizationId, projectId, activityId));
     }
 
     @ApiOperation(value = "Create activity",
@@ -264,7 +263,7 @@ public class OrganizationsResource {
         }
         Preconditions.checkNotNull(request, "Request body must not be empty");
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "\"description\" must be provided");
-        return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createActivity(organizationId, projectId, request));
+        return ResponseFactory.buildResponse(CREATED, orgFacade.createActivity(organizationId, projectId, request));
     }
 
     @ApiOperation(value = "Patch activity",
@@ -286,13 +285,13 @@ public class OrganizationsResource {
         }
         Preconditions.checkNotNull(request, "Request body must not be empty");
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "\"description\" must be provided");
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.updateActivity(organizationId, projectId, activityId, request));
+        return ResponseFactory.buildResponse(OK, orgFacade.updateActivity(organizationId, projectId, activityId, request));
     }
 
     @ApiOperation(value = "Delete activity",
             notes = "Delete an activity.")
     @ApiResponses({
-            @ApiResponse(code = 204, message = "Succesful, no content"),
+            @ApiResponse(code = 204, message = "Deleted"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @DELETE
@@ -305,12 +304,51 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         orgFacade.deleteActivity(organizationId, projectId, activityId);
-        return ResponseFactory.buildResponse(Response.Status.NO_CONTENT.getStatusCode());
+        return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
-    @ApiOperation(value = "Log work", notes = "Create a worklog entry on an activity. Day and logged minutes must be provided. If the log is unconfirmed a reminder will be sent at a pre-configured date.")
+    @ApiOperation(value = "List activity worklogs",
+            notes = "Retrieves a list of worklogs the user is permitted to see for a given activity.")
     @ApiResponses({
-            @ApiResponse(code = 201, message = "Created"),
+            @ApiResponse(code = 200, responseContainer = "List", response = WorklogResponse.class, message = "Successful"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listActivityWorklogs(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        if (!securityContext.hasPermission(PermissionType.WORKLOG_VIEW, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
+        return ResponseFactory.buildResponse(CREATED, orgFacade.listActivityWorklogs(organizationId, projectId, activityId));
+    }
+
+    @ApiOperation(value = "Get worklog", notes = "Retrieve a worklog for a give ID.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = WorklogResponse.class, message = "Succesful"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkNotNull(worklogId, "Worklog ID must be provided");
+        if (!securityContext.hasPermission(PermissionType.WORKLOG_VIEW, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
+        return ResponseFactory.buildResponse(OK, orgFacade.getWorklog(organizationId, projectId, activityId, worklogId));
+    }
+
+    @ApiOperation(value = "Create worklog",
+            notes = "Create a worklog entry on an activity. Day and logged minutes must be provided. If the log is unconfirmed a reminder will be sent at a pre-configured date.")
+    @ApiResponses({
+            @ApiResponse(code = 201, response = WorklogResponse.class, message = "Created"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @POST
@@ -328,6 +366,44 @@ public class OrganizationsResource {
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDay()), "\"day\" must be provided");
         Preconditions.checkArgument(request.getLoggedMinutes() != null, "\"loggedMinutes\" must be provided");
         Preconditions.checkArgument(request.getLoggedMinutes() > 0, "\"loggedMinutes\" must be greater than 0");
-        return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createWorkLog(organizationId, projectId, activityId, request));
+        return ResponseFactory.buildResponse(CREATED, orgFacade.createWorkLog(organizationId, projectId, activityId, request));
+    }
+
+    @ApiOperation(value = "Update worklog",
+            notes = "Update a worklog")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = WorklogResponse.class, message = "Updated"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @PATCH
+    @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId, UpdateWorklogRequest request) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkNotNull(worklogId, "Worklog ID must be provided");
+        if (!securityContext.hasPermission(PermissionType.WORKLOG_EDIT, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
+        Preconditions.checkNotNull(request, "Request body must be provided");
+        return ResponseFactory.buildResponse(OK, orgFacade.updateWorklog(organizationId, projectId, activityId, request));
+    }
+
+    @ApiOperation(value = "Delete worklog",
+            notes = "Delete a worklog.")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Deleted"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @DELETE
+    @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
+    public Response deleteWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId) {
+        if (!securityContext.hasPermission(PermissionType.WORKLOG_ADMIN, organizationId)) {
+            throw ExceptionFactory.unauthorizedException();
+        }
+        orgFacade.deleteWorklog(organizationId, projectId, activityId, worklogId);
+        return ResponseFactory.buildResponse(NO_CONTENT);
     }
 }

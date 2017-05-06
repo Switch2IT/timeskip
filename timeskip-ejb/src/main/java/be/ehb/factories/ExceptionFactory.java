@@ -79,4 +79,8 @@ public class ExceptionFactory {
     public static NoOverTimeAllowedException noOverTimeAllowedException(String projectName) {
         return new NoOverTimeAllowedException(projectName);
     }
+
+    public static WorklogNotFoundException worklogNotFoundException(Long worklogId) {
+        return new WorklogNotFoundException(worklogId.toString());
+    }
 }

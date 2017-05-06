@@ -70,6 +70,22 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public WorklogBean getWorklog(String organizationId, Long projectId, Long activityId, Long worklogId) {
+        ActivityBean activity = getActivity(organizationId, projectId, activityId);
+        WorklogBean worklog = super.get(worklogId, WorklogBean.class);
+        if (worklog == null || !worklog.getActivity().equals(activity))
+            throw ExceptionFactory.worklogNotFoundException(worklogId);
+        return worklog;
+    }
+
+    @Override
+    public WorklogBean getWorklog(Long worklogId) {
+        WorklogBean worklog = super.get(worklogId, WorklogBean.class);
+        if (worklog == null) throw ExceptionFactory.worklogNotFoundException(worklogId);
+        return worklog;
+    }
+
+    @Override
     public ActivityBean createActivity(ActivityBean activity) {
         return super.create(activity);
     }
@@ -110,13 +126,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public void deleteActivity(ActivityBean activity) {
-        super.delete(activity);
+    public ProjectBean updateProject(ProjectBean project) {
+        return super.update(project);
     }
 
     @Override
-    public ProjectBean updateProject(ProjectBean project) {
-        return super.update(project);
+    public WorklogBean updateWorklog(WorklogBean worklog) {
+        return super.update(worklog);
+    }
+
+    @Override
+    public void deleteActivity(ActivityBean activity) {
+        super.delete(activity);
     }
 
     @Override
@@ -127,6 +148,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public void deleteProject(ProjectBean project) {
         super.delete(project);
+    }
+
+    @Override
+    public void deleteWorklog(WorklogBean worklog) {
+        super.delete(worklog);
     }
 
     @Override
@@ -157,6 +183,15 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         return getActiveEntityManager()
                 .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId")
                 .setParameter("orgId", org.getId())
+                .getResultList();
+    }
+
+    @Override
+    public List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId) {
+        ActivityBean activity = getActivity(organizationId, projectId, activityId);
+        return getActiveEntityManager()
+                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity")
+                .setParameter("activity", activity)
                 .getResultList();
     }
 

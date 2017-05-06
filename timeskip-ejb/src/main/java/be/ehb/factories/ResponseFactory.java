@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
  */
 public class ResponseFactory {
 
-    public static Response buildResponse(int httpCode, String headerName, String headerValue, Object entity) {
-        Response.ResponseBuilder builder = Response.status(httpCode);
+    public static Response buildResponse(Response.Status httpCode, String headerName, String headerValue, Object entity) {
+        Response.ResponseBuilder builder = Response.status(httpCode.getStatusCode());
         if (StringUtils.isNotEmpty(headerName) && StringUtils.isNotEmpty(headerValue)) {
             builder.header(headerName, headerValue);
         }
@@ -32,11 +32,11 @@ public class ResponseFactory {
         return builder.type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
-    public static Response buildResponse(int httpCode) {
+    public static Response buildResponse(Response.Status httpCode) {
         return buildResponse(httpCode, null, null, null);
     }
 
-    public static Response buildResponse(int httpCode, Object entity) {
+    public static Response buildResponse(Response.Status httpCode, Object entity) {
         return buildResponse(httpCode, null, null, entity);
     }
 

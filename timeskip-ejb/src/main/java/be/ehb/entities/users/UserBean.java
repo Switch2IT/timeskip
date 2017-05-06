@@ -39,7 +39,7 @@ public class UserBean {
     @Column(name = "default_activity_id")
     private Long defaultActivity;
     @OneToMany
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private List<MembershipBean> memberships;
 
     public String getId() {

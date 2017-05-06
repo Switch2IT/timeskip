@@ -36,6 +36,10 @@ class ErrorCodes {
     static final int USER_NOT_FOUND = 2001;
     static final int JWT_VALIDATION_ERROR = 2002;
 
+    // WORKLOG RELATED
+
+    static final int WORKLOG_NOT_FOUND = 8004;
+
     // SYSTEM RELATED
 
     static final int SYSTEM_ERROR = -1;

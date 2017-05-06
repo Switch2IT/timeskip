@@ -25,7 +25,7 @@ public abstract class AbstractInvalidInputException extends AbstractRestExceptio
     }
 
     @Override
-    public int getHttpCode() {
-        return Response.Status.BAD_REQUEST.getStatusCode();
+    public Response.Status getHttpCode() {
+        return Response.Status.BAD_REQUEST;
     }
 }

@@ -32,6 +32,6 @@ public class NullPointerExceptionMapper implements ExceptionMapper<NullPointerEx
             throw data;
         }
         error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
-        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST.getStatusCode(), "X-Timeskip-Error", "true", error);
+        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error);
     }
 }

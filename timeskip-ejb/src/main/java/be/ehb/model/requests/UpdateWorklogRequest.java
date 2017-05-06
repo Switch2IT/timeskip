@@ -1,21 +1,19 @@
-package be.ehb.model.responses;
+package be.ehb.model.requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WorklogResponse implements Serializable {
+public class UpdateWorklogRequest implements Serializable {
 
     private Long id;
     private String userId;
-    private ActivityResponse activity;
-    private Date day;
+    private String day;
     private Long loggedMinutes;
     private Boolean confirmed;
 
@@ -35,19 +33,11 @@ public class WorklogResponse implements Serializable {
         this.userId = userId;
     }
 
-    public ActivityResponse getActivity() {
-        return activity;
-    }
-
-    public void setActivity(ActivityResponse activity) {
-        this.activity = activity;
-    }
-
-    public Date getDay() {
+    public String getDay() {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(String day) {
         this.day = day;
     }
 
@@ -69,11 +59,10 @@ public class WorklogResponse implements Serializable {
 
     @Override
     public String toString() {
-        return "WorklogResponse{" +
+        return "UpdateWorklogRequest{" +
                 "id=" + id +
                 ", userId='" + userId + '\'' +
-                ", activity=" + activity +
-                ", day=" + day +
+                ", day='" + day + '\'' +
                 ", loggedMinutes=" + loggedMinutes +
                 ", confirmed=" + confirmed +
                 '}';

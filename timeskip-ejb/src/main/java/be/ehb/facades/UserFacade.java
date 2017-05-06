@@ -55,11 +55,7 @@ public class UserFacade implements IUserFacade, Serializable {
 
     @Override
     public UserBean get(String userId) {
-        UserBean rval = storage.getUser(userId);
-        if (rval == null) {
-            throw ExceptionFactory.userNotFoundException(userId);
-        }
-        return rval;
+        return storage.getUser(userId);
     }
 
     @Override
@@ -100,7 +96,7 @@ public class UserFacade implements IUserFacade, Serializable {
             }
             newUser.setAdmin(false);
 
-            newUser = storage.createUser(newUser);
+            storage.createUser(newUser);
         } catch (MalformedClaimException e) {
             log.error("Invalid claims in JWT: {}", e.getMessage());
             throw ExceptionFactory.unauthorizedException();

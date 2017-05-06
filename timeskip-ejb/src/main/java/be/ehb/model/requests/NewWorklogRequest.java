@@ -1,10 +1,15 @@
 package be.ehb.model.requests;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.io.Serializable;
+
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class NewWorklogRequest {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class NewWorklogRequest implements Serializable {
 
     private String day;
     private Long loggedMinutes;
