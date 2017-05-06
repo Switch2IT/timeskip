@@ -55,6 +55,12 @@ The application will be running at the following URL: <http://localhost:8080/tim
         
 ## Release Notes
 
+### v0.2
+
+* Added CRUD endpoints for organizations, projects, activities and worklogs
+* Added user-related endpoints (get current user, parse JWT, create user)
+* Keycloak IDP integration
+* System status endpoint
 
 ### v0.1
 
