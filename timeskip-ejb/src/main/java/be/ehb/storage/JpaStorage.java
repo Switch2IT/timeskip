@@ -5,6 +5,7 @@ import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.persistence.NoResultException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,6 +92,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public UserBean createUser(UserBean user) {
         return super.create(user);
+    }
+
+    @Override
+    public WorklogBean createWorklog(WorklogBean worklog) {
+        return super.create(worklog);
     }
 
     @Override
@@ -239,5 +246,14 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             log.info("No project with name \"{}\" found in organization \"{}\"", organizationId, projectName);
             return null;
         }
+    }
+
+    @Override
+    public Long getUserLoggedMinutesForDay(String userId, Date day) {
+        return (Long) getActiveEntityManager()
+                .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
+                .setParameter("user", userId)
+                .setParameter("day", day)
+                .getSingleResult();
     }
 }

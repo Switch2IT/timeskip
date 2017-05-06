@@ -5,10 +5,12 @@ import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.security.PermissionBean;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +35,8 @@ public interface IStorageService {
     OrganizationBean createOrganization(OrganizationBean organization);
     ProjectBean createProject(ProjectBean project);
     UserBean createUser(UserBean user);
+
+    WorklogBean createWorklog(WorklogBean worklog);
 
     //Update
 
@@ -63,4 +67,6 @@ public interface IStorageService {
     ActivityBean findActivityByName(String organizationId, Long projectId, String activityName);
     OrganizationBean findOrganizationByName(String organizationName);
     ProjectBean findProjectByName(String organizationId, String projectName);
+
+    Long getUserLoggedMinutesForDay(String userId, Date day);
 }

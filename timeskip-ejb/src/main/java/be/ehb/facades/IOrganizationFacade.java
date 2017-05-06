@@ -4,6 +4,7 @@ import be.ehb.model.requests.*;
 import be.ehb.model.responses.ActivityResponse;
 import be.ehb.model.responses.OrganizationResponse;
 import be.ehb.model.responses.ProjectResponse;
+import be.ehb.model.responses.WorklogResponse;
 
 import java.util.List;
 
@@ -137,10 +138,20 @@ public interface IOrganizationFacade {
     /**
      * Delete an activity
      *
-     * @param organizationId the organization id\
+     * @param organizationId the organization id
      * @param projectId      the project id
      * @param activityId     the activity ID
      */
     void deleteActivity(String organizationId, Long projectId, Long activityId);
 
+    /**
+     * Log work on an activity
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param activityId     the activity id
+     * @param request        the worklog
+     * @return Worklog response
+     */
+    WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewWorklogRequest request);
 }

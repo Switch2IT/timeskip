@@ -25,6 +25,7 @@ class ErrorCodes {
 
     static final int PROJECT_NOT_FOUND = 5004;
     static final int PROJECT_ALREADY_EXISTS = 5009;
+    static final int PROJEC_OVERTIME_EXCEEDED = 5000;
 
     // ROLE RELATED
 
@@ -38,5 +39,6 @@ class ErrorCodes {
     // SYSTEM RELATED
 
     static final int SYSTEM_ERROR = -1;
+    static final int INVALID_DATE = 7001;
 
 }

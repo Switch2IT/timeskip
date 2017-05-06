@@ -4,7 +4,9 @@ import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.exceptions.OrganizationNotFoundException;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
@@ -12,9 +14,11 @@ import be.ehb.model.requests.*;
 import be.ehb.model.responses.ActivityResponse;
 import be.ehb.model.responses.OrganizationResponse;
 import be.ehb.model.responses.ProjectResponse;
+import be.ehb.model.responses.WorklogResponse;
 import be.ehb.security.ISecurityContext;
 import be.ehb.storage.IStorageService;
 import be.ehb.utils.ConventionUtil;
+import be.ehb.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,7 @@ import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -234,5 +239,25 @@ public class OrganizationFacade implements IOrganizationFacade {
     public void deleteActivity(String organizationId, Long projectId, Long activityId) {
         ActivityBean activity = storage.getActivity(organizationId, projectId, activityId);
         storage.deleteActivity(activity);
+    }
+
+    @Override
+    public WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewWorklogRequest request) {
+        ActivityBean activity = storage.getActivity(organizationId, projectId, activityId);
+        Date day = DateUtils.convertStringToDate(request.getDay());
+        UserBean user = storage.getUser(securityContext.getCurrentUser());
+        //Check if the project allows overtime and if not, check if logging this work will exceed the limit
+        if (!activity.getProject().getAllowOvertime()
+                && storage.getUserLoggedMinutesForDay(user.getId(), day) + request.getLoggedMinutes() >
+                DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
+            throw ExceptionFactory.noOverTimeAllowedException(activity.getProject().getName());
+        }
+        WorklogBean newWorklog = new WorklogBean();
+        newWorklog.setActivity(activity);
+        newWorklog.setConfirmed(request.getConfirmed() == null ? false : request.getConfirmed());
+        newWorklog.setDay(day);
+        newWorklog.setLoggedMinutes(request.getLoggedMinutes());
+        newWorklog.setUserId(user.getId());
+        return ResponseFactory.createWorklogResponse(storage.createWorklog(newWorklog));
     }
 }

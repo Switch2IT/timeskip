@@ -4,6 +4,7 @@ import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.model.responses.*;
@@ -111,6 +112,20 @@ public class ResponseFactory {
             rval.setDescription(activity.getDescription());
             rval.setBillable(activity.getBillable());
             rval.setProject(createProjectResponse(activity.getProject()));
+        }
+        return rval;
+    }
+
+    public static WorklogResponse createWorklogResponse(WorklogBean worklog) {
+        WorklogResponse rval = null;
+        if (worklog != null) {
+            rval = new WorklogResponse();
+            rval.setId(worklog.getId());
+            rval.setActivity(createActivityResponse(worklog.getActivity()));
+            rval.setConfirmed(worklog.getConfirmed());
+            rval.setDay(worklog.getDay());
+            rval.setLoggedMinutes(worklog.getLoggedMinutes());
+            rval.setUserId(worklog.getUserId());
         }
         return rval;
     }

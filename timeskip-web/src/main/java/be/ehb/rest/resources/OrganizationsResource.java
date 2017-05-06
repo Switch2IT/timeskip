@@ -75,7 +75,7 @@ public class OrganizationsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrganization(@ApiParam NewOrganizationRequest request) {
         Preconditions.checkNotNull(request, "Organization request must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "Organization name must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "\"name\" must be provided");
         return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createOrganization(request));
     }
 
@@ -163,7 +163,7 @@ public class OrganizationsResource {
     public Response createProject(@PathParam("organizationId") String organizationId, @ApiParam NewProjectRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
         Preconditions.checkNotNull(request, "Request body must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "Project name must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "\"name\" must be provided");
         if (!securityContext.hasPermission(PermissionType.PROJECT_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -263,7 +263,7 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
         Preconditions.checkNotNull(request, "Request body must not be empty");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "Activity description must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "\"description\" must be provided");
         return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createActivity(organizationId, projectId, request));
     }
 
@@ -285,7 +285,7 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
         Preconditions.checkNotNull(request, "Request body must not be empty");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "Activity description must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "\"description\" must be provided");
         return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.updateActivity(organizationId, projectId, activityId, request));
     }
 
@@ -308,4 +308,26 @@ public class OrganizationsResource {
         return ResponseFactory.buildResponse(Response.Status.NO_CONTENT.getStatusCode());
     }
 
+    @ApiOperation(value = "Log work", notes = "Create a worklog entry on an activity. Day and logged minutes must be provided. If the log is unconfirmed a reminder will be sent at a pre-configured date.")
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "Created"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @POST
+    @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logWork(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewWorklogRequest request) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        if (!securityContext.hasPermission(PermissionType.WORKLOG_ADMIN, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
+        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDay()), "\"day\" must be provided");
+        Preconditions.checkArgument(request.getLoggedMinutes() != null, "\"loggedMinutes\" must be provided");
+        Preconditions.checkArgument(request.getLoggedMinutes() > 0, "\"loggedMinutes\" must be greater than 0");
+        return ResponseFactory.buildResponse(Response.Status.CREATED.getStatusCode(), orgFacade.createWorkLog(organizationId, projectId, activityId, request));
+    }
 }
