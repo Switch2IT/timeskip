@@ -2,6 +2,7 @@ package be.ehb.facades;
 
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.exceptions.OrganizationNotFoundException;
@@ -192,16 +193,46 @@ public class OrganizationFacade implements IOrganizationFacade {
 
     @Override
     public ActivityResponse createActivity(String organizationId, Long projectID, NewActivityRequest request) {
-        return null;
+        ProjectBean project = storage.getProject(organizationId, projectID);
+        ActivityBean newActivity = new ActivityBean();
+        ActivityBean existingActivity = storage.findActivityByName(organizationId, projectID, request.getName());
+        if (existingActivity != null) {
+            throw ExceptionFactory.activityAlreadyExistsException(request.getName());
+        }
+        newActivity.setName(request.getName());
+        newActivity.setDescription(request.getDescription());
+        newActivity.setBillable(request.getBillable() == null ? true : request.getBillable());
+        newActivity.setProject(project);
+        return ResponseFactory.createActivityResponse(storage.createActivity(newActivity));
     }
 
     @Override
     public ActivityResponse updateActivity(String organizationId, Long projectId, Long activityId, UpdateActivityRequest request) {
-        return null;
+        ActivityBean activity = storage.getActivity(organizationId, projectId, activityId);
+        boolean changed = false;
+        if (request.getBillable() != null && request.getBillable() != activity.getBillable()) {
+            activity.setBillable(request.getBillable());
+            changed = true;
+        }
+        if (request.getDescription() != null && !request.getDescription().equals(activity.getDescription())) {
+            activity.setDescription(request.getDescription());
+            changed = true;
+        }
+        if (StringUtils.isNotEmpty(request.getName()) && !request.getName().equals(activity.getName())) {
+            if (storage.findActivityByName(organizationId, projectId, request.getName()) != null) {
+                throw ExceptionFactory.activityAlreadyExistsException(request.getName());
+            }
+            activity.setName(request.getName());
+            changed = true;
+        }
+        if (changed) {
+            return ResponseFactory.createActivityResponse(storage.updateActivity(activity));
+        } else return null;
     }
 
     @Override
     public void deleteActivity(String organizationId, Long projectId, Long activityId) {
-
+        ActivityBean activity = storage.getActivity(organizationId, projectId, activityId);
+        storage.deleteActivity(activity);
     }
 }

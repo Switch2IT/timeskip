@@ -22,30 +22,28 @@ public interface IStorageService {
 
     ActivityBean getActivity(String organizationId, Long projectId, Long activityId);
     OrganizationBean getOrganization(String organizationId);
-
     ProjectBean getProject(String organizationId, Long projectId);
     RoleBean getRole(String roleId);
-
     UserBean getUser(String userId);
 
     //Create
 
+    ActivityBean createActivity(ActivityBean activity);
     MembershipBean createMembership(MembershipBean membership);
     OrganizationBean createOrganization(OrganizationBean organization);
-
     ProjectBean createProject(ProjectBean project);
     UserBean createUser(UserBean user);
 
     //Update
 
+    ActivityBean updateActivity(ActivityBean activity);
     OrganizationBean updateOrganization(OrganizationBean organization);
-
     ProjectBean updateProject(ProjectBean project);
 
     //Delete
 
+    void deleteActivity(ActivityBean activity);
     void deleteOrganization(OrganizationBean organization);
-
     void deleteProject(ProjectBean project);
 
     //List
@@ -58,12 +56,11 @@ public interface IStorageService {
     //Queries
 
     ConfigBean getDefaultConfig();
-
     RoleBean getAutoGrantRole();
     Set<MembershipBean> getMemberships(String userId);
     Set<PermissionBean> getPermissions(String userId);
 
+    ActivityBean findActivityByName(String organizationId, Long projectId, String activityName);
     OrganizationBean findOrganizationByName(String organizationName);
-
     ProjectBean findProjectByName(String organizationId, String projectName);
 }
