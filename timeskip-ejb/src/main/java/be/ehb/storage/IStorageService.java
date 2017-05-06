@@ -3,6 +3,7 @@ package be.ehb.storage;
 import be.ehb.entities.config.ConfigBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.security.PermissionBean;
@@ -20,28 +21,39 @@ public interface IStorageService {
 
     OrganizationBean getOrganization(String organizationId);
 
-    UserBean getUser(String userId);
-
+    ProjectBean getProject(String organizationId, String projectId);
     RoleBean getRole(String roleId);
+
+    UserBean getUser(String userId);
 
     //Create
 
-    UserBean createUser(UserBean user);
-
     MembershipBean createMembership(MembershipBean membership);
+
+    OrganizationBean createOrganization(OrganizationBean organization);
+
+    UserBean createUser(UserBean user);
 
     //Update
 
+    OrganizationBean updateOrganization(OrganizationBean organization);
+
     //Delete
 
+    void deleteOrganization(OrganizationBean organization);
+
     //List
+
+    List<OrganizationBean> listOrganizations();
+
+    List<ProjectBean> listProjects(String organizationId);
     List<UserBean> listUsers();
 
     //Queries
 
     ConfigBean getDefaultConfig();
 
+    RoleBean getAutoGrantRole();
     Set<MembershipBean> getMemberships(String userId);
-
     Set<PermissionBean> getPermissions(String userId);
 }

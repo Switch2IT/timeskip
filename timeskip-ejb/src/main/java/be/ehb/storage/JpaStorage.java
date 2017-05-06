@@ -3,8 +3,11 @@ package be.ehb.storage;
 import be.ehb.entities.config.ConfigBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.factories.ExceptionFactory;
+import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
 import org.slf4j.Logger;
@@ -12,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
+import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +31,87 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(JpaStorage.class);
 
+    @Inject
+    private ISecurityContext securityContext;
+
+    @Override
+    public OrganizationBean getOrganization(String organizationId) {
+        OrganizationBean org = super.get(organizationId, OrganizationBean.class);
+        if (org == null) throw ExceptionFactory.organizationNotFoundException(organizationId);
+        return org;
+    }
+
+    @Override
+    public ProjectBean getProject(String organizationId, String projectId) {
+        try {
+            return (ProjectBean) getActiveEntityManager().createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.id = :projId")
+                    .setParameter("orgId", organizationId)
+                    .setParameter("projId", projectId)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            throw ExceptionFactory.projectNotFoundException(projectId);
+        }
+    }
+
+    @Override
+    public RoleBean getRole(String roleId) {
+        RoleBean role = super.get(roleId, RoleBean.class);
+        if (role == null) throw ExceptionFactory.roleNotFoundException(roleId);
+        return role;
+    }
+
+    @Override
+    public UserBean getUser(String userId) {
+        UserBean user = super.get(userId, UserBean.class);
+        if (user == null) throw ExceptionFactory.userNotFoundException(userId);
+        return user;
+    }
+
+    @Override
+    public MembershipBean createMembership(MembershipBean membership) {
+        return super.create(membership);
+    }
+
+    @Override
+    public OrganizationBean createOrganization(OrganizationBean organization) {
+        return super.create(organization);
+    }
+
+    @Override
+    public UserBean createUser(UserBean user) {
+        return super.create(user);
+    }
+
+    @Override
+    public OrganizationBean updateOrganization(OrganizationBean organization) {
+        return super.update(organization);
+    }
+
+    @Override
+    public void deleteOrganization(OrganizationBean organization) {
+        super.delete(organization);
+    }
+
+    @Override
+    public List<OrganizationBean> listOrganizations() {
+        return getActiveEntityManager()
+                .createQuery("SELECT o FROM OrganizationBean o")
+                .getResultList();
+    }
+
+    @Override
+    public List<UserBean> listUsers() {
+        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
+    }
+
+    @Override
+    public List<ProjectBean> listProjects(String organizationId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId")
+                .setParameter("orgId", organizationId)
+                .getResultList();
+    }
+
     @Override
     public ConfigBean getDefaultConfig() {
         try {
@@ -38,28 +123,15 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public UserBean getUser(String userId) {
-        return super.get(userId, UserBean.class);
-    }
-
-    @Override
-    public UserBean createUser(UserBean user) {
-        return super.create(user);
-    }
-
-    @Override
-    public MembershipBean createMembership(MembershipBean membership) {
-        return super.create(membership);
-    }
-
-    @Override
-    public List<UserBean> listUsers() {
-        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
-    }
-
-    @Override
-    public RoleBean getRole(String roleId) {
-        return super.get(roleId, RoleBean.class);
+    public RoleBean getAutoGrantRole() {
+        try {
+            return (RoleBean) getActiveEntityManager()
+                    .createQuery("SELECT r FROM RoleBean r WHERE r.autoGrant = TRUE")
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            log.warn("No role configured for auto-grant");
+            return null;
+        }
     }
 
     @Override
@@ -86,10 +158,5 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             }
         }
         return rval;
-    }
-
-    @Override
-    public OrganizationBean getOrganization(String organizationId) {
-        return super.get(organizationId, OrganizationBean.class);
     }
 }

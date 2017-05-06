@@ -6,9 +6,9 @@ package be.ehb.exceptions;
  */
 class ErrorCodes {
 
-    // SYSTEM RELATED
+    // IDP RELATED
 
-    static final int SYSTEM_ERROR = -1;
+    static final int IDP_ERROR = 4000;
 
     // ORGANIZATION RELATED
 
@@ -16,16 +16,21 @@ class ErrorCodes {
     static final int ORGANIZATION_NOT_FOUND = 1004;
     static final int ORGANIZATION_ALREADY_EXISTS = 1005;
 
-    // USER RELATED
+    // PROJECT RELATED
 
-    static final int USER_NOT_FOUND = 2001;
-    static final int JWT_VALIDATION_ERROR = 2002;
+    static final int PROJECT_NOT_FOUND = 5004;
 
     // ROLE RELATED
 
     static final int ROLE_NOT_FOUND = 3001;
 
-    // IDP RELATED
+    // USER RELATED
 
-    static final int IDP_ERROR = 4000;
+    static final int USER_NOT_FOUND = 2001;
+    static final int JWT_VALIDATION_ERROR = 2002;
+
+    // SYSTEM RELATED
+
+    static final int SYSTEM_ERROR = -1;
+
 }

@@ -51,4 +51,8 @@ public class ExceptionFactory {
     public static OrganizationAlreadyExistsException organizationAlreadyExistsException(String organiztionId) {
         return new OrganizationAlreadyExistsException(organiztionId);
     }
+
+    public static ProjectNotFoundException projectNotFoundException(String projectId) {
+        return new ProjectNotFoundException(projectId);
+    }
 }

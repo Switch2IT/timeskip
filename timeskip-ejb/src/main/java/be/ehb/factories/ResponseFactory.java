@@ -1,11 +1,11 @@
 package be.ehb.factories;
 
 import be.ehb.entities.organizations.MembershipBean;
+import be.ehb.entities.organizations.OrganizationBean;
+import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
-import be.ehb.model.responses.MembershipResponse;
-import be.ehb.model.responses.RoleResponse;
-import be.ehb.model.responses.UserResponse;
+import be.ehb.model.responses.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
@@ -72,6 +72,31 @@ public class ResponseFactory {
             rval.setName(role.getName());
             rval.setDescription(role.getDescription());
             rval.setAutoGrant(role.getAutoGrant());
+        }
+        return rval;
+    }
+
+    public static OrganizationResponse createOrganizationResponse(OrganizationBean organization) {
+        OrganizationResponse rval = null;
+        if (organization != null) {
+            rval = new OrganizationResponse();
+            rval.setId(organization.getId());
+            rval.setName(organization.getName());
+            rval.setDescription(organization.getDescription());
+        }
+        return rval;
+    }
+
+    public static ProjectResponse createProjectResponse(ProjectBean project) {
+        ProjectResponse rval = null;
+        if (project != null) {
+            rval = new ProjectResponse();
+            rval.setId(project.getId());
+            rval.setName(project.getName());
+            rval.setDescription(project.getDescription());
+            rval.setAllowOvertime(project.getAllowOvertime());
+            rval.setBillOvertime(project.getBillOvertime());
+            rval.setOrganization(createOrganizationResponse(project.getOrganization()));
         }
         return rval;
     }

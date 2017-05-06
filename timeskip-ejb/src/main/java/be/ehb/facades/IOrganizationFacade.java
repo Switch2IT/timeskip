@@ -39,10 +39,11 @@ public interface IOrganizationFacade {
     /**
      * Update an organization
      *
+     * @param organizationId the organization id
      * @param request the update request
      * @return Organization
      */
-    OrganizationResponse updateOrganization(UpdateOrganizationRequest request);
+    OrganizationResponse updateOrganization(String organizationId, UpdateOrganizationRequest request);
 
     /**
      * Delete an organization

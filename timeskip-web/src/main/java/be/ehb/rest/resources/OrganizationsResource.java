@@ -98,7 +98,7 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         Preconditions.checkNotNull(request, "Request body must be provided");
-        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.updateOrganization(request));
+        return ResponseFactory.buildResponse(Response.Status.OK.getStatusCode(), orgFacade.updateOrganization(organizationId, request));
     }
 
     @ApiOperation(value = "Delete organization",
