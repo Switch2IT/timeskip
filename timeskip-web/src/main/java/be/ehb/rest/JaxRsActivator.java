@@ -16,18 +16,59 @@
  */
 package be.ehb.rest;
 
+import be.ehb.rest.mappers.IllegalArgumentExceptionMapper;
+import be.ehb.rest.mappers.NullPointerExceptionMapper;
+import be.ehb.rest.mappers.RestExceptionMapper;
+import be.ehb.rest.resources.OrganizationsResource;
+import be.ehb.rest.resources.SystemResource;
+import be.ehb.rest.resources.UsersResource;
+import be.ehb.servlets.CORSFilter;
+import be.ehb.servlets.RequestFilter;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import java.util.Set;
 
 /**
  * A class extending {@link Application} and annotated with @ApplicationPath is the Java EE 7 "no XML" approach to activating
  * JAX-RS.
- * 
+ * <p>
  * <p>
  * Resources are served relative to the servlet path specified in the {@link ApplicationPath} annotation.
  * </p>
  */
-@ApplicationPath("/rest")
+@ApplicationPath("/api")
 public class JaxRsActivator extends Application {
-    /* class body intentionally left blank */
+
+    /**
+     * We based ourselves on http://jmchung.github.io/blog/2013/12/14/integrating-swagger-into-jax-rs-with-java-ee-6-specification/
+     * for the integration of swagger with the web app maven archetype
+     *
+     * @return Set of classes
+     */
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> resources = new java.util.HashSet<>();
+        addRestResourceClasses(resources);
+        resources.add(io.swagger.jaxrs.listing.ApiListingResource.class);
+        resources.add(io.swagger.jaxrs.listing.SwaggerSerializers.class);
+        return resources;
+    }
+
+    private void addRestResourceClasses(Set<Class<?>> resources) {
+        //Filters
+        resources.add(CORSFilter.class);
+        resources.add(RequestFilter.class);
+
+        //Exception mappers
+        resources.add(IllegalArgumentExceptionMapper.class);
+        resources.add(NullPointerExceptionMapper.class);
+        resources.add(RestExceptionMapper.class);
+
+        //REST resources
+        resources.add(UsersResource.class);
+        resources.add(OrganizationsResource.class);
+        resources.add(SystemResource.class);
+    }
 }
+
