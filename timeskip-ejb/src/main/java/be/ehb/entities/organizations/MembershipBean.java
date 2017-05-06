@@ -1,24 +1,24 @@
 package be.ehb.entities.organizations;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
 @Entity
-@Table(name = "organization_memberships")
-public class OrganizationMembershipBean implements Serializable {
+@Table(name = "memberships", schema = "timeskip")
+public class MembershipBean {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
-    @Column(name = "organization_id")
+    @Column(name = "organization_id", nullable = false)
     private String organizationId;
-    @Column(name = "role_id")
+    @Column(name = "role_id", nullable = false)
     private String roleId;
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
     public Long getId() {
@@ -36,6 +36,7 @@ public class OrganizationMembershipBean implements Serializable {
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
     }
+
 
     public String getRoleId() {
         return roleId;
@@ -56,21 +57,21 @@ public class OrganizationMembershipBean implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OrganizationMembershipBean)) return false;
+        if (!(o instanceof MembershipBean)) return false;
 
-        OrganizationMembershipBean that = (OrganizationMembershipBean) o;
+        MembershipBean that = (MembershipBean) o;
 
-        return id != null ? id.equals(that.id) : that.id == null;
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 
     @Override
     public String toString() {
-        return "MembershipBean{" +
+        return "MembershipsBean{" +
                 "id=" + id +
                 ", organizationId='" + organizationId + '\'' +
                 ", roleId='" + roleId + '\'' +

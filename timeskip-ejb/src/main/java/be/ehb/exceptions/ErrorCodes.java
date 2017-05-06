@@ -4,27 +4,39 @@ package be.ehb.exceptions;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ErrorCodes {
+class ErrorCodes {
 
-    // SYSTEM RELATED
+    // ACTIVITY RELATED
 
-    public static final int SYSTEM_ERROR = -1;
+    static final int ACTIVITY_NOT_FOUND = 6004;
+    static final int ACTIVITY_ALREADY_EXISTS = 6009;
 
-    // HTTP CODES
+    // IDP RELATED
 
-    public static final int HTTP_STATUS_CODE_INVALID_INPUT = 400;
-    public static final int HTTP_STATUS_CODE_FORBIDDEN = 403;
-    public static final int HTTP_STATUS_CODE_NOT_FOUND = 404;
-    public static final int HTTP_STATUS_CODE_ALREADY_EXISTS = 409;
-    public static final int HTTP_STATUS_CODE_INVALID_STATE = 409;
-    public static final int HTTP_STATUS_CODE_SYSTEM_ERROR = 500;
+    static final int IDP_ERROR = 4000;
 
     // ORGANIZATION RELATED
 
-    public static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
+    static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
+    static final int ORGANIZATION_NOT_FOUND = 1004;
+    static final int ORGANIZATION_ALREADY_EXISTS = 1005;
+
+    // PROJECT RELATED
+
+    static final int PROJECT_NOT_FOUND = 5004;
+    static final int PROJECT_ALREADY_EXISTS = 5009;
+
+    // ROLE RELATED
+
+    static final int ROLE_NOT_FOUND = 3001;
 
     // USER RELATED
 
-    public static final int USER_NOT_FOUND = 2001;
-    public static final int JWT_VALIDATION_ERROR = 2002;
+    static final int USER_NOT_FOUND = 2001;
+    static final int JWT_VALIDATION_ERROR = 2002;
+
+    // SYSTEM RELATED
+
+    static final int SYSTEM_ERROR = -1;
+
 }

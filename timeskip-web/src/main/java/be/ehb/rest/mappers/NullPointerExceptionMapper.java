@@ -1,11 +1,10 @@
 package be.ehb.rest.mappers;
 
-import be.ehb.exceptions.ErrorCodes;
+import be.ehb.factories.ResponseFactory;
 import be.ehb.model.responses.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -32,9 +31,7 @@ public class NullPointerExceptionMapper implements ExceptionMapper<NullPointerEx
             error.setMessage("Missing input");
             throw data;
         }
-        error.setHttpCode(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT);
-        Response.ResponseBuilder builder = Response.status(ErrorCodes.HTTP_STATUS_CODE_INVALID_INPUT).header("X-Timeskip-Error", "true");
-        builder.type(MediaType.APPLICATION_JSON_TYPE);
-        return builder.entity(error).build();
+        error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
+        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST.getStatusCode(), "X-Timeskip-Error", "true", error);
     }
 }

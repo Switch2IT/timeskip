@@ -1,27 +1,26 @@
 package be.ehb.entities.organizations;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.*;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
 @Entity
-@Table(name = "organizations")
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrganizationBean implements Serializable {
+@Table(name = "organizations", schema = "timeskip")
+public class OrganizationBean {
 
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     private String id;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
+    @Lob
+    @Column(name = "description")
+    @Type(type = "org.hibernate.type.TextType")
+    private String description;
 
     public String getId() {
         return id;
@@ -37,6 +36,14 @@ public class OrganizationBean implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -56,9 +63,10 @@ public class OrganizationBean implements Serializable {
 
     @Override
     public String toString() {
-        return "OrganizationBean{" +
+        return "OrganizationsBean{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

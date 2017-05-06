@@ -1,9 +1,10 @@
 package be.ehb.facades;
 
-import be.ehb.entities.identity.UserBean;
+import be.ehb.entities.users.UserBean;
 import be.ehb.model.requests.JWTParseRequest;
+import be.ehb.model.requests.NewUserRequest;
 import be.ehb.model.responses.TokenClaimsResponse;
-import be.ehb.model.users.UserDTO;
+import be.ehb.model.responses.UserResponse;
 import org.jose4j.jwt.JwtClaims;
 
 import java.util.List;
@@ -16,12 +17,14 @@ public interface IUserFacade {
 
     UserBean get(String userId);
 
-    List<UserDTO> listUsers();
+    List<UserResponse> listUsers();
 
     TokenClaimsResponse parseJWT(JWTParseRequest jwt);
 
-    UserBean initNewUser(JwtClaims claims);
+    void initNewUser(JwtClaims claims);
 
-    UserDTO getCurrentUser();
+    UserResponse getCurrentUser();
+
+    UserResponse createUser(NewUserRequest request);
 
 }

@@ -1,5 +1,7 @@
 package be.ehb.exceptions;
 
+import javax.ws.rs.core.Response;
+
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
@@ -23,7 +25,7 @@ public class UnauthorizedException extends AbstractUserException {
 
     @Override
     public int getHttpCode() {
-        return ErrorCodes.HTTP_STATUS_CODE_FORBIDDEN;
+        return Response.Status.FORBIDDEN.getStatusCode();
     }
 
     @Override

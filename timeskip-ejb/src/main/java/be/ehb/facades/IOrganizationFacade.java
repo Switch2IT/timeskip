@@ -1,6 +1,9 @@
 package be.ehb.facades;
 
-import be.ehb.model.organizations.OrganizationDTO;
+import be.ehb.model.requests.*;
+import be.ehb.model.responses.ActivityResponse;
+import be.ehb.model.responses.OrganizationResponse;
+import be.ehb.model.responses.ProjectResponse;
 
 import java.util.List;
 
@@ -15,7 +18,7 @@ public interface IOrganizationFacade {
      *
      * @return List of organizations
      */
-    List<OrganizationDTO> listOrganizations();
+    List<OrganizationResponse> listOrganizations();
 
     /**
      * Get an organization by id
@@ -23,23 +26,24 @@ public interface IOrganizationFacade {
      * @param organizationId the organization ID
      * @return Organization
      */
-    OrganizationDTO getOrganization(String organizationId);
+    OrganizationResponse get(String organizationId);
 
     /**
      * Get or create an organization
      *
-     * @param organization the organization
+     * @param request the organization
      * @return Organization
      */
-    OrganizationDTO createOrganization(OrganizationDTO organization);
+    OrganizationResponse createOrganization(NewOrganizationRequest request);
 
     /**
      * Update an organization
      *
-     * @param organization the organization
+     * @param organizationId the organization id
+     * @param request the update request
      * @return Organization
      */
-    OrganizationDTO updateOrganization(OrganizationDTO organization);
+    OrganizationResponse updateOrganization(String organizationId, UpdateOrganizationRequest request);
 
     /**
      * Delete an organization
@@ -47,5 +51,96 @@ public interface IOrganizationFacade {
      * @param organizationId the organization id
      */
     void deleteOrganization(String organizationId);
+
+    /**
+     * List organization projects
+     *
+     * @param organizationId the organization id
+     * @return the organization projects
+     */
+    List<ProjectResponse> listProjects(String organizationId);
+
+    /**
+     * Get project for given ID
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @return Project
+     */
+    ProjectResponse getProject(String organizationId, Long projectId);
+
+    /**
+     * Create a project
+     *
+     * @param organizationId the organization id
+     * @param request        the project
+     * @return Project
+     */
+    ProjectResponse createProject(String organizationId, NewProjectRequest request);
+
+    /**
+     * Update a project
+     *
+     * @param organizationId the organization id
+     * @param request        the update request
+     * @return Project
+     */
+    ProjectResponse updateProject(String organizationId, Long projectId, UpdateProjectRequest request);
+
+    /**
+     * Delete a project
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     */
+    void deleteProject(String organizationId, Long projectId);
+
+    /**
+     * List activities in project
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @return Activity
+     */
+    List<ActivityResponse> listProjectActivities(String organizationId, Long projectId);
+
+    /**
+     * Get activity for given ID
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param activityId     the activity id
+     * @return Activity
+     */
+    ActivityResponse getActivity(String organizationId, Long projectId, Long activityId);
+
+    /**
+     * Create an activity in a project
+     *
+     * @param organizationId the organization id
+     * @param projectID      the project id
+     * @param request        the activity
+     * @return Activity
+     */
+    ActivityResponse createActivity(String organizationId, Long projectID, NewActivityRequest request);
+
+    /**
+     * Update an activity
+     *
+     * @param organizationId the organization id
+     * @param projectId      the project id
+     * @param request        the update request
+     * @return Activity
+     */
+    ActivityResponse updateActivity(String organizationId, Long projectId, Long activityId, UpdateActivityRequest request);
+
+    /**
+     * Delete an activity
+     *
+     * @param organizationId the organization id\
+     * @param projectId      the project id
+     * @param activityId     the activity ID
+     */
+    void deleteActivity(String organizationId, Long projectId, Long activityId);
 
 }

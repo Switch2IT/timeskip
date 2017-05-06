@@ -1,15 +1,29 @@
-package be.ehb.model.activities;
+package be.ehb.entities.users;
+
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ActivityDTO {
+@Entity
+@Table(name = "paygrades", schema = "timeskip")
+public class PaygradeBean {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "name", nullable = false)
     private String name;
+    @Lob
+    @Column(name = "description")
+    @Type(type = "org.hibernate.type.TextType")
     private String description;
-    private String projectId;
+    @Column(name = "hourly_rate", nullable = false)
+    private Double hourlyRate;
 
     public Long getId() {
         return id;
@@ -35,36 +49,36 @@ public class ActivityDTO {
         this.description = description;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public Double getHourlyRate() {
+        return hourlyRate;
     }
 
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
+    public void setHourlyRate(Double hourlyRate) {
+        this.hourlyRate = hourlyRate;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ActivityDTO)) return false;
+        if (!(o instanceof PaygradeBean)) return false;
 
-        ActivityDTO that = (ActivityDTO) o;
+        PaygradeBean that = (PaygradeBean) o;
 
-        return id != null ? id.equals(that.id) : that.id == null;
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 
     @Override
     public String toString() {
-        return "ActivityDTO{" +
+        return "PaygradeBean{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", projectId='" + projectId + '\'' +
+                ", hourlyRate=" + hourlyRate +
                 '}';
     }
 }

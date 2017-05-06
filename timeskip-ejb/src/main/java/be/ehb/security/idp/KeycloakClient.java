@@ -1,6 +1,8 @@
 package be.ehb.security.idp;
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.entities.users.UserBean;
+import be.ehb.factories.ExceptionFactory;
 import be.ehb.utils.CustomCollectors;
 import be.ehb.utils.KeyUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +10,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +19,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.security.Key;
+import java.util.List;
 
 /**
  * @author Guillaume Vandecasteele
@@ -45,6 +49,24 @@ public class KeycloakClient implements IIdpClient {
         }
     }
 
+    @Override
+    public UserBean createUser(UserBean user) {
+        UserRepresentation rep = new UserRepresentation();
+        rep.setEmail(user.getEmail());
+        rep.setEmailVerified(true);
+        rep.setEnabled(true);
+        rep.setUsername(rep.getEmail());
+        Keycloak client = createKeycloakClient();
+        client.realm(config.getIdpRealm()).users().create(rep);
+        List<UserRepresentation> reps = client.realm(config.getIdpRealm()).users().search(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), null, null);
+        if (reps == null || reps.isEmpty()) {
+            throw ExceptionFactory.idpException();
+        }
+        rep = reps.get(0);
+        user.setId(rep.getId());
+        return user;
+    }
+
     private Keycloak createKeycloakClient() {
         return KeycloakBuilder.builder()
                 .serverUrl(config.getIdpServerUrl())
@@ -56,4 +78,6 @@ public class KeycloakClient implements IIdpClient {
                 .clientSecret(config.getIdpAdminClientSecret())
                 .build();
     }
+
+
 }
