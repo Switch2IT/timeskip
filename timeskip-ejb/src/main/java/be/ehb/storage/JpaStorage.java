@@ -68,6 +68,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ActivityBean createActivity(ActivityBean activity) {
+        return super.create(activity);
+    }
+
+    @Override
     public MembershipBean createMembership(MembershipBean membership) {
         return super.create(membership);
     }
@@ -88,8 +93,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ActivityBean updateActivity(ActivityBean activity) {
+        return super.update(activity);
+    }
+
+    @Override
     public OrganizationBean updateOrganization(OrganizationBean organization) {
         return super.update(organization);
+    }
+
+    @Override
+    public void deleteActivity(ActivityBean activity) {
+        super.delete(activity);
     }
 
     @Override
@@ -184,6 +199,20 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             }
         }
         return rval;
+    }
+
+    @Override
+    public ActivityBean findActivityByName(String organizationId, Long projectId, String activityName) {
+        try {
+            return (ActivityBean) getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId AND a.name = :aName")
+                    .setParameter("orgId", organizationId)
+                    .setParameter("pId", projectId)
+                    .setParameter("aName", activityName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
     }
 
     @Override
