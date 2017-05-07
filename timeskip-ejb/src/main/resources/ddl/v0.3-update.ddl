@@ -1,3 +1,32 @@
+ALTER TABLE permissions
+  CHANGE permissions permission INTEGER;
+
+INSERT INTO permissions (role_id, permission) VALUES ('hr', 12);
+
+INSERT INTO permissions (role_id, permission) VALUES ('hr', 13);
+
+INSERT INTO permissions (role_id, permission) VALUES ('hr', 14);
+
+INSERT INTO permissions (role_id, permission) VALUES ('hr', 15);
+
+INSERT INTO permissions (role_id, permission) VALUES ('manager', 12);
+
+INSERT INTO permissions (role_id, permission) VALUES ('manager', 13);
+
+INSERT INTO permissions (role_id, permission) VALUES ('manager', 14);
+
+INSERT INTO permissions (role_id, permission) VALUES ('manager', 15);
+
+DELETE FROM permissions
+WHERE role_id = 'consultant' AND permission = 6;
+
+DELETE FROM permissions
+WHERE role_id = 'consultant' AND permission = 9;
+
+INSERT INTO permissions (role_id, permission) VALUES ('consultant', 12);
+
+INSERT INTO permissions (role_id, permission) VALUES ('consultant', 14);
+
 ALTER TABLE memberships
   MODIFY COLUMN id BIGINT AUTO_INCREMENT;
 ALTER TABLE users
@@ -36,3 +65,6 @@ ALTER TABLE activities
 ALTER TABLE project_assignments
   ADD CONSTRAINT fk_project_assignments_2 FOREIGN KEY (project_id) REFERENCES projects (id)
   ON UPDATE CASCADE;
+
+ALTER TABLE config
+  ADD COLUMN day_of_monthly_reminder_email INTEGER DEFAULT 1;

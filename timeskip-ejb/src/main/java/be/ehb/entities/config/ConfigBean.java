@@ -18,6 +18,8 @@ public class ConfigBean {
     private String configPath;
     @Column(name = "default_config")
     private Boolean defaultConfig;
+    @Column(name = "day_of_monthly_reminder_email")
+    private Integer dayOfMonthlyReminderEmail;
 
     public Long getId() {
         return id;
@@ -43,6 +45,14 @@ public class ConfigBean {
         this.defaultConfig = defaultConfig;
     }
 
+    public Integer getDayOfMonthlyReminderEmail() {
+        return dayOfMonthlyReminderEmail;
+    }
+
+    public void setDayOfMonthlyReminderEmail(Integer dayOfMonthlyReminderEmail) {
+        this.dayOfMonthlyReminderEmail = dayOfMonthlyReminderEmail;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,6 +74,7 @@ public class ConfigBean {
                 "id=" + id +
                 ", configPath='" + configPath + '\'' +
                 ", defaultConfig=" + defaultConfig +
+                ", dayOfMonthlyReminderEmail=" + dayOfMonthlyReminderEmail +
                 '}';
     }
 }

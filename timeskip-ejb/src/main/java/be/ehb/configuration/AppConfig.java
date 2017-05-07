@@ -46,7 +46,6 @@ public class AppConfig implements Serializable, IAppConfig {
         ConfigBean defaultConfig;
         if (optionalConfig == null) {
             defaultConfig = storage.getDefaultConfig();
-            if (defaultConfig == null) throw ExceptionFactory.storageException("No configuration found.");
         } else {
             defaultConfig = optionalConfig;
         }
@@ -144,5 +143,10 @@ public class AppConfig implements Serializable, IAppConfig {
     @Override
     public boolean getValidateJWT() {
         return config.getBoolean(IConfig.SECURITY_JWT_VALIDATION);
+    }
+
+    @Override
+    public Integer getDayOfMonthlyReminderEmail() {
+        return storage.getDefaultConfig().getDayOfMonthlyReminderEmail();
     }
 }
