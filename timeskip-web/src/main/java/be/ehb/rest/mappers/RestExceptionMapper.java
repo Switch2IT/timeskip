@@ -22,7 +22,7 @@ public class RestExceptionMapper implements ExceptionMapper<AbstractRestExceptio
         ErrorResponse error = new ErrorResponse();
         error.setType(data.getClass().getSimpleName());
         error.setErrorCode(data.getErrorCode());
-        error.setHttpCode(data.getHttpCode());
+        error.setHttpCode(data.getHttpCode().getStatusCode());
         if (StringUtils.isNotEmpty(data.getMessage())) {
             error.setMessage(data.getMessage());
         }

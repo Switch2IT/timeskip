@@ -5,6 +5,7 @@ import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.persistence.NoResultException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,9 +34,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
-        getProject(organizationId, projectId);
+        ProjectBean p = getProject(organizationId, projectId);
         ActivityBean a = super.get(activityId, ActivityBean.class);
-        if (a == null) throw ExceptionFactory.activityNotFoundException(activityId);
+        if (a == null || !a.getProject().equals(p)) throw ExceptionFactory.activityNotFoundException(activityId);
         return a;
     }
 
@@ -47,9 +49,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public ProjectBean getProject(String organizationId, Long projectId) {
-        getOrganization(organizationId);
+        OrganizationBean o = getOrganization(organizationId);
         ProjectBean p = super.get(projectId, ProjectBean.class);
-        if (p == null) throw ExceptionFactory.projectNotFoundException(projectId);
+        if (p == null || !p.getOrganization().equals(o)) throw ExceptionFactory.projectNotFoundException(projectId);
         return p;
     }
 
@@ -65,6 +67,27 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         UserBean user = super.get(userId, UserBean.class);
         if (user == null) throw ExceptionFactory.userNotFoundException(userId);
         return user;
+    }
+
+    @Override
+    public WorklogBean getWorklog(String organizationId, Long projectId, Long activityId, Long worklogId) {
+        ActivityBean activity = getActivity(organizationId, projectId, activityId);
+        WorklogBean worklog = super.get(worklogId, WorklogBean.class);
+        if (worklog == null || !worklog.getActivity().equals(activity))
+            throw ExceptionFactory.worklogNotFoundException(worklogId);
+        return worklog;
+    }
+
+    @Override
+    public WorklogBean getWorklog(Long worklogId) {
+        WorklogBean worklog = super.get(worklogId, WorklogBean.class);
+        if (worklog == null) throw ExceptionFactory.worklogNotFoundException(worklogId);
+        return worklog;
+    }
+
+    @Override
+    public ActivityBean createActivity(ActivityBean activity) {
+        return super.create(activity);
     }
 
     @Override
@@ -88,6 +111,16 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public WorklogBean createWorklog(WorklogBean worklog) {
+        return super.create(worklog);
+    }
+
+    @Override
+    public ActivityBean updateActivity(ActivityBean activity) {
+        return super.update(activity);
+    }
+
+    @Override
     public OrganizationBean updateOrganization(OrganizationBean organization) {
         return super.update(organization);
     }
@@ -98,6 +131,16 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public WorklogBean updateWorklog(WorklogBean worklog) {
+        return super.update(worklog);
+    }
+
+    @Override
+    public void deleteActivity(ActivityBean activity) {
+        super.delete(activity);
+    }
+
+    @Override
     public void deleteOrganization(OrganizationBean organization) {
         super.delete(organization);
     }
@@ -105,6 +148,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public void deleteProject(ProjectBean project) {
         super.delete(project);
+    }
+
+    @Override
+    public void deleteWorklog(WorklogBean worklog) {
+        super.delete(worklog);
     }
 
     @Override
@@ -135,6 +183,15 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         return getActiveEntityManager()
                 .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId")
                 .setParameter("orgId", org.getId())
+                .getResultList();
+    }
+
+    @Override
+    public List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId) {
+        ActivityBean activity = getActivity(organizationId, projectId, activityId);
+        return getActiveEntityManager()
+                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity")
+                .setParameter("activity", activity)
                 .getResultList();
     }
 
@@ -187,6 +244,20 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ActivityBean findActivityByName(String organizationId, Long projectId, String activityName) {
+        try {
+            return (ActivityBean) getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId AND a.name = :aName")
+                    .setParameter("orgId", organizationId)
+                    .setParameter("pId", projectId)
+                    .setParameter("aName", activityName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public OrganizationBean findOrganizationByName(String organizationName) {
         try {
             return (OrganizationBean) getActiveEntityManager()
@@ -210,5 +281,14 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             log.info("No project with name \"{}\" found in organization \"{}\"", organizationId, projectName);
             return null;
         }
+    }
+
+    @Override
+    public Long getUserLoggedMinutesForDay(String userId, Date day) {
+        return (Long) getActiveEntityManager()
+                .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
+                .setParameter("user", userId)
+                .setParameter("day", day)
+                .getSingleResult();
     }
 }

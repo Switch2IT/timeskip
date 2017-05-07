@@ -1,5 +1,13 @@
 package be.ehb.exceptions;
 
+import javax.ejb.ApplicationException;
+import javax.ws.rs.core.Response;
+
+/**
+ * @author Guillaume Vandecasteele
+ * @since 2017
+ */
+@ApplicationException(rollback = true)
 public abstract class AbstractRestException extends RuntimeException {
 
     private transient String serverStack;
@@ -27,7 +35,7 @@ public abstract class AbstractRestException extends RuntimeException {
         this.serverStack = stacktrace;
     }
 
-    public abstract int getHttpCode();
+    public abstract Response.Status getHttpCode();
 
     public abstract int getErrorCode();
 

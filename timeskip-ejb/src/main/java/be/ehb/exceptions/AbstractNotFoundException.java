@@ -17,7 +17,7 @@ public abstract class AbstractNotFoundException extends AbstractRestException {
     }
 
     @Override
-    public int getHttpCode() {
-        return Response.Status.NOT_FOUND.getStatusCode();
+    public Response.Status getHttpCode() {
+        return Response.Status.NOT_FOUND;
     }
 }

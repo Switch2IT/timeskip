@@ -87,4 +87,20 @@ public class ExceptionFactory {
     public static SchedulerUnableToScheduleException schedulerUnableToScheduleException(String name) {
         return new SchedulerUnableToScheduleException(name);
     }
+
+    public static InvalidDateException invalidDateException(String message) {
+        return new InvalidDateException(message);
+    }
+
+    public static NoOverTimeAllowedException noOverTimeAllowedException(String projectName) {
+        return new NoOverTimeAllowedException(projectName);
+    }
+
+    public static WorklogNotFoundException worklogNotFoundException(Long worklogId) {
+        return new WorklogNotFoundException(worklogId.toString());
+    }
+
+    public static UserNotAssignedToProjectException userNotAssignedToProjectException(String projectName) {
+        return new UserNotAssignedToProjectException(projectName);
+    }
 }

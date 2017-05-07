@@ -22,15 +22,15 @@ public class ProjectBean {
     @Column(name = "name", nullable = false)
     private String name;
     @Lob
-    @Column(name="description")
+    @Column(name = "description")
     @Type(type = "org.hibernate.type.TextType")
     private String description;
     @Column(name = "allow_overtime")
     private Boolean allowOvertime;
     @Column(name = "bill_overtime")
     private Boolean billOvertime;
-    @ManyToMany(cascade=CascadeType.ALL)
-    @JoinTable(name="project_assignments", joinColumns=@JoinColumn(name="project_id"), inverseJoinColumns=@JoinColumn(name="user_id"))
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "project_assignments", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<UserBean> assignedUsers;
     @ManyToOne
     @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)

@@ -1,21 +1,21 @@
 -- Tables
 CREATE TABLE IF NOT EXISTS activities (
-  id          BIGINT       NOT NULL,
+  id          BIGINT       NOT NULL AUTO_INCREMENT,
   name        VARCHAR(255) NOT NULL,
-  description TEXT DEFAULT NULL,
+  description TEXT                  DEFAULT NULL,
   project_id  BIGINT       NOT NULL,
-  billable    BOOLEAN DEFAULT TRUE
+  billable    BOOLEAN               DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS config (
-  id             BIGINT       NOT NULL,
+  id             BIGINT       NOT NULL AUTO_INCREMENT,
   config_path    VARCHAR(255) NOT NULL,
-  default_config BOOLEAN DEFAULT NULL
+  default_config BOOLEAN               DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS memberships
 (
-  id              BIGINT       NOT NULL,
+  id              BIGINT       NOT NULL AUTO_INCREMENT,
   organization_id VARCHAR(255) NOT NULL,
   role_id         VARCHAR(255) NOT NULL,
   user_id         VARCHAR(255) NOT NULL
@@ -28,15 +28,15 @@ CREATE TABLE IF NOT EXISTS organizations (
 );
 
 CREATE TABLE IF NOT EXISTS paygrades (
-  id          BIGINT       NOT NULL,
+  id          BIGINT       NOT NULL AUTO_INCREMENT,
   name        VARCHAR(255) NOT NULL,
-  description TEXT DEFAULT NULL,
+  description TEXT                  DEFAULT NULL,
   hourly_rate DOUBLE       NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS permissions (
-  role_id     VARCHAR(255) NOT NULL,
-  permissions INT          NULL
+  role_id    VARCHAR(255) NOT NULL,
+  permission INT          NULL
 );
 
 CREATE TABLE IF NOT EXISTS project_assignments (
@@ -45,11 +45,11 @@ CREATE TABLE IF NOT EXISTS project_assignments (
 );
 
 CREATE TABLE IF NOT EXISTS projects (
-  id              BIGINT       NOT NULL,
+  id              BIGINT       NOT NULL AUTO_INCREMENT,
   name            VARCHAR(255) NOT NULL,
-  description     TEXT    DEFAULT NULL,
-  allow_overtime  BOOLEAN DEFAULT TRUE,
-  bill_overtime   BOOLEAN DEFAULT TRUE,
+  description     TEXT                  DEFAULT NULL,
+  allow_overtime  BOOLEAN               DEFAULT TRUE,
+  bill_overtime   BOOLEAN               DEFAULT TRUE,
   organization_id VARCHAR(255) NOT NULL
 );
 
@@ -77,12 +77,12 @@ CREATE TABLE IF NOT EXISTS user_workdays (
 );
 
 CREATE TABLE IF NOT EXISTS worklogs (
-  id             BIGINT       NOT NULL,
+  id             BIGINT       NOT NULL AUTO_INCREMENT,
   user_id        VARCHAR(255) NOT NULL,
   activity_id    BIGINT       NOT NULL,
   day            DATE         NOT NULL,
   logged_minutes BIGINT       NOT NULL,
-  confirmed      BOOLEAN      DEFAULT FALSE
+  confirmed      BOOLEAN               DEFAULT FALSE
 );
 
 -- Unique indexes
