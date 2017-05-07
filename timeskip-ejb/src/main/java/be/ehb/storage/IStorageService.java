@@ -41,6 +41,8 @@ public interface IStorageService {
 
     ActivityBean createActivity(ActivityBean activity);
 
+    ConfigBean updateConfig(ConfigBean config);
+
     MembershipBean createMembership(MembershipBean membership);
 
     OrganizationBean createOrganization(OrganizationBean organization);

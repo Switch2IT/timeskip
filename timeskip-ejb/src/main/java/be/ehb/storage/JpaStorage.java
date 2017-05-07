@@ -109,6 +109,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ConfigBean updateConfig(ConfigBean config) {
+        return super.update(config);
+    }
+
+    @Override
     public MembershipBean createMembership(MembershipBean membership) {
         return super.create(membership);
     }

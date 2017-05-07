@@ -1,6 +1,8 @@
 package be.ehb.startup;
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.entities.config.ConfigBean;
+import be.ehb.scheduler.ScheduleService;
 import be.ehb.storage.IStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +28,19 @@ public class StartupService {
     private IAppConfig appConfig;
     @Inject
     private IStorageService storage;
+    @Inject
+    private ScheduleService schedServ;
 
     @PostConstruct
     public void init() {
         try {
             // Insert startup tasks here, such as mailing tasks
+            if (appConfig.getDayOfMonthlyReminderEmail() > 28 || appConfig.getDayOfMonthlyReminderEmail() < 1) {
+                ConfigBean cfgb = storage.getDefaultConfig();
+                cfgb.setDayOfMonthlyReminderEmail(28);
+                storage.updateConfig(cfgb);
+            }
+            schedServ.ScheduleStart();
         } catch (Exception ex) {
             log.error("Error occured during startup: {}", ex);
         }
