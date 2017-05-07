@@ -1,7 +1,7 @@
 package be.ehb.exceptions;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele/Patrick Van den Bussche
  * @since 2017
  */
 class ErrorCodes {
@@ -38,5 +38,12 @@ class ErrorCodes {
     // SYSTEM RELATED
 
     static final int SYSTEM_ERROR = -1;
+
+    // SCHEDULER RELATED
+
+    static final int SCHEDULER_NOT_FOUND = 7000;
+    static final int SCHEDULER_UNABLE_TO_ADD_JOB = 7001;
+    static final int SCHEDULER_UNABLE_TO_START = 7002;
+    static final int SCHEDULER_UNABLE_TO_SCHEDUULE = 7003;
 
 }

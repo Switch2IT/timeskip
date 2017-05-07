@@ -3,7 +3,7 @@ package be.ehb.factories;
 import be.ehb.exceptions.*;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele/Patrick Van den Bussche
  * @since 2017
  */
 public class ExceptionFactory {
@@ -70,5 +70,21 @@ public class ExceptionFactory {
 
     public static ActivityNotFoundException activityNotFoundException(Long id) {
         return new ActivityNotFoundException(id.toString());
+    }
+
+    public static SchedulerNotFoundException schedulerNotFoundException(String name) {
+        return new SchedulerNotFoundException(name);
+    }
+
+    public static SchedulerUnableToAddJobException schedulerUnableToAddJobException(String name) {
+        return new SchedulerUnableToAddJobException(name);
+    }
+
+    public static SchedulerUnableToStartException schedulerUnableToStartException(String name) {
+        return new SchedulerUnableToStartException(name);
+    }
+
+    public static SchedulerUnableToScheduleException schedulerUnableToScheduleException(String name) {
+        return new SchedulerUnableToScheduleException(name);
     }
 }
