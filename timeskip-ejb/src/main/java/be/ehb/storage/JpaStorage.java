@@ -34,10 +34,16 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
-        ProjectBean p = getProject(organizationId, projectId);
-        ActivityBean a = super.get(activityId, ActivityBean.class);
-        if (a == null || !a.getProject().equals(p)) throw ExceptionFactory.activityNotFoundException(activityId);
-        return a;
+        try {
+            return (ActivityBean) getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE a.id = :aId AND p.id = :pId AND o.id = :orgId")
+                    .setParameter("aId", activityId)
+                    .setParameter("pId", projectId)
+                    .setParameter("orgId", organizationId)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            throw ExceptionFactory.activityNotFoundException(activityId);
+        }
     }
 
     @Override
@@ -49,10 +55,15 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public ProjectBean getProject(String organizationId, Long projectId) {
-        OrganizationBean o = getOrganization(organizationId);
-        ProjectBean p = super.get(projectId, ProjectBean.class);
-        if (p == null || !p.getOrganization().equals(o)) throw ExceptionFactory.projectNotFoundException(projectId);
-        return p;
+        try {
+            return (ProjectBean) getActiveEntityManager()
+                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE p.id = :pId AND o.id = :orgId")
+                    .setParameter("pId", projectId)
+                    .setParameter("orgId", organizationId)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            throw ExceptionFactory.projectNotFoundException(projectId);
+        }
     }
 
     @Override
@@ -71,11 +82,17 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public WorklogBean getWorklog(String organizationId, Long projectId, Long activityId, Long worklogId) {
-        ActivityBean activity = getActivity(organizationId, projectId, activityId);
-        WorklogBean worklog = super.get(worklogId, WorklogBean.class);
-        if (worklog == null || !worklog.getActivity().equals(activity))
-            throw ExceptionFactory.worklogNotFoundException(worklogId);
-        return worklog;
+        try {
+            return (WorklogBean) getActiveEntityManager()
+                    .createQuery("SELECT w FROM WorklogBean w JOIN w.activity a JOIN a.project p JOIN p.organization o WHERE w.id = :wId AND a.id = :aId AND p.id = :pId AND o.id = :orgId")
+                    .setParameter("wId", worklogId)
+                    .setParameter("aId", activityId)
+                    .setParameter("pId", projectId)
+                    .setParameter("orgId", organizationId)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            throw ExceptionFactory.activityNotFoundException(activityId);
+        }
     }
 
     @Override
@@ -201,7 +218,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             return (ConfigBean) getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE").getSingleResult();
         } catch (NoResultException ex) {
             log.error("No results found: {}", ex.getMessage());
-            return null;
+            throw ExceptionFactory.storageException("No configuration found.");
         }
     }
 

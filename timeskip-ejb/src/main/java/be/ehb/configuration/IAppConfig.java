@@ -27,4 +27,6 @@ public interface IAppConfig {
     String getIdpClient();
 
     boolean getValidateJWT();
+
+    Integer getDayOfMonthlyReminderEmail();
 }

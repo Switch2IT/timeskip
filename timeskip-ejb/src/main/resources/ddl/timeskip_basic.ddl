@@ -8,9 +8,10 @@ CREATE TABLE IF NOT EXISTS activities (
 );
 
 CREATE TABLE IF NOT EXISTS config (
-  id             BIGINT       NOT NULL AUTO_INCREMENT,
-  config_path    VARCHAR(255) NOT NULL,
-  default_config BOOLEAN               DEFAULT NULL
+  id                            BIGINT       NOT NULL AUTO_INCREMENT,
+  config_path                   VARCHAR(255) NOT NULL,
+  default_config                BOOLEAN               DEFAULT NULL,
+  day_of_monthly_reminder_email INTEGER               DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS memberships
