@@ -18,7 +18,7 @@
 -- You can use this file to load seed data into the database using SQL statements
 -- insert into Registrant(id, name, email, phone_number) values (0, 'John Smith', 'john.smith@mailinator.com', '2125551212')
 
-INSERT INTO config VALUES (1, '/opt/wildfly/standalone/configuration/application.conf', TRUE);
+INSERT INTO config VALUES (1, '/opt/wildfly/standalone/configuration/application.conf', TRUE, 1);
 
 INSERT INTO roles (id, auto_grant, description, name)
 VALUES ('consultant', NULL, 'Automatically granted to a new user.', 'Consultant');
