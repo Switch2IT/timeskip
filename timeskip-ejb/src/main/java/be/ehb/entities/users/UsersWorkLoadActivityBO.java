@@ -18,6 +18,17 @@ public class UsersWorkLoadActivityBO {
     //Activity
     private String description;
 
+    public UsersWorkLoadActivityBO(String id, String firstName, String lastName, String email, Date day, Long loggedMinutes, Boolean confirmed, String description) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.day = day;
+        this.loggedMinutes = loggedMinutes;
+        this.confirmed = confirmed;
+        this.description = description;
+    }
+
     public String getId() {
         return id;
     }
@@ -48,5 +59,19 @@ public class UsersWorkLoadActivityBO {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return "UsersWorkLoadActivityBO{" +
+                "id='" + id + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", day=" + day +
+                ", loggedMinutes=" + loggedMinutes +
+                ", confirmed=" + confirmed +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

@@ -17,9 +17,10 @@ import java.util.List;
 /**
  * Created by Patrick Van den Bussche on 7/05/2017.
  */
+
 public class EmailReminderJob implements Job {
 
-    static final String NEW_LINE = "\n";
+    private static final String NEW_LINE = "\n";
     @Inject
     private IMailProvider mp;
     @Inject
@@ -50,7 +51,7 @@ public class EmailReminderJob implements Job {
         if (usersWorkLoadActivityBOList.size() > 0) {
             StringBuilder content = new StringBuilder();
             for (UsersWorkLoadActivityBO usersWorkLoadActivityBO : usersWorkLoadActivityBOList) {
-                if (usersWorkLoadActivityBO.getId() != prevId) {
+                if (usersWorkLoadActivityBO.getId().equals(prevId)) {
                     if (prevId != null) {
                         sendMail(content, bmb, mp);
                     }

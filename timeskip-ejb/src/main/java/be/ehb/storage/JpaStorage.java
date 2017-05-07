@@ -36,8 +36,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
         try {
-            return (ActivityBean) getActiveEntityManager()
-                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE a.id = :aId AND p.id = :pId AND o.id = :orgId")
+            return getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE a.id = :aId AND p.id = :pId AND o.id = :orgId", ActivityBean.class)
                     .setParameter("aId", activityId)
                     .setParameter("pId", projectId)
                     .setParameter("orgId", organizationId)
@@ -57,8 +57,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ProjectBean getProject(String organizationId, Long projectId) {
         try {
-            return (ProjectBean) getActiveEntityManager()
-                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE p.id = :pId AND o.id = :orgId")
+            return getActiveEntityManager()
+                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE p.id = :pId AND o.id = :orgId", ProjectBean.class)
                     .setParameter("pId", projectId)
                     .setParameter("orgId", organizationId)
                     .getSingleResult();
@@ -84,8 +84,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public WorklogBean getWorklog(String organizationId, Long projectId, Long activityId, Long worklogId) {
         try {
-            return (WorklogBean) getActiveEntityManager()
-                    .createQuery("SELECT w FROM WorklogBean w JOIN w.activity a JOIN a.project p JOIN p.organization o WHERE w.id = :wId AND a.id = :aId AND p.id = :pId AND o.id = :orgId")
+            return getActiveEntityManager()
+                    .createQuery("SELECT w FROM WorklogBean w JOIN w.activity a JOIN a.project p JOIN p.organization o WHERE w.id = :wId AND a.id = :aId AND p.id = :pId AND o.id = :orgId", WorklogBean.class)
                     .setParameter("wId", worklogId)
                     .setParameter("aId", activityId)
                     .setParameter("pId", projectId)
@@ -177,7 +177,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public List<ActivityBean> listProjectActivities(String organizationId, Long projectId) {
         ProjectBean proj = getProject(organizationId, projectId);
         return getActiveEntityManager()
-                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId")
+                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId", ActivityBean.class)
                 .setParameter("orgId", proj.getOrganization().getId())
                 .setParameter("pId", proj.getId())
                 .getResultList();
@@ -186,20 +186,20 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public List<OrganizationBean> listOrganizations() {
         return getActiveEntityManager()
-                .createQuery("SELECT o FROM OrganizationBean o")
+                .createQuery("SELECT o FROM OrganizationBean o", OrganizationBean.class)
                 .getResultList();
     }
 
     @Override
     public List<UserBean> listUsers() {
-        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
+        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u", UserBean.class).getResultList();
     }
 
     @Override
     public List<ProjectBean> listProjects(String organizationId) {
         OrganizationBean org = getOrganization(organizationId);
         return getActiveEntityManager()
-                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId")
+                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId", ProjectBean.class)
                 .setParameter("orgId", org.getId())
                 .getResultList();
     }
@@ -208,7 +208,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId) {
         ActivityBean activity = getActivity(organizationId, projectId, activityId);
         return getActiveEntityManager()
-                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity")
+                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity", WorklogBean.class)
                 .setParameter("activity", activity)
                 .getResultList();
     }
@@ -216,7 +216,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ConfigBean getDefaultConfig() {
         try {
-            return (ConfigBean) getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE").getSingleResult();
+            return getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE", ConfigBean.class).getSingleResult();
         } catch (NoResultException ex) {
             log.error("No results found: {}", ex.getMessage());
             throw ExceptionFactory.storageException("No configuration found.");
@@ -226,8 +226,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public RoleBean getAutoGrantRole() {
         try {
-            return (RoleBean) getActiveEntityManager()
-                    .createQuery("SELECT r FROM RoleBean r WHERE r.autoGrant = TRUE")
+            return getActiveEntityManager()
+                    .createQuery("SELECT r FROM RoleBean r WHERE r.autoGrant = TRUE", RoleBean.class)
                     .getSingleResult();
         } catch (NoResultException ex) {
             log.warn("No role configured for auto-grant");
@@ -239,7 +239,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public Set<MembershipBean> getMemberships(String userId) {
         Set<MembershipBean> rval = new HashSet<>();
         rval.addAll(getActiveEntityManager()
-                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :userId")
+                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :userId", MembershipBean.class)
                 .setParameter("userId", userId)
                 .getResultList());
         return rval;
@@ -264,8 +264,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ActivityBean findActivityByName(String organizationId, Long projectId, String activityName) {
         try {
-            return (ActivityBean) getActiveEntityManager()
-                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId AND a.name = :aName")
+            return getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId AND a.name = :aName", ActivityBean.class)
                     .setParameter("orgId", organizationId)
                     .setParameter("pId", projectId)
                     .setParameter("aName", activityName)
@@ -278,8 +278,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public OrganizationBean findOrganizationByName(String organizationName) {
         try {
-            return (OrganizationBean) getActiveEntityManager()
-                    .createQuery("SELECT o FROM OrganizationBean o WHERE o.name = :orgName")
+            return getActiveEntityManager()
+                    .createQuery("SELECT o FROM OrganizationBean o WHERE o.name = :orgName", OrganizationBean.class)
                     .setParameter("orgName", organizationName)
                     .getSingleResult();
         } catch (NoResultException ex) {
@@ -290,8 +290,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ProjectBean findProjectByName(String organizationId, String projectName) {
         try {
-            return (ProjectBean) getActiveEntityManager()
-                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.name = :pName")
+            return getActiveEntityManager()
+                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.name = :pName", ProjectBean.class)
                     .setParameter("orgId", organizationId)
                     .setParameter("pName", projectName)
                     .getSingleResult();
@@ -303,8 +303,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public Long getUserLoggedMinutesForDay(String userId, Date day) {
-        return (Long) getActiveEntityManager()
-                .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
+        return getActiveEntityManager()
+                .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day", Long.class)
                 .setParameter("user", userId)
                 .setParameter("day", day)
                 .getSingleResult();
@@ -312,16 +312,12 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
-        StringBuilder sbqr = new StringBuilder();
-        sbqr.append("select u.id, u.first_name, u.last_name, u.email, wl.day, ac.description, wl.logged_minutes, wl.confirmed");
-        sbqr.append("from users u");
-        sbqr.append("inner join worklogs wl");
-        sbqr.append("on u.id = wl.user_id");
-        sbqr.append("inner join activities ac");
-        sbqr.append("on wl.activity_id = ac.id");
-        sbqr.append("where wl.day < :date");
         return getActiveEntityManager()
-                .createQuery(sbqr.toString())
+                .createQuery("SELECT NEW be.ehb.entities.users.UsersWorkLoadActivityBO(u.id, u.firstName, u.lastName, u.email, w.day, w.loggedMinutes, w.confirmed, a.description) " +
+                        "FROM UserBean u, WorklogBean w " +
+                        "JOIN w.activity a " +
+                        "WHERE u.id = w.userId AND w.day < :date AND w.confirmed = FALSE " +
+                        "ORDER BY u.id, w.day", UsersWorkLoadActivityBO.class)
                 .setParameter("date", day)
                 .getResultList();
     }
