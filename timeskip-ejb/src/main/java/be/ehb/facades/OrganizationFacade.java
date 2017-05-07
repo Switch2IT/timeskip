@@ -153,7 +153,7 @@ public class OrganizationFacade implements IOrganizationFacade {
         newProject.setName(request.getName());
         newProject.setDescription(request.getDescription());
         newProject.setAllowOvertime(request.getAllowOvertime() == null ? true : request.getAllowOvertime());
-        newProject.setBillOvertime(request.getBillOvertime() == null ? true : request.getAllowOvertime());
+        newProject.setBillOvertime(request.getBillOvertime() == null ? true : request.getBillOvertime());
         newProject.setOrganization(org);
 
         return ResponseFactory.createProjectResponse(storage.createProject(newProject));
@@ -269,10 +269,14 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
 
     @Override
-    public WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewWorklogRequest request) {
+    public WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewAdminWorklogRequest request) {
         ActivityBean activity = storage.getActivity(organizationId, projectId, activityId);
         Date day = DateUtils.convertStringToDate(request.getDay());
-        UserBean user = storage.getUser(securityContext.getCurrentUser());
+        UserBean user = storage.getUser(request.getUserId());
+        //Check if the user is assigned to the project
+        if (!activity.getProject().getAssignedUsers().contains(user)) {
+            throw ExceptionFactory.userNotAssignedToProjectException(activity.getProject().getName());
+        }
         //Check if the project allows overtime and if not, check if logging this work will exceed the limit
         if (!activity.getProject().getAllowOvertime()
                 && storage.getUserLoggedMinutesForDay(user.getId(), day) + request.getLoggedMinutes() >

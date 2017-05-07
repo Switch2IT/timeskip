@@ -34,9 +34,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
-        getProject(organizationId, projectId);
+        ProjectBean p = getProject(organizationId, projectId);
         ActivityBean a = super.get(activityId, ActivityBean.class);
-        if (a == null) throw ExceptionFactory.activityNotFoundException(activityId);
+        if (a == null || !a.getProject().equals(p)) throw ExceptionFactory.activityNotFoundException(activityId);
         return a;
     }
 
@@ -49,9 +49,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public ProjectBean getProject(String organizationId, Long projectId) {
-        getOrganization(organizationId);
+        OrganizationBean o = getOrganization(organizationId);
         ProjectBean p = super.get(projectId, ProjectBean.class);
-        if (p == null) throw ExceptionFactory.projectNotFoundException(projectId);
+        if (p == null || !p.getOrganization().equals(o)) throw ExceptionFactory.projectNotFoundException(projectId);
         return p;
     }
 

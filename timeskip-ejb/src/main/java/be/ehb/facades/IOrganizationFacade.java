@@ -173,7 +173,7 @@ public interface IOrganizationFacade {
      * @param request        the worklog
      * @return Worklog response
      */
-    WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewWorklogRequest request);
+    WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewAdminWorklogRequest request);
 
     /**
      * Update a worklog

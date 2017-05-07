@@ -83,4 +83,8 @@ public class ExceptionFactory {
     public static WorklogNotFoundException worklogNotFoundException(Long worklogId) {
         return new WorklogNotFoundException(worklogId.toString());
     }
+
+    public static UserNotAssignedToProjectException userNotAssignedToProjectException(String projectName) {
+        return new UserNotAssignedToProjectException(projectName);
+    }
 }

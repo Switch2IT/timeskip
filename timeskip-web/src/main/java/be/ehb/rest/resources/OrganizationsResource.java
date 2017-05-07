@@ -355,7 +355,7 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response logWork(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewWorklogRequest request) {
+    public Response logWork(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewAdminWorklogRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
         Preconditions.checkNotNull(projectId, "Project ID must be provided");
         Preconditions.checkNotNull(activityId, "Activity ID must be provided");
@@ -367,6 +367,27 @@ public class OrganizationsResource {
         Preconditions.checkArgument(request.getLoggedMinutes() != null, "\"loggedMinutes\" must be provided");
         Preconditions.checkArgument(request.getLoggedMinutes() > 0, "\"loggedMinutes\" must be greater than 0");
         return ResponseFactory.buildResponse(CREATED, orgFacade.createWorkLog(organizationId, projectId, activityId, request));
+    }
+
+    @ApiOperation(value = "Create worklog for current user",
+            notes = "Create a worklog entry on an activity for the current user. Day and logged minutes must be provided. If the log is unconfirmed a reminder will be sent at a pre-configured date.")
+    @ApiResponses({
+            @ApiResponse(code = 201, response = WorklogResponse.class, message = "Created"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @POST
+    @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/currentuser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logWorkForCurrentUser(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewWorklogRequest request) {
+
+        Preconditions.checkNotNull(request, "Request body must be provided");
+        NewAdminWorklogRequest req = new NewAdminWorklogRequest();
+        req.setConfirmed(request.getConfirmed());
+        req.setDay(request.getDay());
+        req.setLoggedMinutes(request.getLoggedMinutes());
+        req.setUserId(securityContext.getCurrentUser());
+        return logWork(organizationId, projectId, activityId, req);
     }
 
     @ApiOperation(value = "Update worklog",

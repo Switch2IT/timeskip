@@ -35,6 +35,7 @@ class ErrorCodes {
 
     static final int USER_NOT_FOUND = 2001;
     static final int JWT_VALIDATION_ERROR = 2002;
+    static final int USER_NOT_ASSIGNED_TO_PROJECT = 2003;
 
     // WORKLOG RELATED
 
