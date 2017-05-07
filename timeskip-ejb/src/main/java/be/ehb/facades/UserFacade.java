@@ -1,6 +1,7 @@
 package be.ehb.facades;
 
 import be.ehb.entities.users.UserBean;
+import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.JWTParseRequest;
@@ -23,11 +24,12 @@ import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 @Stateless
@@ -126,5 +128,10 @@ public class UserFacade implements IUserFacade, Serializable {
         //Create the memberships
         request.getMemberships().forEach(memReq -> membershipFacade.create(userId, memReq.getOrganizationId(), memReq.getRole()));
         return ResponseFactory.createUserResponse(newUser);
+    }
+
+    @Override
+    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
+        return storage.listUsersWorkloadActivity(day).stream().collect(Collectors.toList());
     }
 }

@@ -8,6 +8,7 @@ import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.security.PermissionBean;
 
 import java.util.Date;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 public interface IStorageService {
@@ -81,6 +82,8 @@ public interface IStorageService {
     List<UserBean> listUsers();
 
     List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId);
+
+    List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day);
 
     //Queries
 

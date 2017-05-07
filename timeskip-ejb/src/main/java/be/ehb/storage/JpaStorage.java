@@ -8,6 +8,7 @@ import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 @ApplicationScoped
@@ -290,5 +291,21 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
                 .setParameter("user", userId)
                 .setParameter("day", day)
                 .getSingleResult();
+    }
+
+    @Override
+    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
+        StringBuilder sbqr = new StringBuilder();
+        sbqr.append("select u.id, u.first_name, u.last_name, u.email, wl.day, ac.description, wl.logged_minutes, wl.confirmed");
+        sbqr.append("from users u");
+        sbqr.append("inner join worklogs wl");
+        sbqr.append("on u.id = wl.user_id");
+        sbqr.append("inner join activities ac");
+        sbqr.append("on wl.activity_id = ac.id");
+        sbqr.append("where wl.day < :date");
+        return getActiveEntityManager()
+                .createQuery(sbqr.toString())
+                .setParameter("date", day)
+                .getResultList();
     }
 }
