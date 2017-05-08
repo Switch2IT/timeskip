@@ -1,8 +1,7 @@
 package be.ehb.startup;
 
-import be.ehb.configuration.IAppConfig;
-import be.ehb.scheduler.ScheduleService;
 import be.ehb.mail.IMailService;
+import be.ehb.scheduler.ScheduleService;
 import be.ehb.storage.IStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

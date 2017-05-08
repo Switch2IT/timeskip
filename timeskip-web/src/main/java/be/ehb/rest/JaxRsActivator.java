@@ -19,11 +19,7 @@ package be.ehb.rest;
 import be.ehb.rest.mappers.IllegalArgumentExceptionMapper;
 import be.ehb.rest.mappers.NullPointerExceptionMapper;
 import be.ehb.rest.mappers.RestExceptionMapper;
-import be.ehb.rest.resources.ConfigurationResource;
-import be.ehb.rest.resources.OrganizationsResource;
-import be.ehb.rest.resources.ReportsResource;
-import be.ehb.rest.resources.SystemResource;
-import be.ehb.rest.resources.UsersResource;
+import be.ehb.rest.resources.*;
 import be.ehb.servlets.CORSFilter;
 import be.ehb.servlets.RequestFilter;
 

@@ -1,42 +1,25 @@
 package be.ehb.scheduler;
 
 import be.ehb.entities.users.UsersWorkLoadActivityBO;
-import be.ehb.mail.BaseMailBean;
-import be.ehb.mail.IMailProvider;
+import be.ehb.mail.IMailService;
+import be.ehb.model.mail.ConfirmationReminderMailBean;
 import be.ehb.storage.IStorageService;
 import org.quartz.JobExecutionException;
 
-import javax.mail.internet.MimeMessage;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
- * Created by Patrick Van den Bussche on 7/05/2017.
+ * @author Patrick Van den Bussche
+ * @since 2017
  */
+class EmailReminderJobContext {
 
-public class EmailReminderJobContext {
-
-    private static final String NEW_LINE = "\n";
-
-    private IMailProvider mp;
+    private IMailService mailService;
     private IStorageService iss;
 
-    private static void sendMail(StringBuilder content, BaseMailBean bmb, IMailProvider mp) {
-        content.append("Best regards,");
-        content.append(NEW_LINE);
-        content.append("Hr Manager of the Company");
-        content.append(NEW_LINE);
-        content.append("X-X");
-        content.append(NEW_LINE);
-        content.append("*** This is an automatically generated email, please do not reply ***");
-        bmb.setContent(content.toString());
-        MimeMessage mm = mp.composeMessage(bmb);
-        mp.sendMail(mm);
-    }
-
-    void setMp(IMailProvider mp) {
-        this.mp = mp;
+    void setMailService(IMailService mailService) {
+        this.mailService = mailService;
     }
 
     void setIss(IStorageService iss) {
@@ -44,38 +27,39 @@ public class EmailReminderJobContext {
     }
 
     void execute() throws JobExecutionException {
-
-        String prevId = null;
-        BaseMailBean bmb = new BaseMailBean();
-
         List<UsersWorkLoadActivityBO> usersWorkLoadActivityBOList = iss.listUsersWorkloadActivity(new Date());
 
-        if (usersWorkLoadActivityBOList.size() > 0) {
-            StringBuilder content = new StringBuilder();
-            for (UsersWorkLoadActivityBO usersWorkLoadActivityBO : usersWorkLoadActivityBOList) {
-                if (usersWorkLoadActivityBO.getId().equals(prevId)) {
-                    if (prevId != null) {
-                        sendMail(content, bmb, mp);
-                    }
-                    bmb.setTo(usersWorkLoadActivityBO.getEmail());
-                    bmb.setSubject("TimeSkip - Monthly uncompleted tasks");
-                    content.append("Dear ");
-                    content.append(usersWorkLoadActivityBO.getFirstName());
-                    content.append(" ");
-                    content.append(usersWorkLoadActivityBO.getLastName());
-                    content.append(NEW_LINE);
-                    content.append("Please check following uncompleted tasks for last month");
-                    content.append(NEW_LINE);
+        if (!usersWorkLoadActivityBOList.isEmpty()) {
+            Map<String, List<UsersWorkLoadActivityBO>> sortedMap = new HashMap<>();
+            usersWorkLoadActivityBOList.forEach(bo -> {
+                if (sortedMap.containsKey(bo.getId())) {
+                    sortedMap.get(bo.getId()).add(bo);
                 } else {
-                    content.append(new SimpleDateFormat("dd/MM/yyyy").format(usersWorkLoadActivityBO.getDay()));
-                    content.append(" ");
-                    content.append(usersWorkLoadActivityBO.getDescription());
-                    content.append(" ");
-                    content.append(new Long(String.format(usersWorkLoadActivityBO.getLoggedMinutes().toString(), "###")));
-                    content.append(NEW_LINE);
+                    List<UsersWorkLoadActivityBO> list = new ArrayList<>();
+                    list.add(bo);
+                    sortedMap.put(bo.getId(), list);
                 }
-            }
-            sendMail(content, bmb, mp);
+            });
+            sortedMap.forEach((key, value) -> {
+                ConfirmationReminderMailBean reminder = new ConfirmationReminderMailBean();
+                UsersWorkLoadActivityBO first = value.get(0);
+                reminder.setUserName(first.getFirstName());
+                reminder.setTo(first.getEmail());
+                StringBuilder worklogList = new StringBuilder("<ul>");
+                value.forEach(entry -> worklogList.append("<li><b>")
+                        .append(entry.getDescription())
+                        .append("</b>: ")
+                        .append(entry.getDay())
+                        .append(" - ")
+                        .append(new BigDecimal(entry.getLoggedMinutes().doubleValue() / 60).setScale(2, BigDecimal.ROUND_HALF_UP))
+                        .append(" hours logged. ")
+                        .append(entry.getConfirmed() ? "Already " : "Not yet ")
+                        .append("confirmed.")
+                        .append("</li>"));
+                worklogList.append("</ul>");
+                reminder.setRequiredWorklogConfirmations(worklogList.toString());
+                mailService.sendConfirmationReminder(reminder);
+            });
         }
     }
 }
