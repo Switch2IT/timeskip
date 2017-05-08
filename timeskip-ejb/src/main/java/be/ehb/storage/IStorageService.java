@@ -63,6 +63,10 @@ public interface IStorageService {
 
     WorklogBean createWorklog(WorklogBean worklog);
 
+    //Create or Update
+
+    MembershipBean createOrUpdateMembership(MembershipBean membership);
+
     //Update
 
     ActivityBean updateActivity(ActivityBean activity);
@@ -105,6 +109,8 @@ public interface IStorageService {
 
     List<MailTemplateBean> listMailTemplates();
 
+    List<MembershipBean> listMemberships(String userId);
+
     List<OrganizationBean> listOrganizations();
 
     List<PaygradeBean> listPaygrades();
@@ -126,6 +132,8 @@ public interface IStorageService {
     Set<PermissionBean> getPermissions(String userId);
 
     ActivityBean findActivityByName(String organizationId, Long projectId, String activityName);
+
+    MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId);
 
     OrganizationBean findOrganizationByName(String organizationName);
 

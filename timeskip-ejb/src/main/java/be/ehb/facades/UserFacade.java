@@ -48,7 +48,7 @@ public class UserFacade implements IUserFacade, Serializable {
     @Inject
     private ISecurityContext securityContext;
     @Inject
-    private IManagementFacade membershipFacade;
+    private IManagementFacade managementFacade;
     @Inject
     private IIdpClient idpClient;
 
@@ -133,7 +133,7 @@ public class UserFacade implements IUserFacade, Serializable {
         String userId = newUser.getId();
 
         //Create the memberships
-        request.getMemberships().forEach(memReq -> membershipFacade.createMembership(userId, memReq.getOrganizationId(), memReq.getRole()));
+        request.getMemberships().forEach(memReq -> managementFacade.updateOrCreateMembership(userId, memReq.getOrganizationId(), memReq.getRole()));
         return ResponseFactory.createUserResponse(newUser);
     }
 
@@ -145,12 +145,7 @@ public class UserFacade implements IUserFacade, Serializable {
             throw ExceptionFactory.noUserContextException();
         }
         UserBean cUser = storage.getUser(currentUser);
-        if (StringUtils.isNotEmpty(request.getEmail()) && !request.getEmail().equals(cUser.getEmail())) {
-            if (storage.findUserByEmail(request.getEmail()) != null)
-                throw ExceptionFactory.userAlreadyExists(request.getEmail());
-            cUser.setEmail(request.getEmail());
-            changed = true;
-        }
+        changed = updateEmailIfChanged(cUser, request.getEmail());
         if (StringUtils.isNotEmpty(request.getFirstName()) && !request.getFirstName().equals(cUser.getFirstName())) {
             cUser.setFirstName(request.getFirstName());
             changed = true;
@@ -168,12 +163,7 @@ public class UserFacade implements IUserFacade, Serializable {
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         UserBean user = storage.getUser(userId);
         boolean changed = false;
-        if (StringUtils.isNotEmpty(request.getEmail()) && !request.getEmail().equals(user.getEmail())) {
-            if (storage.findUserByEmail(request.getEmail()) != null)
-                throw ExceptionFactory.userAlreadyExists(request.getEmail());
-            user.setEmail(request.getEmail());
-            changed = true;
-        }
+        changed = updateEmailIfChanged(user, request.getEmail());
         if (StringUtils.isNotEmpty(request.getFirstName()) && !request.getFirstName().equals(user.getFirstName())) {
             user.setFirstName(request.getFirstName());
             changed = true;
@@ -205,7 +195,13 @@ public class UserFacade implements IUserFacade, Serializable {
         } else return null;
     }
 
-    private UserBean updateUserBeanNameAndEmail(UserBean user, String email, String firstName, String lastName) {
-        return null;
+    private boolean updateEmailIfChanged(UserBean user, String requestEmail) {
+        if (StringUtils.isNotEmpty(requestEmail) && !requestEmail.equals(user.getEmail())) {
+            if (storage.findUserByEmail(requestEmail) != null)
+                throw ExceptionFactory.userAlreadyExists(requestEmail);
+            user.setEmail(requestEmail);
+            return true;
+        }
+        return false;
     }
 }

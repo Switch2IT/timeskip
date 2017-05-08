@@ -23,6 +23,10 @@ WHERE role_id = 'consultant' AND permission = 6;
 DELETE FROM permissions
 WHERE role_id = 'consultant' AND permission = 9;
 
+INSERT INTO permissions (role_id, permission) VALUES ('consultant', 7);
+
+INSERT INTO permissions (role_id, permission) VALUES ('consultant', 10);
+
 INSERT INTO permissions (role_id, permission) VALUES ('consultant', 12);
 
 INSERT INTO permissions (role_id, permission) VALUES ('consultant', 14);

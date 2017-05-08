@@ -1,13 +1,14 @@
 package be.ehb.rest.resources;
 
+import be.ehb.facades.IManagementFacade;
 import be.ehb.facades.IOrganizationFacade;
 import be.ehb.facades.IUserFacade;
+import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.*;
-import be.ehb.model.responses.ErrorResponse;
-import be.ehb.model.responses.TokenClaimsResponse;
-import be.ehb.model.responses.UserResponse;
-import be.ehb.model.responses.WorklogResponse;
+import be.ehb.model.responses.*;
+import be.ehb.security.ISecurityContext;
+import be.ehb.security.PermissionType;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
@@ -19,8 +20,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static javax.ws.rs.core.Response.Status.CREATED;
-import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.*;
 
 /**
  * @author Guillaume Vandecasteele
@@ -35,6 +35,10 @@ public class UsersResource {
     private IUserFacade userFacade;
     @Inject
     private IOrganizationFacade orgFacade;
+    @Inject
+    private IManagementFacade managementFacade;
+    @Inject
+    private ISecurityContext securityContext;
 
     @ApiOperation(value = "Parse a JWT",
             notes = "Parse a JWT and return the user info from the claims")
@@ -146,6 +150,58 @@ public class UsersResource {
         Preconditions.checkNotNull(request, "Request body must be provided");
 
         return ResponseFactory.buildResponse(CREATED, userFacade.updateUser(userId, request));
+    }
+
+    @ApiOperation(value = "List user memberships",
+            notes = "List user memberships")
+    @ApiResponses({
+            @ApiResponse(code = 200, responseContainer = "List", response = MembershipResponse.class, message = "Memberships"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/{userId}/memberships")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listUserMemberships(@PathParam("userId") String userId) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        return ResponseFactory.buildResponse(OK, managementFacade.listUserMemberships(userId));
+    }
+
+    @ApiOperation(value = "Delete user membership",
+            notes = "Delete a user's membership in an organization")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Deleted"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @DELETE
+    @Path("/{userId}/memberships/{organizationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listUserMemberships(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
+        managementFacade.deleteUserMembership(userId, organizationId);
+        return ResponseFactory.buildResponse(NO_CONTENT);
+    }
+
+    @ApiOperation(value = "Update/create user membership",
+            notes = "Update or create a user membership")
+    @ApiResponses({
+            @ApiResponse(code = 201, response = MembershipResponse.class, message = "Created"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @PUT
+    @Path("/{userId}/memberships/organizations/{organizationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createUserMembership(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId, @ApiParam MembershipChangeRequest request) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organizationId\" must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getRole()), "\"role\" must be provided");
+        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
+        return ResponseFactory.buildResponse(CREATED, managementFacade.updateOrCreateMembership(userId, organizationId, request.getRole()));
     }
 
     @ApiOperation(value = "Update current user worklogs",

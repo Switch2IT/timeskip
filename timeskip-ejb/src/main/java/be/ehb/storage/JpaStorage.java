@@ -169,6 +169,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public MembershipBean createOrUpdateMembership(MembershipBean membership) {
+        MembershipBean rval = null;
+        MembershipBean existing = findMembershipByUserAndOrganization(membership.getUserId(), membership.getOrganizationId());
+        if (existing != null) {
+            existing.setRoleId(membership.getRoleId());
+            return updateMembership(membership);
+        } else {
+            return createMembership(membership);
+        }
+    }
+
+    @Override
     public ActivityBean updateActivity(ActivityBean activity) {
         return super.update(activity);
     }
@@ -263,6 +275,14 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public List<MembershipBean> listMemberships(String userId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :uId", MembershipBean.class)
+                .setParameter("uId", userId)
+                .getResultList();
+    }
+
+    @Override
     public List<OrganizationBean> listOrganizations() {
         return getActiveEntityManager()
                 .createQuery("SELECT o FROM OrganizationBean o")
@@ -354,6 +374,19 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
                     .setParameter("orgId", organizationId)
                     .setParameter("pId", projectId)
                     .setParameter("aName", activityName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :uId AND m.organizationId = :oId", MembershipBean.class)
+                    .setParameter("uId", userId)
+                    .setParameter("oId", organizationId)
                     .getSingleResult();
         } catch (NoResultException ex) {
             return null;

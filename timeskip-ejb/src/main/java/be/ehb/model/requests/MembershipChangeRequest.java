@@ -9,18 +9,9 @@ import java.io.Serializable;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UpdateMembershipRequest implements Serializable {
+public class MembershipChangeRequest implements Serializable {
 
-    private String organizationId;
     private String role;
-
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
 
     public String getRole() {
         return role;
@@ -32,9 +23,8 @@ public class UpdateMembershipRequest implements Serializable {
 
     @Override
     public String toString() {
-        return "MembershipResponse{" +
-                "organizationId=" + organizationId +
-                ", role='" + role + '\'' +
+        return "MembershipChangeRequest{" +
+                "role='" + role + '\'' +
                 '}';
     }
 }

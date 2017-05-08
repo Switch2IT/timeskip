@@ -94,7 +94,7 @@ public class OrganizationFacade implements IOrganizationFacade {
             membership.setRoleId(role.getId());
             membership.setUserId(userId);
             membership.setOrganizationId(id);
-            storage.createMembership(membership);
+            storage.createOrUpdateMembership(membership);
             log.info("Created membership for user \"{}\" with role \"{}\"", userId, role.getName());
         }
 

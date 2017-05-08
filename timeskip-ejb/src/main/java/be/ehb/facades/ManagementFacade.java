@@ -41,26 +41,34 @@ public class ManagementFacade implements IManagementFacade {
     private static final Logger log = LoggerFactory.getLogger(ManagementFacade.class);
 
     @Inject
-    private IRoleFacade roleFacade;
-    @Inject
-    private IOrganizationFacade orgFacade;
-    @Inject
-    private IUserFacade userFacade;
-    @Inject
     private IStorageService storage;
 
     @Override
-    public MembershipResponse createMembership(String userId, String organizationId, String roleId) {
-        orgFacade.get(organizationId);
-        userFacade.get(userId);
-        roleFacade.get(roleId);
+    public MembershipResponse updateOrCreateMembership(String userId, String organizationId, String roleId) {
+        //Check if entities exist
+        storage.getOrganization(organizationId);
+        storage.getUser(userId);
+        storage.getRole(roleId);
         MembershipBean newMembership = new MembershipBean();
         newMembership.setRoleId(roleId);
         newMembership.setUserId(userId);
         newMembership.setRoleId(roleId);
-        return ResponseFactory.createMembershipResponse(storage.createMembership(newMembership));
+        return ResponseFactory.createMembershipResponse(storage.createOrUpdateMembership(newMembership));
     }
 
+    @Override
+    public List<MembershipResponse> listUserMemberships(String userId) {
+        storage.getUser(userId);
+        return storage.listMemberships(userId).stream().map(ResponseFactory::createMembershipResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteUserMembership(String userId, String organizationId) {
+        storage.getUser(userId);
+        storage.getOrganization(organizationId);
+        MembershipBean membership = storage.findMembershipByUserAndOrganization(userId, organizationId);
+        storage.deleteMembership(membership);
+    }
 
     @Override
     public List<MailTemplateResponse> listMailTemplates() {

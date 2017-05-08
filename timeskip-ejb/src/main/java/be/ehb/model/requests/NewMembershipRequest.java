@@ -32,8 +32,8 @@ public class NewMembershipRequest implements Serializable {
 
     @Override
     public String toString() {
-        return "MembershipResponse{" +
-                "organizationId=" + organizationId +
+        return "NewMembershipRequest{" +
+                "organizationId='" + organizationId + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }

@@ -20,7 +20,11 @@ public interface IManagementFacade {
 
     // MEMBERSHIP RELATED
 
-    MembershipResponse createMembership(String userId, String organizationId, String roleId);
+    MembershipResponse updateOrCreateMembership(String userId, String organizationId, String roleId);
+
+    List<MembershipResponse> listUserMemberships(String userId);
+
+    void deleteUserMembership(String userId, String organizationId);
 
     // MAIL TEMPLATE RELATED
 
