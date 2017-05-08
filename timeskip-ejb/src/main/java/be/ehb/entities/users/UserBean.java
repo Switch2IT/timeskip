@@ -3,6 +3,7 @@ package be.ehb.entities.users;
 import be.ehb.entities.organizations.MembershipBean;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users", schema = "timeskip")
-public class UserBean {
+public class UserBean implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)

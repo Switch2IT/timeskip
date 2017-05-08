@@ -3,6 +3,7 @@ package be.ehb.entities.projects;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
@@ -10,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "activities", schema = "timeskip")
-public class ActivityBean {
+public class ActivityBean implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

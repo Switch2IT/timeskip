@@ -3,6 +3,7 @@ package be.ehb.entities.organizations;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
@@ -10,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "organizations", schema = "timeskip")
-public class OrganizationBean {
+public class OrganizationBean implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)

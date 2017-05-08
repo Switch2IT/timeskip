@@ -8,6 +8,8 @@ public interface IAppConfig {
 
     String getNotificationMailFrom();
 
+    String getNoticationStartupMailTo();
+
     String getVersion();
 
     String getBuildDate();
@@ -29,4 +31,6 @@ public interface IAppConfig {
     boolean getValidateJWT();
 
     Integer getDayOfMonthlyReminderEmail();
+
+    boolean getLastDayOfMonth();
 }

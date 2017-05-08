@@ -57,4 +57,9 @@ abstract class AbstractJpaStorage {
         return em.find(type, id);
     }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    <T> T get(Enum id, Class<T> type) {
+        log.trace("get(enum:id:" + id);
+        return em.find(type, id);
+    }
 }

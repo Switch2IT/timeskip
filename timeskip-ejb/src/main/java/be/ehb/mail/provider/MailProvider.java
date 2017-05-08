@@ -1,6 +1,7 @@
-package be.ehb.mail;
+package be.ehb.mail.provider;
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.model.mail.BaseMailBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
