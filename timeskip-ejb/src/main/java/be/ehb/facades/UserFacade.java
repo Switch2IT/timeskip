@@ -1,10 +1,13 @@
 package be.ehb.facades;
 
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.JWTParseRequest;
 import be.ehb.model.requests.NewUserRequest;
+import be.ehb.model.requests.UpdateCurrentUserRequest;
+import be.ehb.model.requests.UpdateUserRequest;
 import be.ehb.model.responses.TokenClaimsResponse;
 import be.ehb.model.responses.UserResponse;
 import be.ehb.security.ISecurityContext;
@@ -23,6 +26,7 @@ import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +48,7 @@ public class UserFacade implements IUserFacade, Serializable {
     @Inject
     private ISecurityContext securityContext;
     @Inject
-    private IMembershipFacade membershipFacade;
+    private IManagementFacade membershipFacade;
     @Inject
     private IIdpClient idpClient;
 
@@ -56,6 +60,11 @@ public class UserFacade implements IUserFacade, Serializable {
     @Override
     public UserBean get(String userId) {
         return storage.getUser(userId);
+    }
+
+    @Override
+    public UserResponse getUser(String userId) {
+        return ResponseFactory.createUserResponse(storage.getUser(userId));
     }
 
     @Override
@@ -124,7 +133,79 @@ public class UserFacade implements IUserFacade, Serializable {
         String userId = newUser.getId();
 
         //Create the memberships
-        request.getMemberships().forEach(memReq -> membershipFacade.create(userId, memReq.getOrganizationId(), memReq.getRole()));
+        request.getMemberships().forEach(memReq -> membershipFacade.createMembership(userId, memReq.getOrganizationId(), memReq.getRole()));
         return ResponseFactory.createUserResponse(newUser);
+    }
+
+    @Override
+    public UserResponse updateCurrentUser(UpdateCurrentUserRequest request) {
+        String currentUser = securityContext.getCurrentUser();
+        boolean changed = false;
+        if (StringUtils.isEmpty(currentUser)) {
+            throw ExceptionFactory.noUserContextException();
+        }
+        UserBean cUser = storage.getUser(currentUser);
+        if (StringUtils.isNotEmpty(request.getEmail()) && !request.getEmail().equals(cUser.getEmail())) {
+            if (storage.findUserByEmail(request.getEmail()) != null)
+                throw ExceptionFactory.userAlreadyExists(request.getEmail());
+            cUser.setEmail(request.getEmail());
+            changed = true;
+        }
+        if (StringUtils.isNotEmpty(request.getFirstName()) && !request.getFirstName().equals(cUser.getFirstName())) {
+            cUser.setFirstName(request.getFirstName());
+            changed = true;
+        }
+        if (StringUtils.isNotEmpty(request.getLastName()) && !request.getLastName().equals(cUser.getLastName())) {
+            cUser.setFirstName(request.getFirstName());
+            changed = true;
+        }
+        if (changed) {
+            return ResponseFactory.createUserResponse(storage.updateUser(cUser));
+        } else return null;
+    }
+
+    @Override
+    public UserResponse updateUser(String userId, UpdateUserRequest request) {
+        UserBean user = storage.getUser(userId);
+        boolean changed = false;
+        if (StringUtils.isNotEmpty(request.getEmail()) && !request.getEmail().equals(user.getEmail())) {
+            if (storage.findUserByEmail(request.getEmail()) != null)
+                throw ExceptionFactory.userAlreadyExists(request.getEmail());
+            user.setEmail(request.getEmail());
+            changed = true;
+        }
+        if (StringUtils.isNotEmpty(request.getFirstName()) && !request.getFirstName().equals(user.getFirstName())) {
+            user.setFirstName(request.getFirstName());
+            changed = true;
+        }
+        if (StringUtils.isNotEmpty(request.getLastName()) && !request.getLastName().equals(user.getLastName())) {
+            user.setFirstName(request.getFirstName());
+            changed = true;
+        }
+        if (request.getPaygradeId() != null && !request.getPaygradeId().equals(user.getPaygrade().getId())) {
+            PaygradeBean paygrade = storage.getPaygrade(request.getPaygradeId());
+            user.setPaygrade(paygrade);
+            changed = true;
+        }
+        if (request.getDefaultHoursPerDay() != null && !request.getDefaultHoursPerDay().equals(user.getDefaultHoursPerDay())) {
+            user.setDefaultHoursPerDay(request.getDefaultHoursPerDay());
+            changed = true;
+        }
+        if (request.getWorkDays() != null && request.getWorkDays().isEmpty() && !new HashSet<>(request.getWorkDays()).equals(new HashSet<>(user.getWorkdays()))) {
+            user.setWorkdays(request.getWorkDays());
+            changed = true;
+        }
+        if (request.getDefaultActivity() != null && !request.getDefaultActivity().equals(user.getDefaultActivity())) {
+            storage.getActivity(request.getDefaultActivity());
+            user.setDefaultActivity(request.getDefaultActivity());
+            changed = true;
+        }
+        if (changed) {
+            return ResponseFactory.createUserResponse(storage.updateUser(user));
+        } else return null;
+    }
+
+    private UserBean updateUserBeanNameAndEmail(UserBean user, String email, String firstName, String lastName) {
+        return null;
     }
 }

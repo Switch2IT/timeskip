@@ -8,6 +8,7 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.mail.MailTopic;
@@ -33,6 +34,13 @@ import java.util.Set;
 public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(JpaStorage.class);
+
+    @Override
+    public ActivityBean getActivity(Long activityId) {
+        ActivityBean activity = super.get(activityId, ActivityBean.class);
+        if (activity == null) throw ExceptionFactory.activityNotFoundException(activityId);
+        return activity;
+    }
 
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
@@ -67,6 +75,13 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         OrganizationBean org = super.get(organizationId, OrganizationBean.class);
         if (org == null) throw ExceptionFactory.organizationNotFoundException(organizationId);
         return org;
+    }
+
+    @Override
+    public PaygradeBean getPaygrade(Long paygradeId) {
+        PaygradeBean paygrade = super.get(paygradeId, PaygradeBean.class);
+        if (paygrade == null) throw ExceptionFactory.paygradeNotFoundException(paygradeId);
+        return paygrade;
     }
 
     @Override
@@ -134,6 +149,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public PaygradeBean createPaygrade(PaygradeBean paygrade) {
+        return super.create(paygrade);
+    }
+
+    @Override
     public ProjectBean createProject(ProjectBean project) {
         return super.create(project);
     }
@@ -164,13 +184,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public ProjectBean updateProject(ProjectBean project) {
-        return super.update(project);
-    }
-
-    @Override
-    public WorklogBean updateWorklog(WorklogBean worklog) {
-        return super.update(worklog);
+    public PaygradeBean updatePaygrade(PaygradeBean paygrade) {
+        return super.update(paygrade);
     }
 
     @Override
@@ -181,6 +196,21 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public MembershipBean updateMembership(MembershipBean membership) {
         return super.update(membership);
+    }
+
+    @Override
+    public ProjectBean updateProject(ProjectBean project) {
+        return super.update(project);
+    }
+
+    @Override
+    public UserBean updateUser(UserBean user) {
+        return super.update(user);
+    }
+
+    @Override
+    public WorklogBean updateWorklog(WorklogBean worklog) {
+        return super.update(worklog);
     }
 
     @Override
@@ -199,8 +229,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public void deletePaygrade(PaygradeBean paygrade) {
+        super.delete(paygrade);
+    }
+
+    @Override
     public void deleteProject(ProjectBean project) {
         super.delete(project);
+    }
+
+    @Override
+    public void deleteUser(UserBean user) {
+        super.delete(user);
     }
 
     @Override
@@ -209,12 +249,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public List<ActivityBean> listProjectActivities(String organizationId, Long projectId) {
-        ProjectBean proj = getProject(organizationId, projectId);
+    public List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId) {
+        ActivityBean activity = getActivity(organizationId, projectId, activityId);
         return getActiveEntityManager()
-                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId")
-                .setParameter("orgId", proj.getOrganization().getId())
-                .setParameter("pId", proj.getId())
+                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity")
+                .setParameter("activity", activity)
                 .getResultList();
     }
 
@@ -231,8 +270,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public List<UserBean> listUsers() {
-        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
+    public List<PaygradeBean> listPaygrades() {
+        return getActiveEntityManager().createQuery("SELECT p FROM PaygradeBean p", PaygradeBean.class).getResultList();
     }
 
     @Override
@@ -245,12 +284,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId) {
-        ActivityBean activity = getActivity(organizationId, projectId, activityId);
+    public List<ActivityBean> listProjectActivities(String organizationId, Long projectId) {
+        ProjectBean proj = getProject(organizationId, projectId);
         return getActiveEntityManager()
-                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity")
-                .setParameter("activity", activity)
+                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId")
+                .setParameter("orgId", proj.getOrganization().getId())
+                .setParameter("pId", proj.getId())
                 .getResultList();
+    }
+
+    @Override
+    public List<UserBean> listUsers() {
+        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
     }
 
     @Override
@@ -328,6 +373,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public PaygradeBean findPaygradeByName(String paygradeName) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT p FROM PaygradeBean p WHERE p.name = :pName", PaygradeBean.class)
+                    .setParameter("pName", paygradeName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public ProjectBean findProjectByName(String organizationId, String projectName) {
         try {
             return (ProjectBean) getActiveEntityManager()
@@ -339,6 +396,27 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             log.info("No project with name \"{}\" found in organization \"{}\"", organizationId, projectName);
             return null;
         }
+    }
+
+    @Override
+    public UserBean findUserByEmail(String email) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT u FROM UserBean u WHERE u.email = :mail", UserBean.class)
+                    .setParameter("mail", email)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName) {
+        return getActiveEntityManager()
+                .createQuery("SELECT u FROM UserBean u WHERE u.firstName = :fName AND u.lastName = :lName", UserBean.class)
+                .setParameter("fName", firstName)
+                .setParameter("lName", lastName)
+                .getResultList();
     }
 
     @Override

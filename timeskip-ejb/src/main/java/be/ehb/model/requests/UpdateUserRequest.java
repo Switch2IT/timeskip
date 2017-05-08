@@ -1,10 +1,9 @@
-package be.ehb.model.responses;
+package be.ehb.model.requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,26 +11,15 @@ import java.util.Set;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserResponse implements Serializable {
+public class UpdateUserRequest implements Serializable {
 
-    private String id;
     private String email;
     private String firstName;
     private String lastName;
-    private Boolean admin;
-    private List<MembershipResponse> memberships;
-    private PaygradeResponse paygrade;
     private Double defaultHoursPerDay;
     private Set<DayOfWeek> workDays;
+    private Long paygradeId;
     private Long defaultActivity;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getEmail() {
         return email;
@@ -57,22 +45,6 @@ public class UserResponse implements Serializable {
         this.lastName = lastName;
     }
 
-    public Boolean getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
-    }
-
-    public List<MembershipResponse> getMemberships() {
-        return memberships;
-    }
-
-    public void setMemberships(List<MembershipResponse> memberships) {
-        this.memberships = memberships;
-    }
-
     public Double getDefaultHoursPerDay() {
         return defaultHoursPerDay;
     }
@@ -89,6 +61,14 @@ public class UserResponse implements Serializable {
         this.workDays = workDays;
     }
 
+    public Long getPaygradeId() {
+        return paygradeId;
+    }
+
+    public void setPaygradeId(Long paygradeId) {
+        this.paygradeId = paygradeId;
+    }
+
     public Long getDefaultActivity() {
         return defaultActivity;
     }
@@ -97,26 +77,15 @@ public class UserResponse implements Serializable {
         this.defaultActivity = defaultActivity;
     }
 
-    public PaygradeResponse getPaygrade() {
-        return paygrade;
-    }
-
-    public void setPaygrade(PaygradeResponse paygrade) {
-        this.paygrade = paygrade;
-    }
-
     @Override
     public String toString() {
-        return "UserResponse{" +
-                "id='" + id + '\'' +
-                ", email='" + email + '\'' +
+        return "UpdateUserRequest{" +
+                "email='" + email + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", admin=" + admin +
-                ", memberships=" + memberships +
-                ", paygrade=" + paygrade +
                 ", defaultHoursPerDay=" + defaultHoursPerDay +
                 ", workDays=" + workDays +
+                ", paygradeId=" + paygradeId +
                 ", defaultActivity=" + defaultActivity +
                 '}';
     }

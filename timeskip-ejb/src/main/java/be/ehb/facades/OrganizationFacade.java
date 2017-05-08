@@ -73,6 +73,9 @@ public class OrganizationFacade implements IOrganizationFacade {
         String id = ConventionUtil.idFromName(request.getName());
         try {
             storage.getOrganization(id);
+            if (storage.findOrganizationByName(request.getName()) != null) {
+                throw ExceptionFactory.organizationAlreadyExistsException(request.getName());
+            }
             throw ExceptionFactory.organizationAlreadyExistsException(id);
         } catch (OrganizationNotFoundException ex) {
             //Do nothing

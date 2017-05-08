@@ -26,18 +26,26 @@ public class ErrorCodes {
     static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
     static final int ORGANIZATION_NOT_FOUND = 1004;
 
+    // PAYGRADE RELATED
+
+    static final int PAYGRADE_NOT_FOUND = 5004;
+    static final int PAYGRADE_ALREADY_EXISTS = 5009;
+
     // PROJECT RELATED
     static final int ORGANIZATION_ALREADY_EXISTS = 1005;
     static final int PROJECT_NOT_FOUND = 5004;
     static final int PROJECT_ALREADY_EXISTS = 5009;
 
     // ROLE RELATED
-    static final int PROJEC_OVERTIME_EXCEEDED = 5000;
+    static final int PROJEC_OVERTIME_EXCEEDED = 3000;
+    static final int ROLE_NOT_FOUND = 3001;
+
 
     // USER RELATED
-    static final int ROLE_NOT_FOUND = 3001;
     static final int USER_NOT_FOUND = 2001;
     static final int JWT_VALIDATION_ERROR = 2002;
+    static final int NO_USER_CONTEXT_FOUND = 2003;
+    static final int USER_ALREADY_EXISTS = 2009;
 
     // WORKLOG RELATED
     static final int USER_NOT_ASSIGNED_TO_PROJECT = 2003;

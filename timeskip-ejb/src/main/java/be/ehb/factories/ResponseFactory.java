@@ -7,6 +7,7 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.model.responses.*;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,7 @@ public class ResponseFactory {
             rval.setWorkDays(user.getWorkdays());
             rval.setMemberships(createMembershipResponses(user.getMemberships()));
             rval.setAdmin(user.getAdmin());
+            rval.setPaygrade(createPaygradeResponse(user.getPaygrade()));
         }
         return rval;
     }
@@ -151,6 +153,18 @@ public class ResponseFactory {
         if (lastDayOfMonth != null) {
             if (rval == null) rval = new DayOfMonthlyReminderResponse();
             rval.setLastDayOfMonth(lastDayOfMonth);
+        }
+        return rval;
+    }
+
+    public static PaygradeResponse createPaygradeResponse(PaygradeBean paygrade) {
+        PaygradeResponse rval = new PaygradeResponse();
+        if (paygrade != null) {
+            rval = new PaygradeResponse();
+            rval.setId(paygrade.getId());
+            rval.setName(paygrade.getName());
+            rval.setDescription(paygrade.getDescription());
+            rval.setHourlyRate(paygrade.getHourlyRate());
         }
         return rval;
     }

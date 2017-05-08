@@ -100,4 +100,20 @@ public class ExceptionFactory {
     public static MailServiceException mailServiceException(String message) {
         return new MailServiceException(message);
     }
+
+    public static PaygradeNotFoundException paygradeNotFoundException(Long paygradeId) {
+        return new PaygradeNotFoundException(paygradeId.toString());
+    }
+
+    public static PaygradeAlreadyExistsException paygradeAlreadyExists(String name) {
+        return new PaygradeAlreadyExistsException(name);
+    }
+
+    public static NoUserContextException noUserContextException() {
+        return new NoUserContextException();
+    }
+
+    public static UserAlreadyExistsException userAlreadyExists(String email) {
+        return new UserAlreadyExistsException(email);
+    }
 }
