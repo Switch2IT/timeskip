@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.ehb</groupId>
     <artifactId>timeskip</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>pom</packaging>
 
     <url>http://wildfly.org</url>
@@ -32,6 +32,24 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <name>Guillaume Vandecasteele</name>
+            <email>guillaume.vandecasteele@student.ehb.be</email>
+            <organizationUrl>https://www.erasmushogeschool.be</organizationUrl>
+            <organization>Erasmushogeschool</organization>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <name>Patrick Van den Bussche</name>
+            <email>patrick.van.den.bussche@student.ehb.be</email>
+            <organizationUrl>https://www.erasmushogeschool.be</organizationUrl>
+            <organization>Erasmushogeschool</organization>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
     <modules>
         <module>timeskip-ejb</module>
         <module>timeskip-web</module>

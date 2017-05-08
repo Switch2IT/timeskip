@@ -55,6 +55,29 @@ The application will be running at the following URL: <http://localhost:8080/tim
         
 ## Release Notes
 
+### v0.3
+
+#### Upgrade path
+
+When upgrading from v0.2, please execute the `v0.3-update.ddl` script that can be found in `timeskip-ejb/src/main/resources/ddl` folder
+
+#### Additions
+
+* Mail service
+* Configuration endpoints
+* User CRUD
+* Membership CRUD
+* Mail templates
+* Startup service
+* Server restart now sends mail to configurable e-mail address
+
+
+#### Bugfixes
+
+* Added missing auto-increment property to primary keys
+* Fixed issue where user could log work hours on unassigned project
+* Fixed access issue when querying numerical ID not belonging to containing entity
+
 ### v0.2
 
 * Added CRUD endpoints for organizations, projects, activities and worklogs
