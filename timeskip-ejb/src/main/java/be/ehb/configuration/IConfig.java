@@ -11,6 +11,7 @@ interface IConfig {
     String PROP_FILE_CONFIG_FILE = "configuration.file";
 
     String NOTIFICATION_MAIL_FROM = "timeskip.notifications.mail_from";
+    String NOTIFICATION_STARTUP_MAIL_TO = "timeskip.notifications.startup_mail_to";
 
     String IDP_CLIENT_ID = "timeskip.idp.admin_client_id";
     String IDP_CLIENT_SECRET = "timeskip.idp.admin_client_secret";

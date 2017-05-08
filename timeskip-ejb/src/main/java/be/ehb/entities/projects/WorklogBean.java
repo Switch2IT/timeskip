@@ -1,6 +1,7 @@
 package be.ehb.entities.projects;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "worklogs", schema = "timeskip")
-public class WorklogBean {
+public class WorklogBean implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

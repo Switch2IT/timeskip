@@ -1,5 +1,6 @@
 package be.ehb.factories;
 
+import be.ehb.entities.mail.MailTemplateBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
@@ -126,6 +127,30 @@ public class ResponseFactory {
             rval.setDay(worklog.getDay());
             rval.setLoggedMinutes(worklog.getLoggedMinutes());
             rval.setUserId(worklog.getUserId());
+        }
+        return rval;
+    }
+
+    public static MailTemplateResponse createMailTemplateResponse(MailTemplateBean template) {
+        MailTemplateResponse rval = null;
+        if (template != null) {
+            rval = new MailTemplateResponse();
+            rval.setTopic(template.getId().toString());
+            rval.setSubject(template.getSubject());
+            rval.setContent(template.getContent());
+        }
+        return rval;
+    }
+
+    public static DayOfMonthlyReminderResponse createDayOfMonthlyReminderResponse(Integer dayOfMonthlyReminder, Boolean lastDayOfMonth) {
+        DayOfMonthlyReminderResponse rval = null;
+        if (dayOfMonthlyReminder != null) {
+            rval = new DayOfMonthlyReminderResponse();
+            rval.setDayOfMonthlyReminder(dayOfMonthlyReminder);
+        }
+        if (lastDayOfMonth != null) {
+            if (rval == null) rval = new DayOfMonthlyReminderResponse();
+            rval.setLastDayOfMonth(lastDayOfMonth);
         }
         return rval;
     }

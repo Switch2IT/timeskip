@@ -15,6 +15,15 @@ class ErrorCodes {
 
     static final int IDP_ERROR = 4000;
 
+    // MAIL RELATED
+
+    static final int MAIL_SERVICE_ERROR = 9000;
+    static final int MAIL_TEMPLATE_NOT_FOUND = 9004;
+
+    // MEMBERSHIP RELATED
+
+    static final int MEMBERSHIP_NOT_FOUND = 10004;
+
     // ORGANIZATION RELATED
 
     static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;

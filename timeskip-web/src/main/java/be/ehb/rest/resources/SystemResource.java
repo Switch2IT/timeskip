@@ -43,5 +43,4 @@ public class SystemResource {
     public Response getSystemStatus() {
         return ResponseFactory.buildResponse(OK, systemFacade.getStatus());
     }
-
 }

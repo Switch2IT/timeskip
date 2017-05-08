@@ -1,6 +1,7 @@
 package be.ehb.entities.organizations;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
@@ -8,7 +9,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "memberships", schema = "timeskip")
-public class MembershipBean {
+public class MembershipBean implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

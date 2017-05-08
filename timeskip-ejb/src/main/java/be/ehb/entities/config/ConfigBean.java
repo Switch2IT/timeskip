@@ -1,6 +1,7 @@
 package be.ehb.entities.config;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
@@ -8,7 +9,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "config", schema = "timeskip")
-public class ConfigBean {
+public class ConfigBean implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +21,8 @@ public class ConfigBean {
     private Boolean defaultConfig;
     @Column(name = "day_of_monthly_reminder_email")
     private Integer dayOfMonthlyReminderEmail;
+    @Column(name = "last_day_of_month")
+    private Boolean lastDayOfMonth;
 
     public Long getId() {
         return id;
@@ -53,6 +56,14 @@ public class ConfigBean {
         this.dayOfMonthlyReminderEmail = dayOfMonthlyReminderEmail;
     }
 
+    public Boolean getLastDayOfMonth() {
+        return lastDayOfMonth;
+    }
+
+    public void setLastDayOfMonth(Boolean lastDayOfMonth) {
+        this.lastDayOfMonth = lastDayOfMonth;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,6 +86,7 @@ public class ConfigBean {
                 ", configPath='" + configPath + '\'' +
                 ", defaultConfig=" + defaultConfig +
                 ", dayOfMonthlyReminderEmail=" + dayOfMonthlyReminderEmail +
+                ", lastDayOfMonth=" + lastDayOfMonth +
                 '}';
     }
 }

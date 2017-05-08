@@ -1,6 +1,7 @@
 package be.ehb.startup;
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.mail.IMailService;
 import be.ehb.storage.IStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +27,24 @@ public class StartupService {
     private IAppConfig appConfig;
     @Inject
     private IStorageService storage;
+    @Inject
+    private IMailService mailService;
 
     @PostConstruct
     public void init() {
         try {
             // Insert startup tasks here, such as mailing tasks
+            sendStartupMail();
         } catch (Exception ex) {
             log.error("Error occured during startup: {}", ex);
+        }
+    }
+
+    private void sendStartupMail() {
+        try {
+            mailService.sendStartupMail();
+        } catch (Exception ex) {
+            log.error("Failed to send startup mail: {}", ex);
         }
     }
 

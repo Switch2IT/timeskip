@@ -4,6 +4,7 @@ import be.ehb.security.PermissionType;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "roles", schema = "timeskip")
-public class RoleBean {
+public class RoleBean implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)
