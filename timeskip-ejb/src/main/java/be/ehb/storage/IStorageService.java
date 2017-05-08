@@ -8,6 +8,7 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.mail.MailTopic;
 import be.ehb.security.PermissionBean;
@@ -24,6 +25,8 @@ public interface IStorageService {
 
     //Get
 
+    ActivityBean getActivity(Long activityId);
+
     ActivityBean getActivity(String organizationId, Long projectId, Long activityId);
 
     MailTemplateBean getMailTemplate(MailTopic topic);
@@ -31,6 +34,8 @@ public interface IStorageService {
     MembershipBean getMembership(Long membershipId);
 
     OrganizationBean getOrganization(String organizationId);
+
+    PaygradeBean getPaygrade(Long paygradeId);
 
     ProjectBean getProject(String organizationId, Long projectId);
 
@@ -50,11 +55,17 @@ public interface IStorageService {
 
     OrganizationBean createOrganization(OrganizationBean organization);
 
+    PaygradeBean createPaygrade(PaygradeBean paygrade);
+
     ProjectBean createProject(ProjectBean project);
 
     UserBean createUser(UserBean user);
 
     WorklogBean createWorklog(WorklogBean worklog);
+
+    //Create or Update
+
+    MembershipBean createOrUpdateMembership(MembershipBean membership);
 
     //Update
 
@@ -68,7 +79,11 @@ public interface IStorageService {
 
     OrganizationBean updateOrganization(OrganizationBean organization);
 
+    PaygradeBean updatePaygrade(PaygradeBean paygrade);
+
     ProjectBean updateProject(ProjectBean project);
+
+    UserBean updateUser(UserBean user);
 
     WorklogBean updateWorklog(WorklogBean worklog);
 
@@ -80,7 +95,11 @@ public interface IStorageService {
 
     void deleteOrganization(OrganizationBean organization);
 
+    void deletePaygrade(PaygradeBean paygrade);
+
     void deleteProject(ProjectBean project);
+
+    void deleteUser(UserBean user);
 
     void deleteWorklog(WorklogBean worklog);
 
@@ -90,7 +109,11 @@ public interface IStorageService {
 
     List<MailTemplateBean> listMailTemplates();
 
+    List<MembershipBean> listMemberships(String userId);
+
     List<OrganizationBean> listOrganizations();
+
+    List<PaygradeBean> listPaygrades();
 
     List<ProjectBean> listProjects(String organizationId);
 
@@ -110,9 +133,17 @@ public interface IStorageService {
 
     ActivityBean findActivityByName(String organizationId, Long projectId, String activityName);
 
+    MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId);
+
     OrganizationBean findOrganizationByName(String organizationName);
 
+    PaygradeBean findPaygradeByName(String paygradeName);
+
     ProjectBean findProjectByName(String organizationId, String projectName);
+
+    UserBean findUserByEmail(String email);
+
+    List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName);
 
     Long getUserLoggedMinutesForDay(String userId, Date day);
 }

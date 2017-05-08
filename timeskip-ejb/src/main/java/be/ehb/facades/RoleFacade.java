@@ -1,7 +1,5 @@
 package be.ehb.facades;
 
-import be.ehb.entities.security.RoleBean;
-import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.responses.RoleResponse;
 import be.ehb.storage.IStorageService;
@@ -30,10 +28,6 @@ public class RoleFacade implements IRoleFacade {
 
     @Override
     public RoleResponse get(String roleId) {
-        RoleBean role = storage.getRole(roleId);
-        if (role == null) {
-            throw ExceptionFactory.roleNotFoundException(roleId);
-        }
-        return ResponseFactory.createRoleResponse(role);
+        return ResponseFactory.createRoleResponse(storage.getRole(roleId));
     }
 }

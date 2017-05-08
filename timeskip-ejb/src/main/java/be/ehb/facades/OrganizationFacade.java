@@ -73,6 +73,9 @@ public class OrganizationFacade implements IOrganizationFacade {
         String id = ConventionUtil.idFromName(request.getName());
         try {
             storage.getOrganization(id);
+            if (storage.findOrganizationByName(request.getName()) != null) {
+                throw ExceptionFactory.organizationAlreadyExistsException(request.getName());
+            }
             throw ExceptionFactory.organizationAlreadyExistsException(id);
         } catch (OrganizationNotFoundException ex) {
             //Do nothing
@@ -91,7 +94,7 @@ public class OrganizationFacade implements IOrganizationFacade {
             membership.setRoleId(role.getId());
             membership.setUserId(userId);
             membership.setOrganizationId(id);
-            storage.createMembership(membership);
+            storage.createOrUpdateMembership(membership);
             log.info("Created membership for user \"{}\" with role \"{}\"", userId, role.getName());
         }
 

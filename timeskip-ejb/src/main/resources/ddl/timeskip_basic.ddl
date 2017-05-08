@@ -107,6 +107,9 @@ ALTER TABLE memberships
 ALTER TABLE organizations
   ADD CONSTRAINT uk_organizations_1 UNIQUE (name);
 
+ALTER TABLE paygrades
+  ADD CONSTRAINT uk_paygrades_1 UNIQUE (name);
+
 ALTER TABLE projects
   ADD CONSTRAINT uk_projects_1 UNIQUE (organization_id, name);
 
