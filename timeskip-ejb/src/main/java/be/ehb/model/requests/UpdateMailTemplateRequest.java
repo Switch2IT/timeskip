@@ -1,22 +1,18 @@
-package be.ehb.mail;
+package be.ehb.model.requests;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.io.Serializable;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class BaseMailBean {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class UpdateMailTemplateRequest implements Serializable {
 
-    private String to;
     private String subject;
     private String content;
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
 
     public String getSubject() {
         return subject;
@@ -36,11 +32,9 @@ public class BaseMailBean {
 
     @Override
     public String toString() {
-        return "BaseMailBean{" +
-                "to='" + to + '\'' +
-                ", subject='" + subject + '\'' +
+        return "updateMailTemplateRequest{" +
+                "subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
                 '}';
     }
-
 }

@@ -1,6 +1,5 @@
 package be.ehb.model.requests;
 
-import be.ehb.model.responses.MembershipResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
@@ -18,9 +17,10 @@ public class NewUserRequest implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
-    private List<MembershipResponse> memberships;
+    private List<NewMembershipRequest> memberships;
     private Double defaultHoursPerDay;
     private Set<DayOfWeek> workDays;
+    private Long paygradeId;
 
     public String getEmail() {
         return email;
@@ -46,11 +46,11 @@ public class NewUserRequest implements Serializable {
         this.lastName = lastName;
     }
 
-    public List<MembershipResponse> getMemberships() {
+    public List<NewMembershipRequest> getMemberships() {
         return memberships;
     }
 
-    public void setMemberships(List<MembershipResponse> memberships) {
+    public void setMemberships(List<NewMembershipRequest> memberships) {
         this.memberships = memberships;
     }
 
@@ -70,6 +70,14 @@ public class NewUserRequest implements Serializable {
         this.workDays = workDays;
     }
 
+    public Long getPaygradeId() {
+        return paygradeId;
+    }
+
+    public void setPaygradeId(Long paygradeId) {
+        this.paygradeId = paygradeId;
+    }
+
     @Override
     public String toString() {
         return "NewUserRequest{" +
@@ -79,6 +87,7 @@ public class NewUserRequest implements Serializable {
                 ", memberships=" + memberships +
                 ", defaultHoursPerDay=" + defaultHoursPerDay +
                 ", workDays=" + workDays +
+                ", paygradeId=" + paygradeId +
                 '}';
     }
 }

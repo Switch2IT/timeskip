@@ -13,5 +13,7 @@ public interface ISystemFacade {
     String MORE_INFO = "https://www.erasmushogeschool.be";
     String NAME = "Timeskip REST API";
 
+    // STATUS RELATED
+
     SystemStatusResponse getStatus();
 }

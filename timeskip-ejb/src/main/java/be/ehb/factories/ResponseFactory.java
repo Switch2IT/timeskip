@@ -1,11 +1,13 @@
 package be.ehb.factories;
 
+import be.ehb.entities.mail.MailTemplateBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.model.responses.*;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +54,7 @@ public class ResponseFactory {
             rval.setWorkDays(user.getWorkdays());
             rval.setMemberships(createMembershipResponses(user.getMemberships()));
             rval.setAdmin(user.getAdmin());
+            rval.setPaygrade(createPaygradeResponse(user.getPaygrade()));
         }
         return rval;
     }
@@ -126,6 +129,42 @@ public class ResponseFactory {
             rval.setDay(worklog.getDay());
             rval.setLoggedMinutes(worklog.getLoggedMinutes());
             rval.setUserId(worklog.getUserId());
+        }
+        return rval;
+    }
+
+    public static MailTemplateResponse createMailTemplateResponse(MailTemplateBean template) {
+        MailTemplateResponse rval = null;
+        if (template != null) {
+            rval = new MailTemplateResponse();
+            rval.setTopic(template.getId().toString());
+            rval.setSubject(template.getSubject());
+            rval.setContent(template.getContent());
+        }
+        return rval;
+    }
+
+    public static DayOfMonthlyReminderResponse createDayOfMonthlyReminderResponse(Integer dayOfMonthlyReminder, Boolean lastDayOfMonth) {
+        DayOfMonthlyReminderResponse rval = null;
+        if (dayOfMonthlyReminder != null) {
+            rval = new DayOfMonthlyReminderResponse();
+            rval.setDayOfMonthlyReminder(dayOfMonthlyReminder);
+        }
+        if (lastDayOfMonth != null) {
+            if (rval == null) rval = new DayOfMonthlyReminderResponse();
+            rval.setLastDayOfMonth(lastDayOfMonth);
+        }
+        return rval;
+    }
+
+    public static PaygradeResponse createPaygradeResponse(PaygradeBean paygrade) {
+        PaygradeResponse rval = new PaygradeResponse();
+        if (paygrade != null) {
+            rval = new PaygradeResponse();
+            rval.setId(paygrade.getId());
+            rval.setName(paygrade.getName());
+            rval.setDescription(paygrade.getDescription());
+            rval.setHourlyRate(paygrade.getHourlyRate());
         }
         return rval;
     }

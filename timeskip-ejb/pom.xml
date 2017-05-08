@@ -22,7 +22,7 @@
     <parent>
         <artifactId>timeskip</artifactId>
         <groupId>be.ehb</groupId>
-        <version>0.2</version>
+        <version>0.3</version>
     </parent>
 
     <artifactId>timeskip-ejb</artifactId>
@@ -123,6 +123,10 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
         </dependency>
 
         <!--Jackson utils-->

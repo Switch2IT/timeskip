@@ -26,7 +26,7 @@ public class SystemFacade implements ISystemFacade {
     @Inject
     private IIdpClient idpClient;
     @Inject
-    private IAppConfig config;
+    private IAppConfig appConfig;
 
     public SystemStatusResponse getStatus() {
         SystemStatusResponse rval = new SystemStatusResponse();
@@ -34,11 +34,11 @@ public class SystemFacade implements ISystemFacade {
         rval.setName(NAME);
         rval.setDescription(DESCRIPTION);
         rval.setMoreInfo(MORE_INFO);
-        rval.setBuiltOn(config.getBuildDate());
-        rval.setVersion(config.getVersion());
+        rval.setBuiltOn(appConfig.getBuildDate());
+        rval.setVersion(appConfig.getVersion());
         SystemComponentsStatus compStatus = new SystemComponentsStatus();
         compStatus.setTimeskipApi(storage != null);
-        compStatus.setKeycloakIdp(idpClient.getPublicKey(config.getIdpRealm(), config.getIdpKeystoreId()) != null);
+        compStatus.setKeycloakIdp(idpClient.getPublicKey(appConfig.getIdpRealm(), appConfig.getIdpKeystoreId()) != null);
         rval.setComponentsUp(compStatus);
         rval.setUp(compStatus.getKeycloakIdp() && compStatus.getTimeskipApi());
         return rval;

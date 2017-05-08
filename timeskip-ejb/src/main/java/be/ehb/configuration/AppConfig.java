@@ -46,7 +46,6 @@ public class AppConfig implements Serializable, IAppConfig {
         ConfigBean defaultConfig;
         if (optionalConfig == null) {
             defaultConfig = storage.getDefaultConfig();
-            if (defaultConfig == null) throw ExceptionFactory.storageException("No configuration found.");
         } else {
             defaultConfig = optionalConfig;
         }
@@ -83,7 +82,9 @@ public class AppConfig implements Serializable, IAppConfig {
                 log.info("IDP keystore ID: {}", getIdpKeystoreId());
                 log.info("IDP Client: {}", getIdpClient());
                 log.info("Validate JWT: {}", getValidateJWT());
-                log.info("Notification mail will be send from: {}", getNotificationMailFrom());
+                log.info("Notification mail will be sent from: {}", getNotificationMailFrom());
+                log.info("Startup notification mail will be sent to: {}", getNoticationStartupMailTo());
+                log.info(getReminderStartupLog());
                 log.info("====================================================================================");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -94,6 +95,11 @@ public class AppConfig implements Serializable, IAppConfig {
     @Override
     public String getNotificationMailFrom() {
         return config.getString(IConfig.NOTIFICATION_MAIL_FROM);
+    }
+
+    @Override
+    public String getNoticationStartupMailTo() {
+        return config.getString(IConfig.NOTIFICATION_STARTUP_MAIL_TO);
     }
 
     @Override
@@ -144,5 +150,38 @@ public class AppConfig implements Serializable, IAppConfig {
     @Override
     public boolean getValidateJWT() {
         return config.getBoolean(IConfig.SECURITY_JWT_VALIDATION);
+    }
+
+    @Override
+    public Integer getDayOfMonthlyReminderEmail() {
+        return storage.getDefaultConfig().getDayOfMonthlyReminderEmail();
+    }
+
+    @Override
+    public boolean getLastDayOfMonth() {
+        return storage.getDefaultConfig().getLastDayOfMonth();
+    }
+
+    private String getReminderStartupLog() {
+        StringBuilder rval = new StringBuilder("Reminder email will be sent on: ");
+        if (getLastDayOfMonth()) {
+            rval.append("last day of the month");
+        } else {
+            Integer day = getDayOfMonthlyReminderEmail();
+            rval.append(day);
+            switch (day) {
+                case 1:
+                    rval.append("st");
+                    break;
+                case 2:
+                    rval.append("nd");
+                case 3:
+                    rval.append("rd");
+                default:
+                    rval.append("th");
+            }
+            rval.append(" day of the month");
+        }
+        return rval.toString();
     }
 }

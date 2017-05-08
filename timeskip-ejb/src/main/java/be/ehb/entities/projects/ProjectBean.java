@@ -5,6 +5,7 @@ import be.ehb.entities.users.UserBean;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "projects", schema = "timeskip")
-public class ProjectBean {
+public class ProjectBean implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

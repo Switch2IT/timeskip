@@ -1,4 +1,6 @@
-package be.ehb.mail;
+package be.ehb.mail.provider;
+
+import be.ehb.model.mail.BaseMailBean;
 
 import javax.mail.internet.MimeMessage;
 

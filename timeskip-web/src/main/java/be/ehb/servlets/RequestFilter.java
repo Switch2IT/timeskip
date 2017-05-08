@@ -2,6 +2,7 @@ package be.ehb.servlets;
 
 import be.ehb.configuration.IAppConfig;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.model.responses.ErrorResponse;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.JWTValidation;
 import org.jose4j.jwt.JwtClaims;
@@ -62,7 +63,10 @@ public class RequestFilter implements ContainerRequestFilter {
                 } catch (InvalidJwtException | MalformedClaimException ex) {
                     log.error("Unauthorized user:{}", validatedUser);
                     ex.printStackTrace();
-                    containerRequestContext.abortWith(ResponseFactory.buildResponse(Response.Status.UNAUTHORIZED, "User cannot access the resource:" + validatedUser));
+                    ErrorResponse err = new ErrorResponse();
+                    err.setMessage("User cannot access the resource:" + validatedUser);
+                    err.setHttpCode(Response.Status.UNAUTHORIZED.getStatusCode());
+                    containerRequestContext.abortWith(ResponseFactory.buildResponse(Response.Status.UNAUTHORIZED, err));
                 }
             } else {
                 securityContext.setCurrentUser("");
