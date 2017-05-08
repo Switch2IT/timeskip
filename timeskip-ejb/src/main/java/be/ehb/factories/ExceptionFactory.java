@@ -1,6 +1,7 @@
 package be.ehb.factories;
 
 import be.ehb.exceptions.*;
+import be.ehb.mail.MailTopic;
 
 /**
  * @author Guillaume Vandecasteele/Patrick Van den Bussche
@@ -8,8 +9,8 @@ import be.ehb.exceptions.*;
  */
 public class ExceptionFactory {
 
-    public static UnauthorizedException unauthorizedException(String entityId) {
-        return new UnauthorizedException(entityId);
+    public static UnauthorizedException unauthorizedException(String message) {
+        return new UnauthorizedException(message);
     }
 
     public static UnauthorizedException unauthorizedException(Long entityId) {
@@ -102,5 +103,17 @@ public class ExceptionFactory {
 
     public static UserNotAssignedToProjectException userNotAssignedToProjectException(String projectName) {
         return new UserNotAssignedToProjectException(projectName);
+    }
+
+    public static MailTemplateNotFoundException mailTemplateNotFoundException(MailTopic topic) {
+        return new MailTemplateNotFoundException(topic.toString());
+    }
+
+    public static MembershipNotFoundException membershipNotFoundException(Long id) {
+        return new MembershipNotFoundException(id.toString());
+    }
+
+    public static MailServiceException mailServiceException(String message) {
+        return new MailServiceException(message);
     }
 }

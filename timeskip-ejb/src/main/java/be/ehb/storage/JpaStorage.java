@@ -1,6 +1,7 @@
 package be.ehb.storage;
 
 import be.ehb.entities.config.ConfigBean;
+import be.ehb.entities.mail.MailTemplateBean;
 import be.ehb.entities.organizations.MembershipBean;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
@@ -10,6 +11,7 @@ import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.factories.ExceptionFactory;
+import be.ehb.mail.MailTopic;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
 import org.slf4j.Logger;
@@ -45,6 +47,20 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         } catch (NoResultException ex) {
             throw ExceptionFactory.activityNotFoundException(activityId);
         }
+    }
+
+    @Override
+    public MailTemplateBean getMailTemplate(MailTopic topic) {
+        MailTemplateBean template = super.get(topic, MailTemplateBean.class);
+        if (template == null) throw ExceptionFactory.mailTemplateNotFoundException(topic);
+        return template;
+    }
+
+    @Override
+    public MembershipBean getMembership(Long membershipId) {
+        MembershipBean membership = super.get(membershipId, MembershipBean.class);
+        if (membership == null) throw ExceptionFactory.membershipNotFoundException(membershipId);
+        return membership;
     }
 
     @Override
@@ -144,6 +160,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public ConfigBean updateConfig(ConfigBean config) {
+        return super.update(config);
+    }
+
+    @Override
     public OrganizationBean updateOrganization(OrganizationBean organization) {
         return super.update(organization);
     }
@@ -159,6 +180,16 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public MailTemplateBean updateMailTemplate(MailTemplateBean template) {
+        return super.update(template);
+    }
+
+    @Override
+    public MembershipBean updateMembership(MembershipBean membership) {
+        return super.update(membership);
+    }
+
+    @Override
     public void deleteActivity(ActivityBean activity) {
         super.delete(activity);
     }
@@ -166,6 +197,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public void deleteOrganization(OrganizationBean organization) {
         super.delete(organization);
+    }
+
+    @Override
+    public void deleteMembership(MembershipBean membership) {
+        super.delete(membership);
     }
 
     @Override
@@ -186,6 +222,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
                 .setParameter("orgId", proj.getOrganization().getId())
                 .setParameter("pId", proj.getId())
                 .getResultList();
+    }
+
+    @Override
+    public List<MailTemplateBean> listMailTemplates() {
+        return getActiveEntityManager().createQuery("SELECT m FROM MailTemplateBean m", MailTemplateBean.class).getResultList();
     }
 
     @Override

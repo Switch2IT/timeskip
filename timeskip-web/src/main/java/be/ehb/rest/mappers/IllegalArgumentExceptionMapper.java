@@ -1,5 +1,6 @@
 package be.ehb.rest.mappers;
 
+import be.ehb.exceptions.ErrorCodes;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.responses.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ public class IllegalArgumentExceptionMapper implements ExceptionMapper<IllegalAr
             error.setMessage("Invalid Input");
         }
         error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
+        error.setErrorCode(ErrorCodes.INVALID_INPUT);
         return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error);
     }
 }

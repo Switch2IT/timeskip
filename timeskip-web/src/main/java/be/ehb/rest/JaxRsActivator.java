@@ -19,6 +19,7 @@ package be.ehb.rest;
 import be.ehb.rest.mappers.IllegalArgumentExceptionMapper;
 import be.ehb.rest.mappers.NullPointerExceptionMapper;
 import be.ehb.rest.mappers.RestExceptionMapper;
+import be.ehb.rest.resources.ConfigurationResource;
 import be.ehb.rest.resources.OrganizationsResource;
 import be.ehb.rest.resources.ReportsResource;
 import be.ehb.rest.resources.SystemResource;
@@ -71,6 +72,7 @@ public class JaxRsActivator extends Application {
         resources.add(OrganizationsResource.class);
         resources.add(ReportsResource.class);
         resources.add(SystemResource.class);
+        resources.add(ConfigurationResource.class);
     }
 }
 
