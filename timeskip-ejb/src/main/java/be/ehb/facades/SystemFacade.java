@@ -103,6 +103,7 @@ public class SystemFacade implements ISystemFacade {
         }
         if (changed) {
             config = storage.updateConfig(config);
+            //TODO - Update the schedule service
             return ResponseFactory.createDayOfMonthlyReminderResponse(config.getDayOfMonthlyReminderEmail(), config.getLastDayOfMonth());
         } else return null;
     }
