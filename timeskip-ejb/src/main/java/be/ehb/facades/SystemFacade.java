@@ -1,10 +1,15 @@
 package be.ehb.facades;
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.model.requests.RestoreBackupRequest;
+import be.ehb.model.responses.BackUpResponse;
 import be.ehb.model.responses.SystemComponentsStatus;
 import be.ehb.model.responses.SystemStatusResponse;
 import be.ehb.security.idp.IIdpClient;
 import be.ehb.storage.IStorageService;
+import be.ehb.utils.BackupUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
@@ -20,6 +25,8 @@ import javax.inject.Inject;
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Default
 public class SystemFacade implements ISystemFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(SystemFacade.class);
 
     @Inject
     private IStorageService storage;
@@ -42,5 +49,29 @@ public class SystemFacade implements ISystemFacade {
         rval.setComponentsUp(compStatus);
         rval.setUp(compStatus.getKeycloakIdp() && compStatus.getTimeskipApi());
         return rval;
+    }
+
+    @Override
+    public BackUpResponse getBackup() {
+        return BackupUtil.createBackupResponse(
+                storage.listOrganizations(),
+                storage.listProjects(),
+                storage.listActivities(),
+                storage.listPaygrades(),
+                storage.listUsers(),
+                storage.listRoles(),
+                storage.listMemberships(),
+                storage.listMailTemplates(),
+                storage.listConfigs(),
+                storage.listWorklogs()
+        );
+    }
+
+    @Override
+    public void restoreBackup(RestoreBackupRequest request) {
+        // Validate the backup
+        BackupUtil.validateBackup(request);
+        storage.restore(request);
+        log.info("Backup restored");
     }
 }

@@ -1,5 +1,7 @@
 package be.ehb.facades;
 
+import be.ehb.model.requests.RestoreBackupRequest;
+import be.ehb.model.responses.BackUpResponse;
 import be.ehb.model.responses.SystemStatusResponse;
 
 /**
@@ -16,4 +18,10 @@ public interface ISystemFacade {
     // STATUS RELATED
 
     SystemStatusResponse getStatus();
+
+    // BACKUP RELATED
+
+    BackUpResponse getBackup();
+
+    void restoreBackup(RestoreBackupRequest request);
 }

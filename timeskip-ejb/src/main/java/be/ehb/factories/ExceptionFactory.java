@@ -116,4 +116,8 @@ public class ExceptionFactory {
     public static UserAlreadyExistsException userAlreadyExists(String email) {
         return new UserAlreadyExistsException(email);
     }
+
+    public static InvalidBackupDataException invalidBackupDataException(String message) {
+        return new InvalidBackupDataException(message);
+    }
 }

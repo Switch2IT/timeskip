@@ -111,3 +111,9 @@ ALTER TABLE worklogs
   ADD CONSTRAINT fk_worklogs_2 FOREIGN KEY (activity_id) REFERENCES activities (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
+
+ALTER TABLE user_workdays
+  ADD CONSTRAINT uk_user_workdays_1 UNIQUE (user_id, week_day);
+
+ALTER TABLE permissions
+  ADD CONSTRAINT uk_permissions_1 UNIQUE (role_id, permission);

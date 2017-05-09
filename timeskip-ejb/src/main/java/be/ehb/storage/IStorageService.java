@@ -11,6 +11,7 @@ import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.mail.MailTopic;
+import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
 
 import java.util.Date;
@@ -67,6 +68,10 @@ public interface IStorageService {
 
     MembershipBean createOrUpdateMembership(MembershipBean membership);
 
+    //Restore
+
+    void restore(RestoreBackupRequest backup);
+
     //Update
 
     ActivityBean updateActivity(ActivityBean activity);
@@ -105,21 +110,35 @@ public interface IStorageService {
 
     //List
 
+    List<ActivityBean> listActivities();
+
+    List<ConfigBean> listConfigs();
+
     List<ActivityBean> listProjectActivities(String organizationId, Long projectId);
 
     List<MailTemplateBean> listMailTemplates();
 
-    List<MembershipBean> listMemberships(String userId);
+    List<MembershipBean> listUserMemberships(String userId);
+
+    List<MembershipBean> listMemberships();
 
     List<OrganizationBean> listOrganizations();
 
     List<PaygradeBean> listPaygrades();
 
-    List<ProjectBean> listProjects(String organizationId);
+    List<ProjectBean> listOrganizationProjects(String organizationId);
+
+    List<ProjectBean> listProjects();
+
+    List<RoleBean> listRoles();
 
     List<UserBean> listUsers();
 
+    List<WorklogBean> listWorklogs();
+
     List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId);
+
+    List<WorklogBean> listUserWorklogs(String userId);
 
     //Queries
 

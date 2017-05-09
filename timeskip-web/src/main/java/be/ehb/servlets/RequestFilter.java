@@ -32,7 +32,7 @@ public class RequestFilter implements ContainerRequestFilter {
     //Exclusions
     private static final String BASE_PATH = "/timeskip-web/api";
     private static final String SWAGGER_DOC_JSON = "/swagger.json";
-    private static final String SYSTEM_PATH = "/system";
+    private static final String SYSTEM_PATH = "/system/status";
 
     @Inject
     private ISecurityContext securityContext;

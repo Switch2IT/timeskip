@@ -1,14 +1,15 @@
-package be.ehb.model.requests;
+package be.ehb.model.backup;
 
-import be.ehb.model.AbstractBaseNoId;
+import be.ehb.model.AbstractBaseNumericId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class UpdateActivityRequest extends AbstractBaseNoId {
+public class ActivityBackup extends AbstractBaseNumericId {
 
     private Boolean billable;
+    private Long projectId;
 
     public Boolean getBillable() {
         return billable;
@@ -18,11 +19,20 @@ public class UpdateActivityRequest extends AbstractBaseNoId {
         this.billable = billable;
     }
 
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
     @Override
     public String toString() {
-        return "NewActivityRequest{" +
+        return "ActivityBackup{" +
                 super.toString() +
                 ", billable=" + billable +
+                ", projectId=" + projectId +
                 '}';
     }
 }

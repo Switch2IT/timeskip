@@ -1,4 +1,4 @@
-package be.ehb.model.responses;
+package be.ehb.model.requests;
 
 import be.ehb.model.backup.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,7 +12,7 @@ import java.util.Set;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BackUpResponse implements Serializable {
+public class RestoreBackupRequest implements Serializable {
 
     private Date dateOfBackup;
     private Set<OrganizationBackup> organizations;
@@ -125,9 +125,8 @@ public class BackUpResponse implements Serializable {
 
     @Override
     public String toString() {
-        return "BackUpResponse{" +
-                "dateOfBackup=" + dateOfBackup +
-                ", organizations=" + organizations +
+        return "RestoreBackupRequest{" +
+                "organizations=" + organizations +
                 ", projects=" + projects +
                 ", activities=" + activities +
                 ", paygrades=" + paygrades +

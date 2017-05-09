@@ -110,8 +110,14 @@ ALTER TABLE organizations
 ALTER TABLE paygrades
   ADD CONSTRAINT uk_paygrades_1 UNIQUE (name);
 
+ALTER TABLE permissions
+  ADD CONSTRAINT uk_permissions_1 UNIQUE (role_id, permission);
+
 ALTER TABLE projects
   ADD CONSTRAINT uk_projects_1 UNIQUE (organization_id, name);
+
+ALTER TABLE user_workdays
+  ADD CONSTRAINT uk_user_workdays_1 UNIQUE (user_id, week_day);
 
 -- Indexes
 

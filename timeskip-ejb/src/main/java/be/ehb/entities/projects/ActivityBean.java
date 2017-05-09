@@ -25,7 +25,7 @@ public class ActivityBean implements Serializable {
     private String description;
     @Column(name = "billable")
     private Boolean billable;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", referencedColumnName = "id", nullable = false)
     private ProjectBean project;
 

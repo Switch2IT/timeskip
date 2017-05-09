@@ -118,6 +118,7 @@
         <version.org.hibernate.commons.annotations>4.0.4.Final</version.org.hibernate.commons.annotations>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final
         </version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
+        <guava.version>19.0</guava.version>
 
         <buildNumber>${maven.build.timestamp}</buildNumber>
     </properties>
@@ -275,6 +276,13 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
+            </dependency>
+
+            <!-- guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
 
             <!--Jackson utils-->
