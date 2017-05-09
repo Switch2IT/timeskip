@@ -81,6 +81,7 @@ public class AppConfig implements Serializable, IAppConfig {
                 log.info("IDP admin secret: ***************{}", getIdpAdminClientSecret().substring(getIdpAdminClientSecret().length() - 5));
                 log.info("IDP keystore ID: {}", getIdpKeystoreId());
                 log.info("IDP Client: {}", getIdpClient());
+                log.info("IDP Default new user password: {}", getDefaultNewUserPassword());
                 log.info("Validate JWT: {}", getValidateJWT());
                 log.info("Notification mail will be sent from: {}", getNotificationMailFrom());
                 log.info("Startup notification mail will be sent to: {}", getNoticationStartupMailTo());
@@ -140,6 +141,11 @@ public class AppConfig implements Serializable, IAppConfig {
     @Override
     public String getIdpKeystoreId() {
         return config.getString(IConfig.IDP_KEYSTORE_ID);
+    }
+
+    @Override
+    public String getDefaultNewUserPassword() {
+        return config.getString(IConfig.IDP_DEFAULT_NEW_USER_PASSWORD);
     }
 
     @Override

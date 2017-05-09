@@ -324,7 +324,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             return (ConfigBean) getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE").getSingleResult();
         } catch (NoResultException ex) {
             log.error("No results found: {}", ex.getMessage());
-            throw ExceptionFactory.storageException("No configuration found.");
+            throw ExceptionFactory.defaultConfigNotFoundException();
         }
     }
 

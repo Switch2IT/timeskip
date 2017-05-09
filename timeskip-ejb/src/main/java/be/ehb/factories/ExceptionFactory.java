@@ -29,8 +29,8 @@ public class ExceptionFactory {
         return new SystemErrorException(cause);
     }
 
-    public static StorageException storageException(String message) {
-        return new StorageException(message);
+    public static DefaultConfigNotFoundException defaultConfigNotFoundException() {
+        return new DefaultConfigNotFoundException();
     }
 
     public static UserNotFoundException userNotFoundException(String userId) {
@@ -49,8 +49,8 @@ public class ExceptionFactory {
         return new OrganizationNotFoundException(organizationId);
     }
 
-    public static IdpException idpException() {
-        return new IdpException();
+    public static IdpException idpException(String message) {
+        return new IdpException(message);
     }
 
     public static OrganizationAlreadyExistsException organizationAlreadyExistsException(String organiztionId) {
