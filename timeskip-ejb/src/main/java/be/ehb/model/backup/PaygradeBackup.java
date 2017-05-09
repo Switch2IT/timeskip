@@ -1,12 +1,12 @@
-package be.ehb.model.requests;
+package be.ehb.model.backup;
 
-import be.ehb.model.AbstractBaseNoId;
+import be.ehb.model.AbstractBaseNumericId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class UpdatePaygradeRequest extends AbstractBaseNoId {
+public class PaygradeBackup extends AbstractBaseNumericId {
 
     private Double hourlyRate;
 
@@ -20,8 +20,9 @@ public class UpdatePaygradeRequest extends AbstractBaseNoId {
 
     @Override
     public String toString() {
-        return "UpdatePaygradeRequest{" +
-                "hourlyRate=" + hourlyRate +
+        return "PaygradeBackup{" +
+                super.toString() +
+                ", hourlyRate=" + hourlyRate +
                 '}';
     }
 }

@@ -30,10 +30,10 @@ public class ProjectBean implements Serializable {
     private Boolean allowOvertime;
     @Column(name = "bill_overtime")
     private Boolean billOvertime;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "project_assignments", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<UserBean> assignedUsers;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
     private OrganizationBean organization;
 

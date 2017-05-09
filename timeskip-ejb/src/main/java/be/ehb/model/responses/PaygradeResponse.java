@@ -1,12 +1,12 @@
 package be.ehb.model.responses;
 
-import be.ehb.model.AbstractBaseNumericIdResponse;
+import be.ehb.model.AbstractBaseNumericId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class PaygradeResponse extends AbstractBaseNumericIdResponse {
+public class PaygradeResponse extends AbstractBaseNumericId {
 
     private Double hourlyRate;
 

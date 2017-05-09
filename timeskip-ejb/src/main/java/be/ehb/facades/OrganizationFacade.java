@@ -131,7 +131,7 @@ public class OrganizationFacade implements IOrganizationFacade {
     @Override
     public List<ProjectResponse> listProjects(String organizationId) {
         UserBean user = userFacade.get(securityContext.getCurrentUser());
-        return storage.listProjects(organizationId).stream()
+        return storage.listOrganizationProjects(organizationId).stream()
                 .filter(project -> securityContext.hasPermission(PermissionType.PROJECT_VIEW_ALL, organizationId) || project.getAssignedUsers().contains(user))
                 .map(ResponseFactory::createProjectResponse)
                 .collect(Collectors.toList());

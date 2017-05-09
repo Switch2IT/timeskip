@@ -1,12 +1,12 @@
 package be.ehb.model.requests;
 
-import be.ehb.model.AbstractBaseRequest;
+import be.ehb.model.AbstractBaseNoId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class NewActivityRequest extends AbstractBaseRequest {
+public class NewActivityRequest extends AbstractBaseNoId {
 
     private Boolean billable;
 

@@ -1,12 +1,12 @@
 package be.ehb.model.responses;
 
-import be.ehb.model.AbstractBaseNumericIdResponse;
+import be.ehb.model.AbstractBaseNumericId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ActivityResponse extends AbstractBaseNumericIdResponse {
+public class ActivityResponse extends AbstractBaseNumericId {
 
     private Boolean billable;
     private ProjectResponse project;

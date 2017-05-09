@@ -59,7 +59,7 @@ public class ManagementFacade implements IManagementFacade {
     @Override
     public List<MembershipResponse> listUserMemberships(String userId) {
         storage.getUser(userId);
-        return storage.listMemberships(userId).stream().map(ResponseFactory::createMembershipResponse).collect(Collectors.toList());
+        return storage.listUserMemberships(userId).stream().map(ResponseFactory::createMembershipResponse).collect(Collectors.toList());
     }
 
     @Override

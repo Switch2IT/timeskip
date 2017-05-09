@@ -34,12 +34,12 @@ public class UserBean implements Serializable {
     @Column(name = "week_day")
     @Enumerated(EnumType.STRING)
     private Set<DayOfWeek> workdays;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "paygrade_id", referencedColumnName = "id")
     private PaygradeBean paygrade;
     @Column(name = "default_activity_id")
     private Long defaultActivity;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private List<MembershipBean> memberships;
 
