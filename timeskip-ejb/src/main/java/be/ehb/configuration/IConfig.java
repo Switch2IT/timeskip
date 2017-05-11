@@ -19,6 +19,7 @@ interface IConfig {
     String IDP_CLIENT = "timeskip.idp.client";
     String IDP_SERVER_URL = "timeskip.idp.server_url";
     String IDP_KEYSTORE_ID = "timeskip.idp.keystore_id";
+    String IDP_DEFAULT_NEW_USER_PASSWORD = "timeskip.idp.default_new_user_password";
 
     String SECURITY_JWT_VALIDATION = "timeskip.security.validate_jwt";
 }

@@ -22,7 +22,7 @@
     <parent>
         <artifactId>timeskip</artifactId>
         <groupId>be.ehb</groupId>
-        <version>0.3</version>
+        <version>0.4</version>
     </parent>
 
     <artifactId>timeskip-ejb</artifactId>
@@ -198,6 +198,17 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <!-- Joda time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
         </dependency>
 
     </dependencies>

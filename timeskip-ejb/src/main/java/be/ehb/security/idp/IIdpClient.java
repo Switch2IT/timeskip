@@ -12,4 +12,6 @@ public interface IIdpClient {
     Key getPublicKey(String realm, String keystoreId);
 
     UserBean createUser(UserBean user);
+
+    void deleteUser(UserBean user);
 }

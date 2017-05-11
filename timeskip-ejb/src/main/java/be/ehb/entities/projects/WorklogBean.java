@@ -24,7 +24,7 @@ public class WorklogBean implements Serializable {
     private Long loggedMinutes;
     @Column(name = "confirmed")
     private Boolean confirmed;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "activity_id", referencedColumnName = "id", nullable = false)
     private ActivityBean activity;
 

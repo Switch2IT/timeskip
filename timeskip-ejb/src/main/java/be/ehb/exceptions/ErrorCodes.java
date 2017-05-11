@@ -12,16 +12,20 @@ public class ErrorCodes {
     static final int ACTIVITY_NOT_FOUND = 6004;
 
     // IDP RELATED
+
     static final int ACTIVITY_ALREADY_EXISTS = 6009;
 
     // MAIL RELATED
+
     static final int IDP_ERROR = 4000;
     static final int MAIL_SERVICE_ERROR = 9000;
 
     // MEMBERSHIP RELATED
+
     static final int MAIL_TEMPLATE_NOT_FOUND = 9004;
 
     // ORGANIZATION RELATED
+
     static final int MEMBERSHIP_NOT_FOUND = 10004;
     static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
     static final int ORGANIZATION_NOT_FOUND = 1004;
@@ -42,19 +46,24 @@ public class ErrorCodes {
 
 
     // USER RELATED
+
     static final int USER_NOT_FOUND = 2001;
     static final int JWT_VALIDATION_ERROR = 2002;
     static final int NO_USER_CONTEXT_FOUND = 2003;
     static final int USER_ALREADY_EXISTS = 2009;
 
     // WORKLOG RELATED
+
     static final int USER_NOT_ASSIGNED_TO_PROJECT = 2003;
 
     // SYSTEM RELATED
+
+    static final int FUNCTIONALITY_UNAVAILABLE = 8003;
     static final int WORKLOG_NOT_FOUND = 8004;
     static final int SYSTEM_ERROR = -1;
 
     // OTHER
-    static final int INVALID_DATE = 7001;
 
+    static final int INVALID_DATE = 7001;
+    static final int INVALID_BACKUP = 7002;
 }

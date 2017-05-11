@@ -1,12 +1,12 @@
 package be.ehb.model.requests;
 
-import be.ehb.model.AbstractBaseRequest;
+import be.ehb.model.AbstractBaseNoId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class UpdateProjectRequest extends AbstractBaseRequest {
+public class UpdateProjectRequest extends AbstractBaseNoId {
 
     private Boolean allowOvertime;
     private Boolean billOvertime;

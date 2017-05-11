@@ -1,12 +1,12 @@
 package be.ehb.model.requests;
 
-import be.ehb.model.AbstractBaseRequest;
+import be.ehb.model.AbstractBaseNoId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class NewPaygradeRequest extends AbstractBaseRequest {
+public class NewPaygradeRequest extends AbstractBaseNoId {
 
     private Double hourlyRate;
 
