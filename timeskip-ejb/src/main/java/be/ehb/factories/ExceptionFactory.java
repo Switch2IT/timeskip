@@ -120,4 +120,8 @@ public class ExceptionFactory {
     public static InvalidBackupDataException invalidBackupDataException(String message) {
         return new InvalidBackupDataException(message);
     }
+
+    public static UnavailableException unavailableException() {
+        return new UnavailableException();
+    }
 }

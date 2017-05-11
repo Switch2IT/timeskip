@@ -51,9 +51,30 @@ _NOTE: The following build command assumes you have configured your Maven user s
 Access the application 
 ---------------------
 
-The application will be running at the following URL: <http://localhost:8080/timeskip-web>.
+The application will be running at the following URL: <http://localhost:8080/timeskip-web/api>. The Swagger UI can be found at <http://localhost:8080/timeskip-web/api> and the Swagger JSON definition can be downloaded at <http://localhost:8080/timeskip-web/api/swagger.json>
         
 ## Release Notes
+
+### v0.4
+
+#### Upgrade path
+
+When upgrading from v0.3, please execute the `v0.4-update.ddl` script that can be found in `timeskip-ejb/src/main/resources/ddl` folder
+
+#### Additions
+
+* Backup/Restore endpoints
+* Billing report endpoint
+* Logged time report endpoint
+* User logged time report endpoint
+* Current user logged time report endpoint
+* Overtime report endpoint
+* Undertime report endpoint
+
+#### Bugfixes
+
+* User now deleted on IDP when deleted from the Timeskip datastore
+* Foreign keys update, changes now cascade on delete as well as update
 
 ### v0.3
 

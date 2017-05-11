@@ -50,11 +50,7 @@ public class ReportsResource {
     public Response getOvertimeReport(@QueryParam("organization") String organizationId,
                                       @QueryParam("from") String from,
                                       @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organization\" query string parameter must be provided");
-        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
-            throw ExceptionFactory.unauthorizedException(organizationId);
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        checkOverUndertime(organizationId, from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getOvertimeReport(organizationId, from, to));
     }
 
@@ -69,11 +65,7 @@ public class ReportsResource {
     public Response getUndertimeReport(@QueryParam("organization") String organizationId,
                                        @QueryParam("from") String from,
                                        @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organization\" query string parameter must be provided");
-        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
-            throw ExceptionFactory.unauthorizedException(organizationId);
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        checkOverUndertime(organizationId, from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getUndertimeReport(organizationId, from, to));
     }
 
@@ -90,8 +82,7 @@ public class ReportsResource {
                                         @QueryParam("activity") Long activityId,
                                         @QueryParam("from") String from,
                                         @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getLoggedTimeReport(organizationId, projectId, activityId, from, to));
     }
 
@@ -108,8 +99,7 @@ public class ReportsResource {
                                          @QueryParam("activity") Long activityId,
                                          @QueryParam("from") String from,
                                          @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getCurrentUserReport(organizationId, projectId, activityId, from, to));
     }
 
@@ -128,15 +118,14 @@ public class ReportsResource {
                                   @QueryParam("from") String from,
                                   @QueryParam("to") String to) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getUserReport(organizationId, projectId, activityId, userId, from, to));
     }
 
 
     @ApiOperation(value = "Get Billing Report", notes = "Get a report detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
     @ApiResponses({
-            @ApiResponse(code = 200, response = BillingReportResponse.class, message = "Logged time report"),
+            @ApiResponse(code = 200, response = BillingReportResponse.class, message = "Billing report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -148,38 +137,120 @@ public class ReportsResource {
                                      @QueryParam("user") String userId,
                                      @QueryParam("from") String from,
                                      @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getBillingReport(organizationId, projectId, activityId, userId, from, to));
     }
 
-    /*
-    public InputStream getPdfOvertimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        return null;
+    @ApiOperation(value = "Get Overtime PDF Report", notes = "Get a report detailing which users have logged overtime in PDF format. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = Response.class, message = "Overtime PDF report"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("overtime/pdf")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPdfOvertimeReport(@QueryParam("organization") String organizationId,
+                                         @QueryParam("from") String from,
+                                         @QueryParam("to") String to) {
+        checkOverUndertime(organizationId, from, to);
+        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfOvertimeReport(organizationId, from, to));
     }
 
-    
-    public InputStream getPdfUndertimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        return null;
+    @ApiOperation(value = "Get Undertime PDF Report", notes = "Get a report detailing which users have fewer hours than required in PDF format. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = Response.class, message = "Undertime PDF report"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/undertime/pdf")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPdfUndertimeReport(@QueryParam("organization") String organizationId,
+                                          @QueryParam("from") String from,
+                                          @QueryParam("to") String to) {
+        checkOverUndertime(organizationId, from, to);
+        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfUndertimeReport(organizationId, from, to));
     }
 
-    
-    public InputStream getPdfLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        return null;
+
+    @ApiOperation(value = "Get Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/loggedtime/pdf")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPdfLoggedTimeReport(@QueryParam("organization") String organizationId,
+                                           @QueryParam("project") Long projectId,
+                                           @QueryParam("activity") Long activityId,
+                                           @QueryParam("from") String from,
+                                           @QueryParam("to") String to) {
+        checkDates(from, to);
+        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfLoggedTimeReport(organizationId, projectId, activityId, from, to));
     }
 
-    
-    public InputStream getPdfCurrentUserReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        return null;
+    @ApiOperation(value = "Get Current User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/loggedtime/users/current/pdf")
+    public Response getPdfCurrentUserReport(@QueryParam("organization") String organizationId,
+                                            @QueryParam("project") Long projectId,
+                                            @QueryParam("activity") Long activityId,
+                                            @QueryParam("from") String from,
+                                            @QueryParam("to") String to) {
+        checkDates(from, to);
+        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfCurrentUserReport(organizationId, projectId, activityId, from, to));
     }
 
-    
-    public InputStream getPdfUserReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
-        return null;
+    @ApiOperation(value = "Get User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/loggedtime/users/{userId}/pdf")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPdfUserReport(@PathParam("userId") String userId,
+                                     @QueryParam("organization") String organizationId,
+                                     @QueryParam("project") Long projectId,
+                                     @QueryParam("activity") Long activityId,
+                                     @QueryParam("from") String from,
+                                     @QueryParam("to") String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        checkDates(from, to);
+        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to));
     }
 
-    
-    public InputStream getPdfBillingReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        return null;
-    }*/
+    @ApiOperation(value = "Get Billing PDF Report", notes = "Get a report in PDF format detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = BillingReportResponse.class, message = "Billing PDF report"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("billing/pdf")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPdfBillingReport(@QueryParam("organization") String organizationId,
+                                        @QueryParam("project") Long projectId,
+                                        @QueryParam("activity") Long activityId,
+                                        @QueryParam("user") String userId,
+                                        @QueryParam("from") String from,
+                                        @QueryParam("to") String to) {
+        checkDates(from, to);
+        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfBillingReport(organizationId, projectId, activityId, userId, from, to));
+    }
+
+    private void checkOverUndertime(String organizationId, String from, String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organization\" query string parameter must be provided");
+        if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        checkDates(from, to);
+    }
+
+    private void checkDates(String from, String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+    }
 }

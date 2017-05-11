@@ -168,34 +168,35 @@ public class ReportsFacade implements IReportsFacade {
 
     // PDF Methods, not yet supported
 
+
     @Override
-    public InputStream getPdfOvertimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw new UnsupportedOperationException();
+    public InputStream getPdfOvertimeReport(String organizationId, String from, String to) {
+        throw ExceptionFactory.unavailableException();
     }
 
     @Override
-    public InputStream getPdfUndertimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw new UnsupportedOperationException();
+    public InputStream getPdfUndertimeReport(String organizationId, String from, String to) {
+        throw ExceptionFactory.unavailableException();
+    }
+
+    @Override
+    public InputStream getPdfBillingReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
+        throw ExceptionFactory.unavailableException();
     }
 
     @Override
     public InputStream getPdfLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw new UnsupportedOperationException();
+        throw ExceptionFactory.unavailableException();
     }
 
     @Override
     public InputStream getPdfUserReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
-        throw new UnsupportedOperationException();
+        throw ExceptionFactory.unavailableException();
     }
 
     @Override
     public InputStream getPdfCurrentUserReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public InputStream getPdfBillingReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw new UnsupportedOperationException();
+        throw ExceptionFactory.unavailableException();
     }
 
     // PRIVATE METHODS
