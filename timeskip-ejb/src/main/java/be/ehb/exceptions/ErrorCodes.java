@@ -58,6 +58,7 @@ public class ErrorCodes {
 
     // SYSTEM RELATED
 
+    static final int FUNCTIONALITY_UNAVAILABLE = 8003;
     static final int WORKLOG_NOT_FOUND = 8004;
     static final int SYSTEM_ERROR = -1;
 

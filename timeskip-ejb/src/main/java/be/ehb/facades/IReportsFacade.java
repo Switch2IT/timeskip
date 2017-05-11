@@ -29,9 +29,9 @@ public interface IReportsFacade {
 
     // PDF Reports;
 
-    InputStream getPdfOvertimeReport(String organizationId, Long projectId, Long activityId, String from, String to);
+    InputStream getPdfOvertimeReport(String organizationId, String from, String to);
 
-    InputStream getPdfUndertimeReport(String organizationId, Long projectId, Long activityId, String from, String to);
+    InputStream getPdfUndertimeReport(String organizationId, String from, String to);
 
     InputStream getPdfLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to);
 
@@ -39,5 +39,5 @@ public interface IReportsFacade {
 
     InputStream getPdfUserReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to);
 
-    InputStream getPdfBillingReport(String organizationId, Long projectId, Long activityId, String from, String to);
+    InputStream getPdfBillingReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to);
 }
