@@ -16,6 +16,9 @@ import be.ehb.model.backup.*;
 import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +27,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.util.*;
 
 /**
@@ -527,12 +531,55 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public Long getUserLoggedMinutesForDay(String userId, Date day) {
+    public Long getUserLoggedMinutesForDay(String userId, LocalDate day) {
         return (Long) getActiveEntityManager()
                 .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
                 .setParameter("user", userId)
                 .setParameter("day", day)
                 .getSingleResult();
+    }
+
+    public List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period) {
+        // BASE
+        StringBuilder query = new StringBuilder("SELECT w FROM WorklogBean w");
+
+        boolean orgQualifier = StringUtils.isNotEmpty(organizationId);
+        boolean projQualifier = projectId != null;
+        boolean actQualifier = activityId != null;
+        boolean uQualifier = StringUtils.isNotEmpty(userId);
+        boolean periodQualifier = CollectionUtils.isNotEmpty(period);
+
+        // FROM
+        if (orgQualifier) {
+            query.append(" JOIN w.activity a JOIN a.project p JOIN p.organization o");
+        } else if (projQualifier) {
+            query.append(" JOIN w.activity a JOIN a.project p");
+        } else if (actQualifier) {
+            query.append(" JOIN w.activity a");
+        }
+        if (orgQualifier || projQualifier || actQualifier || uQualifier || periodQualifier) {
+            query.append(" WHERE");
+        }
+        List<String> qualifiers = new ArrayList<>();
+        if (orgQualifier) qualifiers.add(" o.id = :oId");
+        if (projQualifier) qualifiers.add(" p.id = :pId");
+        if (actQualifier) qualifiers.add(" a.id = :aId");
+        if (uQualifier) qualifiers.add(" w.userId = :uId");
+        if (periodQualifier) qualifiers.add(" w.day IN :period");
+        Iterator it = qualifiers.iterator();
+        while (it.hasNext()) {
+            query.append(it.next());
+            if (it.hasNext()) query.append(" AND");
+        }
+
+        TypedQuery<WorklogBean> q = getActiveEntityManager().createQuery(query.toString(), WorklogBean.class);
+        if (orgQualifier) q.setParameter("oId", organizationId);
+        if (projQualifier) q.setParameter("pId", projectId);
+        if (actQualifier) q.setParameter("aId", activityId);
+        if (uQualifier) q.setParameter("uId", userId);
+        if (periodQualifier) q.setParameter("period", period);
+        log.debug("Search query: {}", query.toString());
+        return q.getResultList();
     }
 
     //Private helper methods
@@ -670,7 +717,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             nw.setId(w.getId());
             nw.setUserId(w.getUserId());
             nw.setActivity(sortedActivities.get(w.getActivityId()));
-            nw.setDay(w.getDay());
+            nw.setDay(w.getDay().toDate());
             nw.setLoggedMinutes(w.getLoggedMinutes());
             nw.setConfirmed(w.getConfirmed());
             super.update(nw);

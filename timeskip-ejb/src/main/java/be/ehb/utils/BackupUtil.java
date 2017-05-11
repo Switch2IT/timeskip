@@ -18,6 +18,7 @@ import be.ehb.model.responses.BackUpResponse;
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -100,7 +101,7 @@ public class BackupUtil {
             if (rval == null) rval = new BackUpResponse();
             rval.setWorklogs(worklogs.parallelStream().map(BackupUtil::createWorklogBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
-        if (rval != null) rval.setDateOfBackup(new Date());
+        if (rval != null) rval.setDateOfBackup(new LocalDate());
         return rval;
     }
 
@@ -236,7 +237,7 @@ public class BackupUtil {
             rval.setId(w.getId());
             rval.setActivityId(w.getActivity() == null ? null : w.getActivity().getId());
             rval.setUserId(w.getUserId());
-            rval.setDay(w.getDay());
+            rval.setDay(new LocalDate(w.getDay()));
             rval.setLoggedMinutes(w.getLoggedMinutes());
             rval.setConfirmed(w.getConfirmed());
         }

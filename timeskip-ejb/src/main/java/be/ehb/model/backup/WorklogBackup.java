@@ -1,9 +1,9 @@
 package be.ehb.model.backup;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.joda.time.LocalDate;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author Guillaume Vandecasteele
@@ -15,7 +15,7 @@ public class WorklogBackup implements Serializable {
     private Long id;
     private String userId;
     private Long activityId;
-    private Date day;
+    private LocalDate day;
     private Long loggedMinutes;
     private Boolean confirmed;
 
@@ -43,11 +43,11 @@ public class WorklogBackup implements Serializable {
         this.activityId = activityId;
     }
 
-    public Date getDay() {
+    public LocalDate getDay() {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(LocalDate day) {
         this.day = day;
     }
 
