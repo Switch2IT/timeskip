@@ -8,12 +8,14 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.mail.MailTopic;
+import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
+import org.joda.time.LocalDate;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +27,8 @@ public interface IStorageService {
 
     //Get
 
+    ActivityBean getActivity(Long activityId);
+
     ActivityBean getActivity(String organizationId, Long projectId, Long activityId);
 
     MailTemplateBean getMailTemplate(MailTopic topic);
@@ -32,6 +36,8 @@ public interface IStorageService {
     MembershipBean getMembership(Long membershipId);
 
     OrganizationBean getOrganization(String organizationId);
+
+    PaygradeBean getPaygrade(Long paygradeId);
 
     ProjectBean getProject(String organizationId, Long projectId);
 
@@ -51,11 +57,21 @@ public interface IStorageService {
 
     OrganizationBean createOrganization(OrganizationBean organization);
 
+    PaygradeBean createPaygrade(PaygradeBean paygrade);
+
     ProjectBean createProject(ProjectBean project);
 
     UserBean createUser(UserBean user);
 
     WorklogBean createWorklog(WorklogBean worklog);
+
+    //Create or Update
+
+    MembershipBean createOrUpdateMembership(MembershipBean membership);
+
+    //Restore
+
+    void restore(RestoreBackupRequest backup);
 
     //Update
 
@@ -69,7 +85,11 @@ public interface IStorageService {
 
     OrganizationBean updateOrganization(OrganizationBean organization);
 
+    PaygradeBean updatePaygrade(PaygradeBean paygrade);
+
     ProjectBean updateProject(ProjectBean project);
+
+    UserBean updateUser(UserBean user);
 
     WorklogBean updateWorklog(WorklogBean worklog);
 
@@ -81,25 +101,47 @@ public interface IStorageService {
 
     void deleteOrganization(OrganizationBean organization);
 
+    void deletePaygrade(PaygradeBean paygrade);
+
     void deleteProject(ProjectBean project);
+
+    void deleteUser(UserBean user);
 
     void deleteWorklog(WorklogBean worklog);
 
     //List
 
+    List<ActivityBean> listActivities();
+
+    List<ConfigBean> listConfigs();
+
     List<ActivityBean> listProjectActivities(String organizationId, Long projectId);
 
     List<MailTemplateBean> listMailTemplates();
 
+    List<MembershipBean> listUserMemberships(String userId);
+
+    List<MembershipBean> listMemberships();
+
     List<OrganizationBean> listOrganizations();
 
-    List<ProjectBean> listProjects(String organizationId);
+    List<PaygradeBean> listPaygrades();
+
+    List<ProjectBean> listOrganizationProjects(String organizationId);
+
+    List<ProjectBean> listProjects();
+
+    List<RoleBean> listRoles();
 
     List<UserBean> listUsers();
 
+    List<WorklogBean> listWorklogs();
+
     List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId);
 
-    List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day);
+    List<WorklogBean> listUserWorklogs(String userId);
+
+    List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(LocalDate day);
 
     //Queries
 
@@ -113,9 +155,19 @@ public interface IStorageService {
 
     ActivityBean findActivityByName(String organizationId, Long projectId, String activityName);
 
+    MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId);
+
     OrganizationBean findOrganizationByName(String organizationName);
+
+    PaygradeBean findPaygradeByName(String paygradeName);
 
     ProjectBean findProjectByName(String organizationId, String projectName);
 
-    Long getUserLoggedMinutesForDay(String userId, Date day);
+    UserBean findUserByEmail(String email);
+
+    List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName);
+
+    Long getUserLoggedMinutesForDay(String userId, LocalDate day);
+
+    List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period);
 }

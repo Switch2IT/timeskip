@@ -8,22 +8,28 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.mail.MailTopic;
+import be.ehb.model.backup.*;
+import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.persistence.NoResultException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.persistence.TypedQuery;
+import java.util.*;
 
 /**
  * @author Guillaume Vandecasteele / Patrick Van den Bussche
@@ -34,6 +40,13 @@ import java.util.Set;
 public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(JpaStorage.class);
+
+    @Override
+    public ActivityBean getActivity(Long activityId) {
+        ActivityBean activity = super.get(activityId, ActivityBean.class);
+        if (activity == null) throw ExceptionFactory.activityNotFoundException(activityId);
+        return activity;
+    }
 
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
@@ -68,6 +81,13 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         OrganizationBean org = super.get(organizationId, OrganizationBean.class);
         if (org == null) throw ExceptionFactory.organizationNotFoundException(organizationId);
         return org;
+    }
+
+    @Override
+    public PaygradeBean getPaygrade(Long paygradeId) {
+        PaygradeBean paygrade = super.get(paygradeId, PaygradeBean.class);
+        if (paygrade == null) throw ExceptionFactory.paygradeNotFoundException(paygradeId);
+        return paygrade;
     }
 
     @Override
@@ -135,6 +155,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public PaygradeBean createPaygrade(PaygradeBean paygrade) {
+        return super.create(paygrade);
+    }
+
+    @Override
     public ProjectBean createProject(ProjectBean project) {
         return super.create(project);
     }
@@ -148,6 +173,53 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public WorklogBean createWorklog(WorklogBean worklog) {
         return super.create(worklog);
     }
+
+    @Override
+    public MembershipBean createOrUpdateMembership(MembershipBean membership) {
+        MembershipBean rval = null;
+        MembershipBean existing = findMembershipByUserAndOrganization(membership.getUserId(), membership.getOrganizationId());
+        if (existing != null) {
+            existing.setRoleId(membership.getRoleId());
+            return updateMembership(membership);
+        } else {
+            return createMembership(membership);
+        }
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    private void deleteAll() {
+
+    }
+
+    @Override
+    public void restore(RestoreBackupRequest backup) {
+        getActiveEntityManager().createQuery("DELETE FROM WorklogBean w").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM PaygradeBean p").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM MembershipBean m").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM MailTemplateBean m").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM ConfigBean c").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM ActivityBean a").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM ProjectBean p").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM OrganizationBean o").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM RoleBean r").executeUpdate();
+        getActiveEntityManager().createQuery("DELETE FROM UserBean u").executeUpdate();
+
+        restoreConfigs(backup.getConfigurations());
+        restoreMailTemplates(backup.getMailTemplates());
+        restoreRoles(backup.getRoles());
+
+        Map<String, OrganizationBean> sortedOrgs = backup.getOrganizations() == null ? new HashMap<>() : restoreOrganizations(backup.getOrganizations());
+        Map<Long, ProjectBean> sortedProjects = backup.getProjects() == null ? new HashMap<>() : restoreProjects(backup.getProjects(), sortedOrgs);
+        Map<Long, PaygradeBean> sortedPaygrades = backup.getPaygrades() == null ? new HashMap<>() : restorePaygrades(backup.getPaygrades());
+        Map<String, UserBean> sortedUsers = backup.getUsers() == null ? new HashMap<>() : restoreUsers(backup.getUsers(), sortedPaygrades);
+        if (backup.getMemberships() != null) restoreMemberships(backup.getMemberships());
+        Map<Long, ActivityBean> sortedActivities = backup.getActivities() == null ? new HashMap<>() : restoreActivities(backup.getActivities(), sortedProjects);
+        if (backup.getAssignments() != null)
+            restoreProjectAssignments(backup.getAssignments(), sortedProjects, sortedUsers);
+        if (backup.getWorklogs() != null) restoreWorklogs(backup.getWorklogs(), sortedActivities);
+    }
+
+
 
     @Override
     public ActivityBean updateActivity(ActivityBean activity) {
@@ -165,13 +237,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public ProjectBean updateProject(ProjectBean project) {
-        return super.update(project);
-    }
-
-    @Override
-    public WorklogBean updateWorklog(WorklogBean worklog) {
-        return super.update(worklog);
+    public PaygradeBean updatePaygrade(PaygradeBean paygrade) {
+        return super.update(paygrade);
     }
 
     @Override
@@ -182,6 +249,21 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public MembershipBean updateMembership(MembershipBean membership) {
         return super.update(membership);
+    }
+
+    @Override
+    public ProjectBean updateProject(ProjectBean project) {
+        return super.update(project);
+    }
+
+    @Override
+    public UserBean updateUser(UserBean user) {
+        return super.update(user);
+    }
+
+    @Override
+    public WorklogBean updateWorklog(WorklogBean worklog) {
+        return super.update(worklog);
     }
 
     @Override
@@ -200,13 +282,82 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public void deletePaygrade(PaygradeBean paygrade) {
+        super.delete(paygrade);
+    }
+
+    @Override
     public void deleteProject(ProjectBean project) {
         super.delete(project);
     }
 
     @Override
+    public void deleteUser(UserBean user) {
+        super.delete(user);
+    }
+
+    @Override
     public void deleteWorklog(WorklogBean worklog) {
         super.delete(worklog);
+    }
+
+    @Override
+    public List<ActivityBean> listActivities() {
+        return getActiveEntityManager().createQuery("SELECT a FROM ActivityBean a", ActivityBean.class).getResultList();
+    }
+
+    @Override
+    public List<ConfigBean> listConfigs() {
+        return getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c", ConfigBean.class).getResultList();
+    }
+
+    @Override
+    public List<MailTemplateBean> listMailTemplates() {
+        return getActiveEntityManager().createQuery("SELECT m FROM MailTemplateBean m", MailTemplateBean.class).getResultList();
+    }
+
+    @Override
+    public List<MembershipBean> listUserMemberships(String userId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :uId", MembershipBean.class)
+                .setParameter("uId", userId)
+                .getResultList();
+    }
+
+    @Override
+    public List<MembershipBean> listMemberships() {
+        return getActiveEntityManager().createQuery("SELECT m FROM MembershipBean m", MembershipBean.class).getResultList();
+    }
+
+    @Override
+    public List<OrganizationBean> listOrganizations() {
+        return getActiveEntityManager()
+                .createQuery("SELECT o FROM OrganizationBean o", OrganizationBean.class)
+                .getResultList();
+    }
+
+    @Override
+    public List<PaygradeBean> listPaygrades() {
+        return getActiveEntityManager().createQuery("SELECT p FROM PaygradeBean p", PaygradeBean.class).getResultList();
+    }
+
+    @Override
+    public List<ProjectBean> listOrganizationProjects(String organizationId) {
+        OrganizationBean org = getOrganization(organizationId);
+        return getActiveEntityManager()
+                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId", ProjectBean.class)
+                .setParameter("orgId", org.getId())
+                .getResultList();
+    }
+
+    @Override
+    public List<ProjectBean> listProjects() {
+        return getActiveEntityManager().createQuery("SELECT p FROM ProjectBean p", ProjectBean.class).getResultList();
+    }
+
+    @Override
+    public List<RoleBean> listRoles() {
+        return getActiveEntityManager().createQuery("SELECT r FROM RoleBean r", RoleBean.class).getResultList();
     }
 
     @Override
@@ -220,29 +371,13 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public List<MailTemplateBean> listMailTemplates() {
-        return getActiveEntityManager().createQuery("SELECT m FROM MailTemplateBean m", MailTemplateBean.class).getResultList();
-    }
-
-    @Override
-    public List<OrganizationBean> listOrganizations() {
-        return getActiveEntityManager()
-                .createQuery("SELECT o FROM OrganizationBean o", OrganizationBean.class)
-                .getResultList();
-    }
-
-    @Override
     public List<UserBean> listUsers() {
         return getActiveEntityManager().createQuery("SELECT u FROM UserBean u", UserBean.class).getResultList();
     }
 
     @Override
-    public List<ProjectBean> listProjects(String organizationId) {
-        OrganizationBean org = getOrganization(organizationId);
-        return getActiveEntityManager()
-                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId", ProjectBean.class)
-                .setParameter("orgId", org.getId())
-                .getResultList();
+    public List<WorklogBean> listWorklogs() {
+        return getActiveEntityManager().createQuery("SELECT w FROM WorklogBean w", WorklogBean.class).getResultList();
     }
 
     @Override
@@ -255,12 +390,20 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public List<WorklogBean> listUserWorklogs(String userId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT w FROM WorklogBean w WHERE w.userId = :uId", WorklogBean.class)
+                .setParameter("uId", userId)
+                .getResultList();
+    }
+
+    @Override
     public ConfigBean getDefaultConfig() {
         try {
             return getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE", ConfigBean.class).getSingleResult();
         } catch (NoResultException ex) {
             log.error("No results found: {}", ex.getMessage());
-            throw ExceptionFactory.storageException("No configuration found.");
+            throw ExceptionFactory.defaultConfigNotFoundException();
         }
     }
 
@@ -317,11 +460,36 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :uId AND m.organizationId = :oId", MembershipBean.class)
+                    .setParameter("uId", userId)
+                    .setParameter("oId", organizationId)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public OrganizationBean findOrganizationByName(String organizationName) {
         try {
             return getActiveEntityManager()
                     .createQuery("SELECT o FROM OrganizationBean o WHERE o.name = :orgName", OrganizationBean.class)
                     .setParameter("orgName", organizationName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public PaygradeBean findPaygradeByName(String paygradeName) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT p FROM PaygradeBean p WHERE p.name = :pName", PaygradeBean.class)
+                    .setParameter("pName", paygradeName)
                     .getSingleResult();
         } catch (NoResultException ex) {
             return null;
@@ -343,16 +511,222 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public Long getUserLoggedMinutesForDay(String userId, Date day) {
+    public UserBean findUserByEmail(String email) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT u FROM UserBean u WHERE u.email = :mail", UserBean.class)
+                    .setParameter("mail", email)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName) {
         return getActiveEntityManager()
-                .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day", Long.class)
+                .createQuery("SELECT u FROM UserBean u WHERE u.firstName = :fName AND u.lastName = :lName", UserBean.class)
+                .setParameter("fName", firstName)
+                .setParameter("lName", lastName)
+                .getResultList();
+    }
+
+    @Override
+    public Long getUserLoggedMinutesForDay(String userId, LocalDate day) {
+        return (Long) getActiveEntityManager()
+                .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
                 .setParameter("user", userId)
                 .setParameter("day", day)
                 .getSingleResult();
     }
 
+    public List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period) {
+        // BASE
+        StringBuilder query = new StringBuilder("SELECT w FROM WorklogBean w");
+
+        boolean orgQualifier = StringUtils.isNotEmpty(organizationId);
+        boolean projQualifier = projectId != null;
+        boolean actQualifier = activityId != null;
+        boolean uQualifier = StringUtils.isNotEmpty(userId);
+        boolean periodQualifier = CollectionUtils.isNotEmpty(period);
+
+        // FROM
+        if (orgQualifier) {
+            query.append(" JOIN w.activity a JOIN a.project p JOIN p.organization o");
+        } else if (projQualifier) {
+            query.append(" JOIN w.activity a JOIN a.project p");
+        } else if (actQualifier) {
+            query.append(" JOIN w.activity a");
+        }
+        if (orgQualifier || projQualifier || actQualifier || uQualifier || periodQualifier) {
+            query.append(" WHERE");
+        }
+        List<String> qualifiers = new ArrayList<>();
+        if (orgQualifier) qualifiers.add(" o.id = :oId");
+        if (projQualifier) qualifiers.add(" p.id = :pId");
+        if (actQualifier) qualifiers.add(" a.id = :aId");
+        if (uQualifier) qualifiers.add(" w.userId = :uId");
+        if (periodQualifier) qualifiers.add(" w.day IN :period");
+        Iterator it = qualifiers.iterator();
+        while (it.hasNext()) {
+            query.append(it.next());
+            if (it.hasNext()) query.append(" AND");
+        }
+
+        TypedQuery<WorklogBean> q = getActiveEntityManager().createQuery(query.toString(), WorklogBean.class);
+        if (orgQualifier) q.setParameter("oId", organizationId);
+        if (projQualifier) q.setParameter("pId", projectId);
+        if (actQualifier) q.setParameter("aId", activityId);
+        if (uQualifier) q.setParameter("uId", userId);
+        if (periodQualifier) q.setParameter("period", period);
+        log.debug("Search query: {}", query.toString());
+        return q.getResultList();
+    }
+
+    //Private helper methods
+
+    private void restoreRoles(Set<RoleBackup> rs) {
+        for (RoleBackup r : rs) {
+            RoleBean nr = new RoleBean();
+            nr.setId(r.getId());
+            nr.setName(r.getName());
+            nr.setDescription(r.getDescription());
+            nr.setAutoGrant(r.getAutoGrant());
+            nr.setPermissions(new ArrayList<>(r.getPermissions()));
+            super.update(nr);
+        }
+    }
+
+    private void restoreConfigs(Set<ConfigurationBackup> cbs) {
+        for (ConfigurationBackup c : cbs) {
+            ConfigBean nc = new ConfigBean();
+            nc.setId(c.getId());
+            nc.setConfigPath(c.getConfigPath());
+            nc.setDefaultConfig(c.getDefaultConfig());
+            nc.setDayOfMonthlyReminderEmail(c.getDayOfMonthlyReminderEmail());
+            nc.setLastDayOfMonth(c.getLastDayOfMonth());
+            super.update(nc);
+        }
+    }
+
+    private void restoreMailTemplates(Set<MailTemplateBackup> mbs) {
+        for (MailTemplateBackup m : mbs) {
+            MailTemplateBean nm = new MailTemplateBean();
+            nm.setId(m.getId());
+            nm.setSubject(m.getSubject());
+            nm.setContent(m.getContent());
+            super.update(nm);
+        }
+    }
+
+    private Map<Long, PaygradeBean> restorePaygrades(Set<PaygradeBackup> pbs) {
+        Map<Long, PaygradeBean> sortedPaygrades = new HashMap<>();
+        for (PaygradeBackup p : pbs) {
+            PaygradeBean np = new PaygradeBean();
+            np.setId(p.getId());
+            np.setName(p.getName());
+            np.setDescription(p.getDescription());
+            np.setHourlyRate(p.getHourlyRate());
+            sortedPaygrades.put(p.getId(), super.update(np));
+        }
+        return sortedPaygrades;
+    }
+
+    private Map<String, OrganizationBean> restoreOrganizations(Set<OrganizationBackup> obs) {
+        Map<String, OrganizationBean> sortedOrgs = new HashMap<>();
+        for (OrganizationBackup o : obs) {
+            OrganizationBean no = new OrganizationBean();
+            no.setId(o.getId());
+            no.setName(o.getName());
+            no.setDescription(o.getDescription());
+            sortedOrgs.put(o.getId(), super.update(no));
+        }
+        return sortedOrgs;
+    }
+
+    private Map<Long, ProjectBean> restoreProjects(Set<ProjectBackup> pbs, Map<String, OrganizationBean> os) {
+        Map<Long, ProjectBean> sortedProjects = new HashMap<>();
+        for (ProjectBackup p : pbs) {
+            ProjectBean np = new ProjectBean();
+            np.setId(p.getId());
+            np.setName(p.getName());
+            np.setDescription(p.getDescription());
+            np.setBillOvertime(p.getBillOvertime());
+            np.setAllowOvertime(np.getAllowOvertime());
+            np.setOrganization(os.get(p.getOrganizationId()));
+            sortedProjects.put(p.getId(), super.update(np));
+        }
+        return sortedProjects;
+    }
+
+    private Map<Long, ActivityBean> restoreActivities(Set<ActivityBackup> abs, Map<Long, ProjectBean> ps) {
+        Map<Long, ActivityBean> sortedActivities = new HashMap<>();
+        for (ActivityBackup a : abs) {
+            ActivityBean na = new ActivityBean();
+            na.setId(a.getId());
+            na.setName(a.getName());
+            na.setDescription(a.getDescription());
+            na.setBillable(a.getBillable());
+            na.setProject(ps.get(a.getProjectId()));
+            sortedActivities.put(a.getId(), super.update(na));
+        }
+        return sortedActivities;
+    }
+
+    private Map<String, UserBean> restoreUsers(Set<UserBackup> ubs, Map<Long, PaygradeBean> pgs) {
+        Map<String, UserBean> sortedUsers = new HashMap<>();
+        for (UserBackup u : ubs) {
+            UserBean nu = new UserBean();
+            nu.setId(u.getId());
+            nu.setFirstName(u.getFirstName());
+            nu.setLastName(u.getLastName());
+            nu.setEmail(u.getEmail());
+            nu.setAdmin(u.getAdmin());
+            nu.setPaygrade(pgs.get(u.getPaygradeId()));
+            nu.setDefaultHoursPerDay(u.getDefaultHoursPerDay());
+            nu.setDefaultActivity(u.getDefaultActivityId());
+            nu.setWorkdays(u.getWorkDays());
+            sortedUsers.put(u.getId(), super.update(nu));
+        }
+        return sortedUsers;
+    }
+
+    private void restoreMemberships(Set<MembershipBackup> mbs) {
+        for (MembershipBackup m : mbs) {
+            MembershipBean nm = new MembershipBean();
+            nm.setId(m.getId());
+            nm.setUserId(m.getUserId());
+            nm.setOrganizationId(m.getOrganizationId());
+            nm.setRoleId(m.getRoleId());
+            super.update(nm);
+        }
+    }
+
+    private void restoreProjectAssignments(Set<ProjecAssignmentBackup> pas, Map<Long, ProjectBean> ps, Map<String, UserBean> us) {
+        for (ProjecAssignmentBackup p : pas) {
+            ProjectBean pb = ps.get(p.getProjectId());
+            UserBean u = us.get(p.getUserId());
+            if (pb.getAssignedUsers() == null) pb.setAssignedUsers(new ArrayList<>());
+            pb.getAssignedUsers().add(u);
+            super.update(pb);
+        }
+    }
+
+    private void restoreWorklogs(Set<WorklogBackup> worklogs, Map<Long, ActivityBean> sortedActivities) {
+        for (WorklogBackup w : worklogs) {
+            WorklogBean nw = new WorklogBean();
+            nw.setId(w.getId());
+            nw.setUserId(w.getUserId());
+            nw.setActivity(sortedActivities.get(w.getActivityId()));
+            nw.setDay(w.getDay().toDate());
+            nw.setLoggedMinutes(w.getLoggedMinutes());
+            nw.setConfirmed(w.getConfirmed());
+            super.update(nw);
+        }
+    }
+
     @Override
-    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
+    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(LocalDate day) {
         return getActiveEntityManager()
                 .createQuery("SELECT NEW be.ehb.entities.users.UsersWorkLoadActivityBO(u.id, u.firstName, u.lastName, u.email, w.day, w.loggedMinutes, w.confirmed, a.description) " +
                         "FROM UserBean u, WorklogBean w " +

@@ -2,7 +2,6 @@ package be.ehb.mail;
 
 import be.ehb.configuration.IAppConfig;
 import be.ehb.entities.mail.MailTemplateBean;
-import be.ehb.exceptions.StorageException;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.mail.provider.IMailProvider;
 import be.ehb.model.mail.BaseMailBean;
@@ -65,12 +64,12 @@ public class MailService implements IMailService {
             Map<String, String> keymap = BeanUtilsBean.getInstance().describe(bean);
             //Pass string substitutor along
             prepAndSendMail(new StrSubstitutor(keymap, KEY_START, KEY_END), template, bean.getTo());
-        } catch (StorageException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             throw ExceptionFactory.mailServiceException(ex.getMessage());
         }
     }
 
-    private void prepAndSendMail(StrSubstitutor sub, MailTemplateBean template, String to) throws StorageException {
+    private void prepAndSendMail(StrSubstitutor sub, MailTemplateBean template, String to) {
         BaseMailBean mailBean = new BaseMailBean();
         mailBean.setSubject(sub.replace(template.getSubject()));
         mailBean.setContent(sub.replace(template.getContent()));

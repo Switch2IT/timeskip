@@ -9,17 +9,17 @@ import java.io.Serializable;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class AbstractBaseNumericIdResponse implements Serializable {
+public abstract class AbstractBaseStringId implements Serializable {
 
-    private Long id;
+    private String id;
     private String name;
     private String description;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -37,6 +37,21 @@ public abstract class AbstractBaseNumericIdResponse implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractBaseStringId)) return false;
+
+        AbstractBaseStringId that = (AbstractBaseStringId) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
+    public final int hashCode() {
+        return id.hashCode();
     }
 
     @Override

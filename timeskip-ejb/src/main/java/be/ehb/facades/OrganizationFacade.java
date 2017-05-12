@@ -23,6 +23,7 @@ import be.ehb.storage.IStorageService;
 import be.ehb.utils.ConventionUtil;
 import be.ehb.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +74,9 @@ public class OrganizationFacade implements IOrganizationFacade {
         String id = ConventionUtil.idFromName(request.getName());
         try {
             storage.getOrganization(id);
+            if (storage.findOrganizationByName(request.getName()) != null) {
+                throw ExceptionFactory.organizationAlreadyExistsException(request.getName());
+            }
             throw ExceptionFactory.organizationAlreadyExistsException(id);
         } catch (OrganizationNotFoundException ex) {
             //Do nothing
@@ -91,7 +95,7 @@ public class OrganizationFacade implements IOrganizationFacade {
             membership.setRoleId(role.getId());
             membership.setUserId(userId);
             membership.setOrganizationId(id);
-            storage.createMembership(membership);
+            storage.createOrUpdateMembership(membership);
             log.info("Created membership for user \"{}\" with role \"{}\"", userId, role.getName());
         }
 
@@ -128,7 +132,7 @@ public class OrganizationFacade implements IOrganizationFacade {
     @Override
     public List<ProjectResponse> listProjects(String organizationId) {
         UserBean user = userFacade.get(securityContext.getCurrentUser());
-        return storage.listProjects(organizationId).stream()
+        return storage.listOrganizationProjects(organizationId).stream()
                 .filter(project -> securityContext.hasPermission(PermissionType.PROJECT_VIEW_ALL, organizationId) || project.getAssignedUsers().contains(user))
                 .map(ResponseFactory::createProjectResponse)
                 .collect(Collectors.toList());
@@ -271,7 +275,7 @@ public class OrganizationFacade implements IOrganizationFacade {
     @Override
     public WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewAdminWorklogRequest request) {
         ActivityBean activity = storage.getActivity(organizationId, projectId, activityId);
-        Date day = DateUtils.convertStringToDate(request.getDay());
+        LocalDate day = DateUtils.convertStringToDate(request.getDay());
         UserBean user = storage.getUser(request.getUserId());
         //Check if the user is assigned to the project
         if (!activity.getProject().getAssignedUsers().contains(user)) {
@@ -286,7 +290,7 @@ public class OrganizationFacade implements IOrganizationFacade {
         WorklogBean newWorklog = new WorklogBean();
         newWorklog.setActivity(activity);
         newWorklog.setConfirmed(request.getConfirmed() == null ? false : request.getConfirmed());
-        newWorklog.setDay(day);
+        newWorklog.setDay(day.toDate());
         newWorklog.setLoggedMinutes(request.getLoggedMinutes());
         newWorklog.setUserId(user.getId());
         return ResponseFactory.createWorklogResponse(storage.createWorklog(newWorklog));
@@ -342,7 +346,7 @@ public class OrganizationFacade implements IOrganizationFacade {
         }
         Date newDate;
         try {
-            if (StringUtils.isNotEmpty(day)) newDate = DateUtils.convertStringToDate(day);
+            if (StringUtils.isNotEmpty(day)) newDate = DateUtils.convertStringToDate(day).toDate();
             else newDate = null;
         } catch (InvalidDateException ex) {
             newDate = null;
@@ -355,7 +359,7 @@ public class OrganizationFacade implements IOrganizationFacade {
             //Check if the changed minutes make
             if (!worklogToUpdate.getActivity().getProject().getAllowOvertime()
                     //Remove the current worklog's minutes before comparing it with the user's default hours
-                    && storage.getUserLoggedMinutesForDay(user.getId(), worklogToUpdate.getDay()) + loggedMinutes - worklogToUpdate.getLoggedMinutes() >
+                    && storage.getUserLoggedMinutesForDay(user.getId(), new LocalDate(worklogToUpdate.getDay())) + loggedMinutes - worklogToUpdate.getLoggedMinutes() >
                     DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
                 throw ExceptionFactory.noOverTimeAllowedException(worklogToUpdate.getActivity().getProject().getName());
             }

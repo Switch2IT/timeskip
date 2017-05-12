@@ -1,9 +1,9 @@
 package be.ehb.model.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.joda.time.LocalDate;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author Guillaume Vandecasteele
@@ -15,7 +15,7 @@ public class WorklogResponse implements Serializable {
     private Long id;
     private String userId;
     private ActivityResponse activity;
-    private Date day;
+    private LocalDate day;
     private Long loggedMinutes;
     private Boolean confirmed;
 
@@ -43,11 +43,11 @@ public class WorklogResponse implements Serializable {
         this.activity = activity;
     }
 
-    public Date getDay() {
+    public LocalDate getDay() {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(LocalDate day) {
         this.day = day;
     }
 

@@ -20,7 +20,7 @@ public class UserResponse implements Serializable {
     private String lastName;
     private Boolean admin;
     private List<MembershipResponse> memberships;
-    private PayGradeResponse payGrade;
+    private PaygradeResponse paygrade;
     private Double defaultHoursPerDay;
     private Set<DayOfWeek> workDays;
     private Long defaultActivity;
@@ -97,12 +97,12 @@ public class UserResponse implements Serializable {
         this.defaultActivity = defaultActivity;
     }
 
-    public PayGradeResponse getPayGrade() {
-        return payGrade;
+    public PaygradeResponse getPaygrade() {
+        return paygrade;
     }
 
-    public void setPayGrade(PayGradeResponse payGrade) {
-        this.payGrade = payGrade;
+    public void setPaygrade(PaygradeResponse paygrade) {
+        this.paygrade = paygrade;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class UserResponse implements Serializable {
                 ", lastName='" + lastName + '\'' +
                 ", admin=" + admin +
                 ", memberships=" + memberships +
-                ", payGrade=" + payGrade +
+                ", paygrade=" + paygrade +
                 ", defaultHoursPerDay=" + defaultHoursPerDay +
                 ", workDays=" + workDays +
                 ", defaultActivity=" + defaultActivity +

@@ -7,13 +7,19 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
+import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.model.responses.*;
+import be.ehb.utils.DateUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +59,7 @@ public class ResponseFactory {
             rval.setWorkDays(user.getWorkdays());
             rval.setMemberships(createMembershipResponses(user.getMemberships()));
             rval.setAdmin(user.getAdmin());
+            rval.setPaygrade(createPaygradeResponse(user.getPaygrade()));
         }
         return rval;
     }
@@ -124,7 +131,7 @@ public class ResponseFactory {
             rval.setId(worklog.getId());
             rval.setActivity(createActivityResponse(worklog.getActivity()));
             rval.setConfirmed(worklog.getConfirmed());
-            rval.setDay(worklog.getDay());
+            rval.setDay(new LocalDate(worklog.getDay()));
             rval.setLoggedMinutes(worklog.getLoggedMinutes());
             rval.setUserId(worklog.getUserId());
         }
@@ -151,6 +158,151 @@ public class ResponseFactory {
         if (lastDayOfMonth != null) {
             if (rval == null) rval = new DayOfMonthlyReminderResponse();
             rval.setLastDayOfMonth(lastDayOfMonth);
+        }
+        return rval;
+    }
+
+    public static PaygradeResponse createPaygradeResponse(PaygradeBean paygrade) {
+        PaygradeResponse rval = new PaygradeResponse();
+        if (paygrade != null) {
+            rval = new PaygradeResponse();
+            rval.setId(paygrade.getId());
+            rval.setName(paygrade.getName());
+            rval.setDescription(paygrade.getDescription());
+            rval.setHourlyRate(paygrade.getHourlyRate());
+        }
+        return rval;
+    }
+
+    public static WorkDayResponse createWorkDayResponse(LocalDate day, Long minutes) {
+        WorkDayResponse rval = null;
+        if (day != null && minutes != null) {
+            rval = new WorkDayResponse();
+            rval.setDay(DateUtils.convertDateToString(day));
+            rval.setLoggedMinutes(minutes);
+        }
+        return rval;
+    }
+
+    public static UserWorkDayResponse createUserWorkDayResponse(UserBean user, List<WorkDayResponse> workdays) {
+        UserWorkDayResponse rval = null;
+        if (user != null && CollectionUtils.isNotEmpty(workdays)) {
+            rval = new UserWorkDayResponse();
+            rval.setUser(createUserResponse(user));
+            rval.setWorkdays(workdays);
+        }
+        return rval;
+    }
+
+    public static ActivityLoggedTimeResponse createActivityLoggedTimeResponse(ActivityBean activity, Long sum) {
+        ActivityLoggedTimeResponse rval = null;
+        if (activity != null && sum != null) {
+            rval = new ActivityLoggedTimeResponse();
+            rval.setActivity(createActivityResponse(activity));
+            rval.setTotalLoggedMinutes(sum);
+        }
+        return rval;
+    }
+
+    public static ProjectLoggedTimeResponse createProjectLoggedTimeResponse(ProjectBean project, List<ActivityLoggedTimeResponse> alts, Long sum) {
+        ProjectLoggedTimeResponse rval = null;
+        if (project != null && CollectionUtils.isNotEmpty(alts) && sum != null) {
+            rval = new ProjectLoggedTimeResponse();
+            rval.setProject(createProjectResponse(project));
+            rval.setActivities(alts);
+            rval.setTotalLoggedMinutes(sum);
+        }
+        return rval;
+    }
+
+    public static OrganizationLoggedTimeResponse createOrganizationLoggedTimeResponse(OrganizationBean o, List<ProjectLoggedTimeResponse> plts, Long sum) {
+        OrganizationLoggedTimeResponse rval = null;
+        if (o != null && CollectionUtils.isNotEmpty(plts) && sum != null) {
+            rval = new OrganizationLoggedTimeResponse();
+            rval.setOrganization(createOrganizationResponse(o));
+            rval.setProjects(plts);
+            rval.setTotalLoggedMinutes(sum);
+        }
+        return rval;
+    }
+
+    public static UserLoggedTimeReportResponse createUserLoggedTimeReportResponse(UserBean user, LoggedTimeReportResponse loggedTimeReport) {
+        UserLoggedTimeReportResponse rval = null;
+        if (user != null && loggedTimeReport != null) {
+            rval = new UserLoggedTimeReportResponse();
+            rval.setUser(createUserResponse(user));
+            rval.setReport(loggedTimeReport);
+        }
+        return rval;
+    }
+
+    public static UserBillingResponse createUserBillingResponse(UserBean u, Long totalMinutes) {
+        UserBillingResponse rval = null;
+        if (u != null && totalMinutes != null) {
+            rval = new UserBillingResponse();
+            rval.setUser(createUserResponse(u));
+
+            rval.setTotalBillableHours(new BigDecimal(totalMinutes.doubleValue() / 60).setScale(2, BigDecimal.ROUND_HALF_UP));
+            rval.setTotalAmountDue(rval.getTotalBillableHours().multiply(new BigDecimal(u.getPaygrade().getHourlyRate().toString()).setScale(2, BigDecimal.ROUND_HALF_UP)));
+        }
+        return rval;
+    }
+
+    public static ActivityBillingResponse createActivityBillingResponse(ActivityBean a, List<UserBillingResponse> users, Optional<BigDecimal> totalHours, Optional<BigDecimal> totalAmount) {
+        ActivityBillingResponse rval = null;
+        if (a != null && CollectionUtils.isNotEmpty(users) && totalHours.isPresent() && totalAmount.isPresent()) {
+            rval = new ActivityBillingResponse();
+            rval.setActivity(createActivityResponse(a));
+            rval.setTotalBillableHours(totalHours.get());
+            rval.setTotalAmountDue(totalAmount.get());
+            rval.setUsers(users);
+        }
+        return rval;
+    }
+
+    public static ProjectBillingResponse createProjectBillingResponse(ProjectBean p, List<ActivityBillingResponse> activities, Optional<BigDecimal> totalHours, Optional<BigDecimal> totalAmount) {
+        ProjectBillingResponse rval = null;
+        if (p != null && CollectionUtils.isNotEmpty(activities) && totalHours.isPresent() && totalAmount.isPresent()) {
+            rval = new ProjectBillingResponse();
+            rval.setProject(createProjectResponse(p));
+            rval.setActivities(activities);
+            rval.setTotalBillableHours(totalHours.get());
+            rval.setTotalAmountDue(totalAmount.get());
+        }
+        return rval;
+    }
+
+    public static DayBillingResponse createDayBillingResponse(LocalDate d, List<ProjectBillingResponse> projects, Optional<BigDecimal> totalHours, Optional<BigDecimal> totalAmount) {
+        DayBillingResponse rval = null;
+        if (d != null && CollectionUtils.isNotEmpty(projects) && totalHours.isPresent() && totalAmount.isPresent()) {
+            rval = new DayBillingResponse();
+            rval.setDay(DateUtils.convertDateToString(d));
+            rval.setProjects(projects);
+            rval.setTotalBillableHours(totalHours.get());
+            rval.setTotalAmountDue(totalAmount.get());
+        }
+        return rval;
+    }
+
+    public static OrganizationBillingResponse createOrganizationBillingResponse(OrganizationBean o, List<DayBillingResponse> days, Optional<BigDecimal> totalHours, Optional<BigDecimal> totalAmount) {
+        OrganizationBillingResponse rval = null;
+        if (o != null && CollectionUtils.isNotEmpty(days) && totalHours.isPresent() && totalAmount.isPresent()) {
+            rval = new OrganizationBillingResponse();
+            rval.setOrganization(createOrganizationResponse(o));
+            rval.setDays(days);
+            rval.setTotalBillableHours(totalHours.get());
+            rval.setTotalAmountDue(totalAmount.get());
+        }
+        return rval;
+    }
+
+    public static BillingReportResponse createBillingReportResponse(List<OrganizationBillingResponse> obs, Optional<BigDecimal> totalHours, Optional<BigDecimal> totalAmount) {
+        BillingReportResponse rval = null;
+        if (CollectionUtils.isNotEmpty(obs) && totalHours.isPresent() && totalAmount.isPresent()) {
+            rval = new BillingReportResponse();
+            rval.setOrganizations(obs);
+            rval.setTotalBillableHours(totalHours.get());
+            rval.setTotalAmountDue(totalAmount.get());
         }
         return rval;
     }

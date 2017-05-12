@@ -1,12 +1,12 @@
 package be.ehb.model.responses;
 
-import be.ehb.model.AbstractBaseNumericIdResponse;
+import be.ehb.model.AbstractBaseNumericId;
 
 /**
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ProjectResponse extends AbstractBaseNumericIdResponse {
+public class ProjectResponse extends AbstractBaseNumericId {
 
     private Boolean allowOvertime;
     private Boolean billOvertime;
@@ -38,7 +38,7 @@ public class ProjectResponse extends AbstractBaseNumericIdResponse {
 
     @Override
     public String toString() {
-        return "ProjectDTO{" +
+        return "ProjectResponse{" +
                 super.toString() +
                 ", allowOvertime=" + allowOvertime +
                 ", billOvertime=" + billOvertime +

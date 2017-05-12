@@ -1,13 +1,8 @@
 package be.ehb.facades;
 
-import be.ehb.mail.MailTopic;
-import be.ehb.model.requests.UpdateDayOfMonthlyReminderRequest;
-import be.ehb.model.requests.UpdateMailTemplateRequest;
-import be.ehb.model.responses.DayOfMonthlyReminderResponse;
-import be.ehb.model.responses.MailTemplateResponse;
+import be.ehb.model.requests.RestoreBackupRequest;
+import be.ehb.model.responses.BackUpResponse;
 import be.ehb.model.responses.SystemStatusResponse;
-
-import java.util.List;
 
 /**
  * @author Guillaume Vandecasteele
@@ -24,17 +19,9 @@ public interface ISystemFacade {
 
     SystemStatusResponse getStatus();
 
-    // MAIL TEMPLATE RELATED
+    // BACKUP RELATED
 
-    List<MailTemplateResponse> listMailTemplates();
+    BackUpResponse getBackup();
 
-    MailTemplateResponse getMailTemplate(MailTopic topic);
-
-    MailTemplateResponse updateMailTemplate(MailTopic topic, UpdateMailTemplateRequest request);
-
-    // SCHEDULE RELATED
-
-    DayOfMonthlyReminderResponse getDayOfMonthlyReminder();
-
-    DayOfMonthlyReminderResponse updateDayOfMonthlyReminder(UpdateDayOfMonthlyReminderRequest request);
+    void restoreBackup(RestoreBackupRequest request);
 }

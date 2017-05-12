@@ -4,10 +4,14 @@ import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.mail.IMailService;
 import be.ehb.model.mail.ConfirmationReminderMailBean;
 import be.ehb.storage.IStorageService;
+import org.joda.time.LocalDate;
 import org.quartz.JobExecutionException;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Patrick Van den Bussche
@@ -27,7 +31,7 @@ class EmailReminderJobContext {
     }
 
     void execute() throws JobExecutionException {
-        List<UsersWorkLoadActivityBO> usersWorkLoadActivityBOList = iss.listUsersWorkloadActivity(new Date());
+        List<UsersWorkLoadActivityBO> usersWorkLoadActivityBOList = iss.listUsersWorkloadActivity(new LocalDate());
 
         if (!usersWorkLoadActivityBOList.isEmpty()) {
             Map<String, List<UsersWorkLoadActivityBO>> sortedMap = new HashMap<>();

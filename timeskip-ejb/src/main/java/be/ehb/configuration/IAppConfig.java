@@ -28,6 +28,8 @@ public interface IAppConfig {
 
     String getIdpClient();
 
+    String getDefaultNewUserPassword();
+
     boolean getValidateJWT();
 
     Integer getDayOfMonthlyReminderEmail();

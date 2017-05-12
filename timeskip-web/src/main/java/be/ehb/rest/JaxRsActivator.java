@@ -64,11 +64,11 @@ public class JaxRsActivator extends Application {
         resources.add(RestExceptionMapper.class);
 
         //REST resources
-        resources.add(UsersResource.class);
+        resources.add(ConfigurationResource.class);
         resources.add(OrganizationsResource.class);
         resources.add(ReportsResource.class);
         resources.add(SystemResource.class);
-        resources.add(ConfigurationResource.class);
+        resources.add(UsersResource.class);
     }
 }
 
