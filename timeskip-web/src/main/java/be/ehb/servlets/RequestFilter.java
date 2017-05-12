@@ -28,6 +28,8 @@ public class RequestFilter implements ContainerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(RequestFilter.class);
 
     private static final String HEADER_USER_AUTHORIZATION = "Authorization";
+    private static final String KEYCLOAK_TOKEN = "keycloak-token";
+    private static final String ACCESS_TOKEN = "access_token";
 
     //Exclusions
     private static final String BASE_PATH = "/timeskip-web/api";
@@ -47,7 +49,14 @@ public class RequestFilter implements ContainerRequestFilter {
         String path = containerRequestContext.getUriInfo().getRequestUri().getPath();
         //Filter requests to intercept JWT. Allow calls to system info
         if (!(path.startsWith(BASE_PATH + SYSTEM_PATH) || path.startsWith(BASE_PATH + SWAGGER_DOC_JSON))) {
-            String jwt = containerRequestContext.getHeaderString(HEADER_USER_AUTHORIZATION);
+            String jwt = null;
+            if (containerRequestContext.getHeaders().containsKey(HEADER_USER_AUTHORIZATION)) {
+                jwt = containerRequestContext.getHeaderString(HEADER_USER_AUTHORIZATION);
+            } else if (containerRequestContext.getHeaders().containsKey(KEYCLOAK_TOKEN)) {
+                jwt = containerRequestContext.getHeaderString(KEYCLOAK_TOKEN);
+            } else if (containerRequestContext.getHeaders().containsKey(ACCESS_TOKEN)) {
+                jwt = containerRequestContext.getHeaderString(ACCESS_TOKEN);
+            }
             if (jwt != null) {
                 //remove Bearer prefix
                 jwt = jwt.replaceFirst("Bearer", "").trim();
