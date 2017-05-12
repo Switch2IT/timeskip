@@ -1,38 +1,72 @@
 package be.ehb.utils;
 
+import be.ehb.exceptions.InvalidDateException;
+import be.ehb.factories.ExceptionFactory;
 import org.junit.*;
 
+import org.joda.time.LocalDate;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 
 /**
  * Created by Christophe on 12/05/2017.
  */
 public class DateUtilsTest {
- /*   @Test
-    public void convertStringToDate() throws Exception {
 
+    @Test
+    public void convertStringToDate() throws Exception {
+        String dateToParse = "05-10-2017";
+        Date date = new GregorianCalendar(2017, Calendar.OCTOBER,05).getTime();
+        LocalDate parsedLocalDate =  LocalDate.fromDateFields(date);
+        Assert.assertEquals(parsedLocalDate, DateUtils.convertStringToDate(dateToParse));
     }
-*/
+
+    @Test(expected = InvalidDateException.class)
+    public void convertStringToDateWrongFormat() throws Exception {
+        String dateToParse = "2017-10-05";
+        Date date = new GregorianCalendar(2017, Calendar.OCTOBER,05).getTime();
+        LocalDate parsedLocalDate =  LocalDate.fromDateFields(date);
+        DateUtils.convertStringToDate(dateToParse);
+    }
+
+    @Test(expected = InvalidDateException.class)
+    public void convertStringToDateNoDate() throws Exception {
+        String dateToParse = "";
+        Date date = new GregorianCalendar(2017, Calendar.OCTOBER,05).getTime();
+        LocalDate parsedLocalDate =  LocalDate.fromDateFields(date);
+        DateUtils.convertStringToDate(dateToParse);
+    }
+
+    @Test(expected = InvalidDateException.class)
+    public void convertStringToDateRightFormatButNotRightDate() throws Exception {
+        String dateToParse = "13-13-2017";
+        Date date = new GregorianCalendar(2017, 14,05).getTime();
+        LocalDate parsedLocalDate =  LocalDate.fromDateFields(date);
+        DateUtils.convertStringToDate(dateToParse);
+    }
+
     @Test
     public void convertHoursToMinutesRoundUp() throws Exception {
         long roundUp = DateUtils.convertHoursToMinutes(1.03);
         long expected = 62;
-        Assert.assertEquals(expected,roundUp);
+        Assert.assertEquals(expected, roundUp);
     }
 
     @Test
     public void convertHoursToMinutesRoundDown() throws Exception {
         long roundDown = DateUtils.convertHoursToMinutes(1.02);
         long expected = 61;
-        Assert.assertEquals(expected,roundDown);
+        Assert.assertEquals(expected, roundDown);
     }
 
     @Test
     public void convertHoursToMinutesRoundMiddle() throws Exception {
         long roundMiddle = DateUtils.convertHoursToMinutes(1.075);
         long expected = 65;
-        Assert.assertEquals(expected,roundMiddle);
+        Assert.assertEquals(expected, roundMiddle);
     }
 
     @Test(expected = NullPointerException.class)
@@ -44,14 +78,14 @@ public class DateUtilsTest {
     public void convertHoursToMinutesRoundMax() throws Exception {
         long roundMiddle = DateUtils.convertHoursToMinutes((double) Long.MAX_VALUE);
         long expected = Long.MAX_VALUE;
-        Assert.assertEquals(expected,roundMiddle);
+        Assert.assertEquals(expected, roundMiddle);
     }
 
     @Test
     public void convertHoursToMinutesRoundMin() throws Exception {
         long roundMiddle = DateUtils.convertHoursToMinutes((double) Long.MIN_VALUE);
         long expected = Long.MIN_VALUE;
-        Assert.assertEquals(expected,roundMiddle);
+        Assert.assertEquals(expected, roundMiddle);
     }
 /*
     @Test
