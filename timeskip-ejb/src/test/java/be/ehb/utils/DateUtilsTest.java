@@ -1,14 +1,9 @@
 package be.ehb.utils;
 
 import be.ehb.exceptions.InvalidDateException;
-import be.ehb.factories.ExceptionFactory;
 import org.junit.*;
-
 import org.joda.time.LocalDate;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 
 /**
@@ -87,15 +82,47 @@ public class DateUtilsTest {
         long expected = Long.MIN_VALUE;
         Assert.assertEquals(expected, roundMiddle);
     }
-/*
+
     @Test
     public void getDatesBetween() throws Exception {
 
+        String startDate = "05-10-2017";;
+        String endDate = "07-10-2017";;
+        List<LocalDate> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
+        List<LocalDate> datesBetweenManual = new ArrayList<>();
+        LocalDate start = DateUtils.convertStringToDate(startDate);
+        LocalDate between = DateUtils.convertStringToDate("06-10-2017");
+        datesBetweenManual.add(start);
+        datesBetweenManual.add(between);
+        Assert.assertArrayEquals(datesBetween.toArray(),datesBetweenManual.toArray());
+        Assert.assertEquals(datesBetween.toArray()[0],datesBetweenManual.toArray()[0]);
+        Assert.assertEquals(datesBetween.toArray()[1],datesBetweenManual.toArray()[1]);
+    }
+
+
+    @Test(expected = InvalidDateException.class)
+    public void getDatesBetweenWrongDate() throws Exception {
+        String startDate = "05-10-2017";;
+        String endDate = "13-13-2017";;
+        List<LocalDate> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
+    }
+
+    @Test
+    public void getDatesBetweenStartAfterEnddate() throws Exception {
+
+        String endDate = "05-10-2017";;
+        String startDate = "07-10-2017";;
+        List<LocalDate> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
+        List<LocalDate> datesBetweenManual = new ArrayList<>();
+        Assert.assertArrayEquals(datesBetween.toArray(),datesBetweenManual.toArray());
     }
 
     @Test
     public void convertDateToString() throws Exception {
-
+        String parsedDate = "05-10-2017";
+        Date date = new GregorianCalendar(2017, Calendar.OCTOBER,05).getTime();
+        LocalDate localDateToParse =  LocalDate.fromDateFields(date);
+        Assert.assertEquals(parsedDate,DateUtils.convertDateToString(localDateToParse));
     }
-*/
+
 }
