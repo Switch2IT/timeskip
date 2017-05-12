@@ -138,7 +138,7 @@ public interface IStorageService {
 
     List<RoleBean> listRoles();
 
-    List<UserBean> listUsers();
+    List<UserBean> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email);
 
     List<WorklogBean> listWorklogs();
 

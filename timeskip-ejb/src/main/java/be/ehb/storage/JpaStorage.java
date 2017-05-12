@@ -385,8 +385,47 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public List<UserBean> listUsers() {
-        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u", UserBean.class).getResultList();
+    public List<UserBean> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email) {
+        // BASE
+        StringBuilder query = new StringBuilder("SELECT u FROM UserBean u");
+
+        boolean orgQualifier = StringUtils.isNotEmpty(organizationId);
+        boolean roleQualifier = StringUtils.isNotEmpty(roleId);
+        boolean uQualifier = StringUtils.isNotEmpty(userId);
+        boolean fnQualifier = StringUtils.isNotEmpty(firstName);
+        boolean lnQualifier = StringUtils.isNotEmpty(lastName);
+        boolean emQualifier = StringUtils.isNotEmpty(email);
+
+        // FROM
+        if (orgQualifier || roleQualifier) {
+            query.append(" JOIN u.memberships m");
+        }
+        if (orgQualifier || roleQualifier || uQualifier || fnQualifier || lnQualifier || emQualifier) {
+            query.append(" WHERE");
+        }
+
+        List<String> qualifiers = new ArrayList<>();
+        if (orgQualifier) qualifiers.add(" m.organizationId = :oId");
+        if (roleQualifier) qualifiers.add(" m.roleId = :rId");
+        if (uQualifier) qualifiers.add(" u.id = :uId");
+        if (fnQualifier) qualifiers.add(" u.firstName = :fn");
+        if (lnQualifier) qualifiers.add(" u.lastName = :ln");
+        if (emQualifier) qualifiers.add(" u.email = :em");
+        Iterator it = qualifiers.iterator();
+        while (it.hasNext()) {
+            query.append(it.next());
+            if (it.hasNext()) query.append(" AND");
+        }
+
+        TypedQuery<UserBean> q = getActiveEntityManager().createQuery(query.toString(), UserBean.class);
+        if (orgQualifier) q.setParameter("oId", organizationId);
+        if (roleQualifier) q.setParameter("rId", roleId);
+        if (uQualifier) q.setParameter("uId", userId);
+        if (fnQualifier) q.setParameter("fn", firstName);
+        if (lnQualifier) q.setParameter("ln", lastName);
+        if (emQualifier) q.setParameter("em", email);
+        log.debug("Search query: {}", query.toString());
+        return q.getResultList();
     }
 
     @Override

@@ -21,7 +21,7 @@ public interface IUserFacade {
 
     UserResponse getUser(String userId);
 
-    List<UserResponse> listUsers();
+    List<UserResponse> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email);
 
     TokenClaimsResponse parseJWT(JWTParseRequest jwt);
 

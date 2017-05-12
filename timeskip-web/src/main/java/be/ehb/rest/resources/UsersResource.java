@@ -93,8 +93,13 @@ public class UsersResource {
     })
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listUsers() {
-        return ResponseFactory.buildResponse(OK, userFacade.listUsers());
+    public Response listUsers(@QueryParam("organization") String organizationId,
+                              @QueryParam("role") String roleId,
+                              @QueryParam("id") String userId,
+                              @QueryParam("firstname") String firstName,
+                              @QueryParam("lastname") String lastName,
+                              @QueryParam("email") String email) {
+        return ResponseFactory.buildResponse(OK, userFacade.listUsers(organizationId, roleId, userId, firstName, lastName, email));
     }
 
     @ApiOperation(value = "Get user",
