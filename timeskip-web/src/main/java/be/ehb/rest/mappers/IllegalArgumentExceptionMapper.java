@@ -2,6 +2,7 @@ package be.ehb.rest.mappers;
 
 import be.ehb.exceptions.ErrorCodes;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.responses.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,8 +29,7 @@ public class IllegalArgumentExceptionMapper implements ExceptionMapper<IllegalAr
         if (StringUtils.isNotEmpty(data.getMessage())) {
             error.setMessage(data.getMessage());
         } else {
-            //TODO - Use resource bundle for internationalization
-            error.setMessage("Invalid Input");
+            error.setMessage(Messages.i18n.format("invalidInput"));
         }
         error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
         error.setErrorCode(ErrorCodes.INVALID_INPUT);

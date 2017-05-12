@@ -18,7 +18,7 @@ public class DateUtils {
 
     public static LocalDate convertStringToDate(String dateString) {
         try {
-            return LocalDate.parse("05-10-2017", DateTimeFormat.forPattern("dd-MM-yyyy"));
+            return LocalDate.parse(dateString, DateTimeFormat.forPattern("dd-MM-yyyy"));
         } catch (Exception ex) {
             throw ExceptionFactory.invalidDateException(String.format("Date should have \"%s\" format", DATE_FORMAT));
         }

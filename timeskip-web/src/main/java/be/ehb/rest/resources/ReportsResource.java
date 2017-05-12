@@ -3,6 +3,7 @@ package be.ehb.rest.resources;
 import be.ehb.facades.IReportsFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionType;
@@ -117,7 +118,7 @@ public class ReportsResource {
                                   @QueryParam("activity") Long activityId,
                                   @QueryParam("from") String from,
                                   @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getUserReport(organizationId, projectId, activityId, userId, from, to));
     }
@@ -219,7 +220,7 @@ public class ReportsResource {
                                      @QueryParam("activity") Long activityId,
                                      @QueryParam("from") String from,
                                      @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to));
     }
@@ -243,14 +244,14 @@ public class ReportsResource {
     }
 
     private void checkOverUndertime(String organizationId, String from, String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organization\" query string parameter must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("missingQueryString", "organization"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
             throw ExceptionFactory.unauthorizedException(organizationId);
         checkDates(from, to);
     }
 
     private void checkDates(String from, String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(from), Messages.i18n.format("missingQueryString", "from"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(to), Messages.i18n.format("missingQueryString", "to"));
     }
 }

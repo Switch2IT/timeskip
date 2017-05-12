@@ -3,6 +3,7 @@ package be.ehb.rest.resources;
 import be.ehb.facades.ISystemFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.model.responses.BackUpResponse;
 import be.ehb.model.responses.ErrorResponse;
@@ -72,7 +73,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response restoreBackup(@ApiParam RestoreBackupRequest request) {
         if (!securityContext.isAdmin()) throw ExceptionFactory.unauthorizedException();
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         systemFacade.restoreBackup(request);
         return ResponseFactory.buildResponse(OK);
     }

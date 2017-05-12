@@ -82,6 +82,7 @@ public class ResponseFactory {
             rval.setName(role.getName());
             rval.setDescription(role.getDescription());
             rval.setAutoGrant(role.getAutoGrant());
+            rval.setPermissions(role.getPermissions());
         }
         return rval;
     }

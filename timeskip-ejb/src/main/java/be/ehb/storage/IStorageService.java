@@ -60,6 +60,8 @@ public interface IStorageService {
 
     ProjectBean createProject(ProjectBean project);
 
+    RoleBean createRole(RoleBean role);
+
     UserBean createUser(UserBean user);
 
     WorklogBean createWorklog(WorklogBean worklog);
@@ -88,6 +90,8 @@ public interface IStorageService {
 
     ProjectBean updateProject(ProjectBean project);
 
+    RoleBean updateRole(RoleBean role);
+
     UserBean updateUser(UserBean user);
 
     WorklogBean updateWorklog(WorklogBean worklog);
@@ -103,6 +107,8 @@ public interface IStorageService {
     void deletePaygrade(PaygradeBean paygrade);
 
     void deleteProject(ProjectBean project);
+
+    void deleteRole(RoleBean role);
 
     void deleteUser(UserBean user);
 
@@ -154,11 +160,15 @@ public interface IStorageService {
 
     MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId);
 
+    List<MembershipBean> findMembershipsByRole(String roleId);
+
     OrganizationBean findOrganizationByName(String organizationName);
 
     PaygradeBean findPaygradeByName(String paygradeName);
 
     ProjectBean findProjectByName(String organizationId, String projectName);
+
+    RoleBean findRoleByName(String roleName);
 
     UserBean findUserByEmail(String email);
 
