@@ -179,7 +179,7 @@ public class ReportsFacade implements IReportsFacade {
             Optional<BigDecimal> totalHours = obr.parallelStream().map(OrganizationBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
             Optional<BigDecimal> totalAmount = obr.parallelStream().map(OrganizationBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
             BillingReportResponse rval = ResponseFactory.createBillingReportResponse(obr, totalHours, totalAmount);
-            if (rval == null) return new BillingReportResponse();
+            if (rval == null) return null;
             else return rval;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -430,7 +430,7 @@ public class ReportsFacade implements IReportsFacade {
 
         storage.searchWorklogs(organizationId, projectId, activityId, userId, DateUtils.getDatesBetween(from, to)).forEach(w -> {
             ActivityBean a = w.getActivity();
-            if (a.getBillable()) {
+            if (a.getBillable() != null && a.getBillable()) {
                 ProjectBean p = a.getProject();
                 OrganizationBean o = p.getOrganization();
                 UserBean u = storage.getUser(w.getUserId());

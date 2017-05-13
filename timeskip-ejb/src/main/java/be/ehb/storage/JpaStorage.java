@@ -207,20 +207,131 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         getActiveEntityManager().createQuery("DELETE FROM OrganizationBean o").executeUpdate();
         getActiveEntityManager().createQuery("DELETE FROM RoleBean r").executeUpdate();
         getActiveEntityManager().createQuery("DELETE FROM UserBean u").executeUpdate();
+        if (CollectionUtils.isNotEmpty(backup.getConfigurations())) {
+            for (ConfigurationBackup c : backup.getConfigurations()) {
+                ConfigBean nc = new ConfigBean();
+                nc.setId(c.getId());
+                nc.setConfigPath(c.getConfigPath());
+                nc.setDefaultConfig(c.getDefaultConfig());
+                nc.setDayOfMonthlyReminderEmail(c.getDayOfMonthlyReminderEmail());
+                nc.setLastDayOfMonth(c.getLastDayOfMonth());
+                super.update(nc);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getMailTemplates())) {
+            for (MailTemplateBackup m : backup.getMailTemplates()) {
+                MailTemplateBean nm = new MailTemplateBean();
+                nm.setId(m.getId());
+                nm.setSubject(m.getSubject());
+                nm.setContent(m.getContent());
+                super.update(nm);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getRoles())) {
+            for (RoleBackup r : backup.getRoles()) {
+                RoleBean nr = new RoleBean();
+                nr.setId(r.getId());
+                nr.setName(r.getName());
+                nr.setDescription(r.getDescription());
+                nr.setAutoGrant(r.getAutoGrant());
+                nr.setPermissions(new ArrayList<>(r.getPermissions()));
+                super.update(nr);
+            }
+        }
 
-        restoreConfigs(backup.getConfigurations());
-        restoreMailTemplates(backup.getMailTemplates());
-        restoreRoles(backup.getRoles());
-
-        Map<String, OrganizationBean> sortedOrgs = backup.getOrganizations() == null ? new HashMap<>() : restoreOrganizations(backup.getOrganizations());
-        Map<Long, ProjectBean> sortedProjects = backup.getProjects() == null ? new HashMap<>() : restoreProjects(backup.getProjects(), sortedOrgs);
-        Map<Long, PaygradeBean> sortedPaygrades = backup.getPaygrades() == null ? new HashMap<>() : restorePaygrades(backup.getPaygrades());
-        Map<String, UserBean> sortedUsers = backup.getUsers() == null ? new HashMap<>() : restoreUsers(backup.getUsers(), sortedPaygrades);
-        if (backup.getMemberships() != null) restoreMemberships(backup.getMemberships());
-        Map<Long, ActivityBean> sortedActivities = backup.getActivities() == null ? new HashMap<>() : restoreActivities(backup.getActivities(), sortedProjects);
-        if (backup.getAssignments() != null)
-            restoreProjectAssignments(backup.getAssignments(), sortedProjects, sortedUsers);
-        if (backup.getWorklogs() != null) restoreWorklogs(backup.getWorklogs(), sortedActivities);
+        Map<String, OrganizationBean> sortedOrgs = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getOrganizations())) {
+            for (OrganizationBackup o : backup.getOrganizations()) {
+                OrganizationBean no = new OrganizationBean();
+                no.setId(o.getId());
+                no.setName(o.getName());
+                no.setDescription(o.getDescription());
+                sortedOrgs.put(o.getId(), super.update(no));
+            }
+        }
+        Map<Long, ProjectBean> sortedProjects = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getProjects())) {
+            for (ProjectBackup p : backup.getProjects()) {
+                ProjectBean np = new ProjectBean();
+                np.setId(p.getId());
+                np.setName(p.getName());
+                np.setDescription(p.getDescription());
+                np.setBillOvertime(p.getBillOvertime());
+                np.setAllowOvertime(np.getAllowOvertime());
+                np.setOrganization(sortedOrgs.get(p.getOrganizationId()));
+                sortedProjects.put(p.getId(), super.update(np));
+            }
+        }
+        Map<Long, PaygradeBean> sortedPaygrades = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getPaygrades())) {
+            for (PaygradeBackup p : backup.getPaygrades()) {
+                PaygradeBean np = new PaygradeBean();
+                np.setId(p.getId());
+                np.setName(p.getName());
+                np.setDescription(p.getDescription());
+                np.setHourlyRate(p.getHourlyRate());
+                sortedPaygrades.put(p.getId(), super.update(np));
+            }
+        }
+        Map<Long, ActivityBean> sortedActivities = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getActivities())) {
+            for (ActivityBackup a : backup.getActivities()) {
+                ActivityBean na = new ActivityBean();
+                na.setId(a.getId());
+                na.setName(a.getName());
+                na.setDescription(a.getDescription());
+                na.setBillable(a.getBillable());
+                na.setProject(sortedProjects.get(a.getProjectId()));
+                sortedActivities.put(a.getId(), super.update(na));
+            }
+        }
+        Map<String, UserBean> sortedUsers = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getUsers())) {
+            for (UserBackup u : backup.getUsers()) {
+                UserBean nu = new UserBean();
+                nu.setId(u.getId());
+                nu.setFirstName(u.getFirstName());
+                nu.setLastName(u.getLastName());
+                nu.setEmail(u.getEmail());
+                nu.setAdmin(u.getAdmin());
+                nu.setPaygrade(sortedPaygrades.get(u.getPaygradeId()));
+                nu.setDefaultHoursPerDay(u.getDefaultHoursPerDay());
+                nu.setDefaultActivity(u.getDefaultActivityId());
+                nu.setWorkdays(u.getWorkDays());
+                sortedUsers.put(u.getId(), super.create(nu));
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getMemberships())) {
+            for (MembershipBackup m : backup.getMemberships()) {
+                MembershipBean nm = new MembershipBean();
+                nm.setId(m.getId());
+                nm.setUserId(m.getUserId());
+                nm.setOrganizationId(m.getOrganizationId());
+                nm.setRoleId(m.getRoleId());
+                super.update(nm);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getAssignments())) {
+            for (ProjecAssignmentBackup p : backup.getAssignments()) {
+                ProjectBean pb = sortedProjects.get(p.getProjectId());
+                UserBean u = sortedUsers.get(p.getUserId());
+                if (pb.getAssignedUsers() == null) pb.setAssignedUsers(new ArrayList<>());
+                pb.getAssignedUsers().add(u);
+                super.update(pb);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getWorklogs())) {
+            for (WorklogBackup w : backup.getWorklogs()) {
+                WorklogBean nw = new WorklogBean();
+                nw.setId(w.getId());
+                nw.setUserId(w.getUserId());
+                nw.setActivity(sortedActivities.get(w.getActivityId()));
+                nw.setDay(w.getDay());
+                nw.setLoggedMinutes(w.getLoggedMinutes());
+                nw.setConfirmed(w.getConfirmed());
+                super.update(nw);
+            }
+        }
     }
 
 
@@ -654,147 +765,5 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         if (periodQualifier) q.setParameter("period", period);
         log.debug("Search query: {}", query.toString());
         return q.getResultList();
-    }
-
-    //Private helper methods
-
-    private void restoreRoles(Set<RoleBackup> rs) {
-        for (RoleBackup r : rs) {
-            RoleBean nr = new RoleBean();
-            nr.setId(r.getId());
-            nr.setName(r.getName());
-            nr.setDescription(r.getDescription());
-            nr.setAutoGrant(r.getAutoGrant());
-            nr.setPermissions(new ArrayList<>(r.getPermissions()));
-            super.update(nr);
-        }
-    }
-
-    private void restoreConfigs(Set<ConfigurationBackup> cbs) {
-        for (ConfigurationBackup c : cbs) {
-            ConfigBean nc = new ConfigBean();
-            nc.setId(c.getId());
-            nc.setConfigPath(c.getConfigPath());
-            nc.setDefaultConfig(c.getDefaultConfig());
-            nc.setDayOfMonthlyReminderEmail(c.getDayOfMonthlyReminderEmail());
-            nc.setLastDayOfMonth(c.getLastDayOfMonth());
-            super.update(nc);
-        }
-    }
-
-    private void restoreMailTemplates(Set<MailTemplateBackup> mbs) {
-        for (MailTemplateBackup m : mbs) {
-            MailTemplateBean nm = new MailTemplateBean();
-            nm.setId(m.getId());
-            nm.setSubject(m.getSubject());
-            nm.setContent(m.getContent());
-            super.update(nm);
-        }
-    }
-
-    private Map<Long, PaygradeBean> restorePaygrades(Set<PaygradeBackup> pbs) {
-        Map<Long, PaygradeBean> sortedPaygrades = new HashMap<>();
-        for (PaygradeBackup p : pbs) {
-            PaygradeBean np = new PaygradeBean();
-            np.setId(p.getId());
-            np.setName(p.getName());
-            np.setDescription(p.getDescription());
-            np.setHourlyRate(p.getHourlyRate());
-            sortedPaygrades.put(p.getId(), super.update(np));
-        }
-        return sortedPaygrades;
-    }
-
-    private Map<String, OrganizationBean> restoreOrganizations(Set<OrganizationBackup> obs) {
-        Map<String, OrganizationBean> sortedOrgs = new HashMap<>();
-        for (OrganizationBackup o : obs) {
-            OrganizationBean no = new OrganizationBean();
-            no.setId(o.getId());
-            no.setName(o.getName());
-            no.setDescription(o.getDescription());
-            sortedOrgs.put(o.getId(), super.update(no));
-        }
-        return sortedOrgs;
-    }
-
-    private Map<Long, ProjectBean> restoreProjects(Set<ProjectBackup> pbs, Map<String, OrganizationBean> os) {
-        Map<Long, ProjectBean> sortedProjects = new HashMap<>();
-        for (ProjectBackup p : pbs) {
-            ProjectBean np = new ProjectBean();
-            np.setId(p.getId());
-            np.setName(p.getName());
-            np.setDescription(p.getDescription());
-            np.setBillOvertime(p.getBillOvertime());
-            np.setAllowOvertime(np.getAllowOvertime());
-            np.setOrganization(os.get(p.getOrganizationId()));
-            sortedProjects.put(p.getId(), super.update(np));
-        }
-        return sortedProjects;
-    }
-
-    private Map<Long, ActivityBean> restoreActivities(Set<ActivityBackup> abs, Map<Long, ProjectBean> ps) {
-        Map<Long, ActivityBean> sortedActivities = new HashMap<>();
-        for (ActivityBackup a : abs) {
-            ActivityBean na = new ActivityBean();
-            na.setId(a.getId());
-            na.setName(a.getName());
-            na.setDescription(a.getDescription());
-            na.setBillable(a.getBillable());
-            na.setProject(ps.get(a.getProjectId()));
-            sortedActivities.put(a.getId(), super.update(na));
-        }
-        return sortedActivities;
-    }
-
-    private Map<String, UserBean> restoreUsers(Set<UserBackup> ubs, Map<Long, PaygradeBean> pgs) {
-        Map<String, UserBean> sortedUsers = new HashMap<>();
-        for (UserBackup u : ubs) {
-            UserBean nu = new UserBean();
-            nu.setId(u.getId());
-            nu.setFirstName(u.getFirstName());
-            nu.setLastName(u.getLastName());
-            nu.setEmail(u.getEmail());
-            nu.setAdmin(u.getAdmin());
-            nu.setPaygrade(pgs.get(u.getPaygradeId()));
-            nu.setDefaultHoursPerDay(u.getDefaultHoursPerDay());
-            nu.setDefaultActivity(u.getDefaultActivityId());
-            nu.setWorkdays(u.getWorkDays());
-            sortedUsers.put(u.getId(), super.update(nu));
-        }
-        return sortedUsers;
-    }
-
-    private void restoreMemberships(Set<MembershipBackup> mbs) {
-        for (MembershipBackup m : mbs) {
-            MembershipBean nm = new MembershipBean();
-            nm.setId(m.getId());
-            nm.setUserId(m.getUserId());
-            nm.setOrganizationId(m.getOrganizationId());
-            nm.setRoleId(m.getRoleId());
-            super.update(nm);
-        }
-    }
-
-    private void restoreProjectAssignments(Set<ProjecAssignmentBackup> pas, Map<Long, ProjectBean> ps, Map<String, UserBean> us) {
-        for (ProjecAssignmentBackup p : pas) {
-            ProjectBean pb = ps.get(p.getProjectId());
-            UserBean u = us.get(p.getUserId());
-            if (pb.getAssignedUsers() == null) pb.setAssignedUsers(new ArrayList<>());
-            pb.getAssignedUsers().add(u);
-            super.update(pb);
-        }
-    }
-
-    private void restoreWorklogs(Set<WorklogBackup> worklogs, Map<Long, ActivityBean> sortedActivities) {
-        for (WorklogBackup w : worklogs) {
-            WorklogBean nw = new WorklogBean();
-            nw.setId(w.getId());
-            nw.setUserId(w.getUserId());
-            nw.setActivity(sortedActivities.get(w.getActivityId()));
-            nw.setDay(w.getDay().toDate());
-            nw.setLoggedMinutes(w.getLoggedMinutes());
-            nw.setConfirmed(w.getConfirmed());
-            super.update(nw);
-        }
     }
 }

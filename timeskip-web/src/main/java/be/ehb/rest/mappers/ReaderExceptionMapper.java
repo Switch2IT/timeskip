@@ -35,8 +35,10 @@ public class ReaderExceptionMapper implements ExceptionMapper<ReaderException> {
             String originalMessage = data.getCause().getMessage();
             String expectedValues = originalMessage.substring(originalMessage.indexOf(START_ENUM) + 17, originalMessage.indexOf(END_ENUM));
             error.setMessage(Messages.i18n.format("wrongEnumValue", expectedValues));
+        } else {
+            error.setMessage(Messages.i18n.format("invalidRequestBody"));
         }
-        error.setMessage(Messages.i18n.format("invalidRequestBody"));
+        data.printStackTrace();
         error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
         error.setErrorCode(ErrorCodes.INVALID_INPUT);
         return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error, MediaType.APPLICATION_JSON);
