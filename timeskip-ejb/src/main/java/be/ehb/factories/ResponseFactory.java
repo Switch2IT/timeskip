@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -310,7 +311,7 @@ public class ResponseFactory {
         return rval;
     }
 
-    private static List<MembershipResponse> createMembershipResponses(List<MembershipBean> memberships) {
+    private static List<MembershipResponse> createMembershipResponses(Set<MembershipBean> memberships) {
         List<MembershipResponse> rval = null;
         if (memberships != null) {
             rval = memberships.stream().map(ResponseFactory::createMembershipResponse).collect(Collectors.toList());

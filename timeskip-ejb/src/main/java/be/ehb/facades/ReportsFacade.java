@@ -22,6 +22,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,10 +91,11 @@ public class ReportsFacade implements IReportsFacade {
     public OverUnderTimeReportResponse getUndertimeReport(String organizationId, String from, String to) {
         try {
             OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
+            List<Date> dates = DateUtils.getDatesBetween(from, to);
             Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
-            Map<UserBean, Map<LocalDate, Long>> filteredData = new HashMap<>();
             List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
-            sorted.forEach((user, map) -> {
+            List<UserBean> orgUsers = storage.listUsers(organizationId, null, null, null, null, null);
+            sorted.forEach((UserBean user, Map<LocalDate, Long> map) -> {
                 if (user.getDefaultHoursPerDay() != null) {
                     List<WorkDayResponse> workdays = new ArrayList<>();
                     map.forEach((day, minutes) -> {
@@ -101,7 +104,30 @@ public class ReportsFacade implements IReportsFacade {
                             if (wd != null) workdays.add(wd);
                         }
                     });
+                    //Check for the days an employee was supposed to be working, but didn't log any hours
+                    dates.stream()
+                            .map(LocalDate::new)
+                            .filter(d -> !map.containsKey(d) && !user.getWorkdays().parallelStream().map(DayOfWeek::getValue).filter(dw -> dw == d.getDayOfWeek()).collect(Collectors.toList()).isEmpty())
+                            .forEach(d -> {
+                                WorkDayResponse wd = ResponseFactory.createWorkDayResponse(d, 0L);
+                                if (wd != null) workdays.add(wd);
+                            });
+
                     UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(user, workdays);
+                    if (uwd != null) userWorkDayResponses.add(uwd);
+                }
+            });
+            orgUsers.parallelStream().filter(u -> !sorted.keySet().parallelStream().map(UserBean::getId).collect(Collectors.toList()).contains(u.getId())).forEach(u -> {
+                if (CollectionUtils.isNotEmpty(u.getWorkdays())) {
+                    List<WorkDayResponse> workdays = new ArrayList<>();
+                    dates.stream()
+                            .map(LocalDate::new)
+                            .filter(d -> !u.getWorkdays().parallelStream().map(DayOfWeek::getValue).filter(dw -> dw == d.getDayOfWeek()).collect(Collectors.toList()).isEmpty())
+                            .forEach(d -> {
+                                WorkDayResponse wd = ResponseFactory.createWorkDayResponse(d, 0L);
+                                if (wd != null) workdays.add(wd);
+                            });
+                    UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(u, workdays);
                     if (uwd != null) userWorkDayResponses.add(uwd);
                 }
             });

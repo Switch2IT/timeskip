@@ -180,11 +180,10 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public MembershipBean createOrUpdateMembership(MembershipBean membership) {
-        MembershipBean rval = null;
         MembershipBean existing = findMembershipByUserAndOrganization(membership.getUserId(), membership.getOrganizationId());
         if (existing != null) {
             existing.setRoleId(membership.getRoleId());
-            return updateMembership(membership);
+            return updateMembership(existing);
         } else {
             return createMembership(membership);
         }

@@ -52,7 +52,7 @@ public class ManagementFacade implements IManagementFacade {
         MembershipBean newMembership = new MembershipBean();
         newMembership.setRoleId(roleId);
         newMembership.setUserId(userId);
-        newMembership.setRoleId(roleId);
+        newMembership.setOrganizationId(organizationId);
         return ResponseFactory.createMembershipResponse(storage.createOrUpdateMembership(newMembership));
     }
 
