@@ -133,4 +133,8 @@ public class ExceptionFactory {
     public static RoleStillInUseException roleStillInUseException(String roleId) {
         return new RoleStillInUseException(Messages.i18n.format("stillInUse", "Role", roleId));
     }
+
+    public static PaygradeStillInUseException paygradeStillInUseException(Long paygradeId) {
+        return new PaygradeStillInUseException(Messages.i18n.format("stillInUse", "Payggrade", paygradeId.toString()));
+    }
 }

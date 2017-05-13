@@ -173,6 +173,8 @@ public interface IStorageService {
 
     UserBean findUserByEmail(String email);
 
+    List<UserBean> findUsersByPaygrade(Long paygradeId);
+
     List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName);
 
     Long getUserLoggedMinutesForDay(String userId, LocalDate day);

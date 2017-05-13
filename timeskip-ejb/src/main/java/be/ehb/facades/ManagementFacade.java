@@ -170,6 +170,8 @@ public class ManagementFacade implements IManagementFacade {
     @Override
     public void deletePaygrade(Long paygradeId) {
         PaygradeBean paygrade = storage.getPaygrade(paygradeId);
+        if (!storage.findUsersByPaygrade(paygradeId).isEmpty())
+            throw ExceptionFactory.paygradeStillInUseException(paygradeId);
         storage.deletePaygrade(paygrade);
     }
 }

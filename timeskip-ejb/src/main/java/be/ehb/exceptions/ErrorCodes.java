@@ -34,6 +34,7 @@ public class ErrorCodes {
 
     static final int PAYGRADE_NOT_FOUND = 5004;
     static final int PAYGRADE_ALREADY_EXISTS = 5009;
+    static final int PAYGRADE_STILL_IN_USE = 5010;
 
     // PROJECT RELATED
     static final int ORGANIZATION_ALREADY_EXISTS = 1005;

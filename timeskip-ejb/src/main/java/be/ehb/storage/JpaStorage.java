@@ -706,6 +706,14 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public List<UserBean> findUsersByPaygrade(Long paygradeId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT u FROM UserBean u JOIN u.paygrade p WHERE p.id = :pId", UserBean.class)
+                .setParameter("pId", paygradeId)
+                .getResultList();
+    }
+
+    @Override
     public List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName) {
         return getActiveEntityManager()
                 .createQuery("SELECT u FROM UserBean u WHERE u.firstName = :fName AND u.lastName = :lName", UserBean.class)
