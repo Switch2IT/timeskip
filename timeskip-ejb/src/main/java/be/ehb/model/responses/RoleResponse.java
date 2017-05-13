@@ -1,8 +1,10 @@
 package be.ehb.model.responses;
 
+import be.ehb.security.PermissionType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Guillaume Vandecasteele
@@ -15,6 +17,7 @@ public class RoleResponse implements Serializable {
     private String name;
     private String description;
     private Boolean autoGrant;
+    private List<PermissionType> permissions;
 
     public String getId() {
         return id;
@@ -48,6 +51,14 @@ public class RoleResponse implements Serializable {
         this.autoGrant = autoGrant;
     }
 
+    public List<PermissionType> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<PermissionType> permissions) {
+        this.permissions = permissions;
+    }
+
     @Override
     public String toString() {
         return "RoleResponse{" +
@@ -55,6 +66,7 @@ public class RoleResponse implements Serializable {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", autoGrant=" + autoGrant +
+                ", permissions=" + permissions +
                 '}';
     }
 }

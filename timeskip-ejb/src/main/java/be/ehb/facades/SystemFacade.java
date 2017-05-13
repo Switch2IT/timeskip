@@ -58,7 +58,7 @@ public class SystemFacade implements ISystemFacade {
                 storage.listProjects(),
                 storage.listActivities(),
                 storage.listPaygrades(),
-                storage.listUsers(),
+                storage.listUsers(null, null, null, null, null, null),
                 storage.listRoles(),
                 storage.listMemberships(),
                 storage.listMailTemplates(),

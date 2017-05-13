@@ -15,7 +15,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class ResponseFactory {
 
-    public static Response buildResponse(Response.Status httpCode, String headerName, String headerValue, Object entity) {
+    public static Response buildResponse(Response.Status httpCode, String headerName, String headerValue, Object entity, String contentType) {
         Response.ResponseBuilder builder = Response.status(httpCode.getStatusCode());
         if (StringUtils.isNotEmpty(headerName) && StringUtils.isNotEmpty(headerValue)) {
             builder.header(headerName, headerValue);
@@ -36,15 +35,18 @@ public class ResponseFactory {
         if (entity != null) {
             builder.entity(entity);
         }
-        return builder.type(MediaType.APPLICATION_JSON_TYPE).build();
+        if (StringUtils.isNotEmpty(contentType)) {
+            builder.type(contentType);
+        }
+        return builder.build();
     }
 
     public static Response buildResponse(Response.Status httpCode) {
-        return buildResponse(httpCode, null, null, null);
+        return buildResponse(httpCode, null, null, null, null);
     }
 
     public static Response buildResponse(Response.Status httpCode, Object entity) {
-        return buildResponse(httpCode, null, null, entity);
+        return buildResponse(httpCode, null, null, entity, null);
     }
 
     public static UserResponse createUserResponse(UserBean user) {
@@ -82,6 +84,7 @@ public class ResponseFactory {
             rval.setName(role.getName());
             rval.setDescription(role.getDescription());
             rval.setAutoGrant(role.getAutoGrant());
+            rval.setPermissions(role.getPermissions());
         }
         return rval;
     }
