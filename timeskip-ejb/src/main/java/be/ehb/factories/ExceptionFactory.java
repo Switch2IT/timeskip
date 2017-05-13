@@ -1,6 +1,7 @@
 package be.ehb.factories;
 
 import be.ehb.exceptions.*;
+import be.ehb.i18n.Messages;
 import be.ehb.mail.MailTopic;
 
 /**
@@ -10,11 +11,11 @@ import be.ehb.mail.MailTopic;
 public class ExceptionFactory {
 
     public static UnauthorizedException unauthorizedException(String message) {
-        return new UnauthorizedException(message);
+        return new UnauthorizedException(Messages.i18n.format("notAuthorizedForResouce", message));
     }
 
     public static UnauthorizedException unauthorizedException(Long entityId) {
-        return new UnauthorizedException(entityId.toString());
+        return unauthorizedException(entityId.toString());
     }
 
     public static UnauthorizedException unauthorizedException() {
@@ -123,5 +124,17 @@ public class ExceptionFactory {
 
     public static UnavailableException unavailableException() {
         return new UnavailableException();
+    }
+
+    public static RoleAlreadyExistsException roleAlreadyExistsException(String name) {
+        return new RoleAlreadyExistsException(Messages.i18n.format("alreadyExists", "Role", name));
+    }
+
+    public static RoleStillInUseException roleStillInUseException(String roleId) {
+        return new RoleStillInUseException(Messages.i18n.format("stillInUse", "Role", roleId));
+    }
+
+    public static PaygradeStillInUseException paygradeStillInUseException(Long paygradeId) {
+        return new PaygradeStillInUseException(Messages.i18n.format("stillInUse", "Payggrade", paygradeId.toString()));
     }
 }

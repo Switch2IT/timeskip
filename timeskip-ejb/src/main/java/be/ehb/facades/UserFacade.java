@@ -53,8 +53,8 @@ public class UserFacade implements IUserFacade, Serializable {
     private IIdpClient idpClient;
 
     @Override
-    public List<UserResponse> listUsers() {
-        return storage.listUsers().stream().map(ResponseFactory::createUserResponse).collect(Collectors.toList());
+    public List<UserResponse> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email) {
+        return storage.listUsers(organizationId, roleId, userId, firstName, lastName, email).parallelStream().map(ResponseFactory::createUserResponse).collect(Collectors.toList());
     }
 
     @Override
@@ -140,7 +140,7 @@ public class UserFacade implements IUserFacade, Serializable {
     @Override
     public UserResponse updateCurrentUser(UpdateCurrentUserRequest request) {
         String currentUser = securityContext.getCurrentUser();
-        boolean changed = false;
+        boolean changed;
         if (StringUtils.isEmpty(currentUser)) {
             throw ExceptionFactory.noUserContextException();
         }
@@ -162,7 +162,7 @@ public class UserFacade implements IUserFacade, Serializable {
     @Override
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         UserBean user = storage.getUser(userId);
-        boolean changed = false;
+        boolean changed;
         changed = updateEmailIfChanged(user, request.getEmail());
         if (StringUtils.isNotEmpty(request.getFirstName()) && !request.getFirstName().equals(user.getFirstName())) {
             user.setFirstName(request.getFirstName());

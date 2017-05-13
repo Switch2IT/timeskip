@@ -1,6 +1,6 @@
 Timeskip: A RESTful API for Timesheet Management
 ==============================================================================================
-Author: Christophe Devos, Stephan Ghequiere, Timothy Pecceu, Patrick Van den Bussche, Guillaume Vandecasteele, Olivier Vanderstede
+Author: Christophe Devos, Stephan Ghequiere, Timothy Pecceu, Patrick Van den Bussche, Guillaume Vandecasteele, Olivier Vanderstede.
 Level: Intermediate
 Technologies: EAR, JPA, Swagger
 Summary: Based on the Wildfly EE Web Application archetype
@@ -45,7 +45,7 @@ _NOTE: The following build command assumes you have configured your Maven user s
 
         mvn clean install
 
-4. Copy the /target/timeskip-ear.ear to the deployment folder of the Wildfly server
+4. Copy the /target/timeskip-ear.ear to the deployment folder of the Wildfly server.
 
 
 Access the application 
@@ -55,57 +55,75 @@ The application will be running at the following URL: <http://localhost:8080/tim
         
 ## Release Notes
 
+### v0.5
+
+#### Upgrade path
+
+Adjust the `application.conf` file in your configuration folder to mirror the example in the `timeskip-ejb/src/main/resources/` folder. If you want PDF reports to bear a watermark, place the logo image in a folder of your choosing, and set the path in the configuration file.
+
+#### Additions
+
+* Roles CRUD endpoints.
+* `GET` `/users` now allows filtering the results with querystring parameters. Accepted parameters are `organization`, `id`, `role`, `firstname`, `lastname` and `email`.
+* PDF Report endpoints are now functional. Possibility to set an image as a logo.
+* JWT token can now be sent along requests in multiple headers: `keycloak-token`, `access_token` and `Authorization`.
+
+#### Bugfixes
+
+* Converting String to Date no longers uses dummy data.
+* Added `keycloak-token`, `access_token` and `Authorization` to the CORS filter's `Access-Control-Allow-Headers` header
+
 ### v0.4
 
 #### Upgrade path
 
-When upgrading from v0.3, please execute the `v0.4-update.ddl` script that can be found in `timeskip-ejb/src/main/resources/ddl` folder
+When upgrading from v0.3, please execute the `v0.4-update.ddl` script that can be found in the `timeskip-ejb/src/main/resources/ddl` folder
 
 #### Additions
 
-* Backup/Restore endpoints
-* Billing report endpoint
-* Logged time report endpoint
-* User logged time report endpoint
-* Current user logged time report endpoint
-* Overtime report endpoint
-* Undertime report endpoint
+* Backup/Restore endpoints.
+* Billing report endpoint.
+* Logged time report endpoint.
+* User logged time report endpoint.
+* Current user logged time report endpoint.
+* Overtime report endpoint.
+* Undertime report endpoint.
 
 #### Bugfixes
 
-* User now deleted on IDP when deleted from the Timeskip datastore
-* Foreign keys update, changes now cascade on delete as well as update
+* User now deleted on IDP when deleted from the Timeskip datastore.
+* Foreign keys update, changes now cascade on delete as well as update.
 
 ### v0.3
 
 #### Upgrade path
 
-When upgrading from v0.2, please execute the `v0.3-update.ddl` script that can be found in `timeskip-ejb/src/main/resources/ddl` folder
+When upgrading from v0.2, please execute the `v0.3-update.ddl` script that can be found in `timeskip-ejb/src/main/resources/ddl` folder.
 
 #### Additions
 
-* Mail service
-* Configuration endpoints
-* User CRUD
-* Membership CRUD
-* Mail templates
-* Startup service
-* Server restart now sends mail to configurable e-mail address
+* Mail service.
+* Configuration endpoints.
+* User CRUD.
+* Membership CRUD.
+* Mail templates.
+* Startup service.
+* Server restart now sends mail to configurable e-mail address.
 
 
 #### Bugfixes
 
-* Added missing auto-increment property to primary keys
-* Fixed issue where user could log work hours on unassigned project
-* Fixed access issue when querying numerical ID not belonging to containing entity
+* Added missing auto-increment property to primary keys.
+* Fixed issue where user could log work hours on unassigned project.
+* Fixed access issue when querying numerical ID not belonging to containing entity.
 
 ### v0.2
 
-* Added CRUD endpoints for organizations, projects, activities and worklogs
-* Added user-related endpoints (get current user, parse JWT, create user)
-* Keycloak IDP integration
-* System status endpoint
+* Added CRUD endpoints for organizations, projects, activities and worklogs.
+* Added user-related endpoints (get current user, parse JWT, create user).
+* Keycloak IDP integration.
+* System status endpoint.
 
 ### v0.1
 
-Initial release
+Initial release.

@@ -164,6 +164,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public RoleBean createRole(RoleBean role) {
+        return super.create(role);
+    }
+
+    @Override
     public UserBean createUser(UserBean user) {
         return super.create(user);
     }
@@ -175,11 +180,10 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
 
     @Override
     public MembershipBean createOrUpdateMembership(MembershipBean membership) {
-        MembershipBean rval = null;
         MembershipBean existing = findMembershipByUserAndOrganization(membership.getUserId(), membership.getOrganizationId());
         if (existing != null) {
             existing.setRoleId(membership.getRoleId());
-            return updateMembership(membership);
+            return updateMembership(existing);
         } else {
             return createMembership(membership);
         }
@@ -202,20 +206,131 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         getActiveEntityManager().createQuery("DELETE FROM OrganizationBean o").executeUpdate();
         getActiveEntityManager().createQuery("DELETE FROM RoleBean r").executeUpdate();
         getActiveEntityManager().createQuery("DELETE FROM UserBean u").executeUpdate();
+        if (CollectionUtils.isNotEmpty(backup.getConfigurations())) {
+            for (ConfigurationBackup c : backup.getConfigurations()) {
+                ConfigBean nc = new ConfigBean();
+                nc.setId(c.getId());
+                nc.setConfigPath(c.getConfigPath());
+                nc.setDefaultConfig(c.getDefaultConfig());
+                nc.setDayOfMonthlyReminderEmail(c.getDayOfMonthlyReminderEmail());
+                nc.setLastDayOfMonth(c.getLastDayOfMonth());
+                super.update(nc);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getMailTemplates())) {
+            for (MailTemplateBackup m : backup.getMailTemplates()) {
+                MailTemplateBean nm = new MailTemplateBean();
+                nm.setId(m.getId());
+                nm.setSubject(m.getSubject());
+                nm.setContent(m.getContent());
+                super.update(nm);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getRoles())) {
+            for (RoleBackup r : backup.getRoles()) {
+                RoleBean nr = new RoleBean();
+                nr.setId(r.getId());
+                nr.setName(r.getName());
+                nr.setDescription(r.getDescription());
+                nr.setAutoGrant(r.getAutoGrant());
+                nr.setPermissions(new ArrayList<>(r.getPermissions()));
+                super.update(nr);
+            }
+        }
 
-        restoreConfigs(backup.getConfigurations());
-        restoreMailTemplates(backup.getMailTemplates());
-        restoreRoles(backup.getRoles());
-
-        Map<String, OrganizationBean> sortedOrgs = backup.getOrganizations() == null ? new HashMap<>() : restoreOrganizations(backup.getOrganizations());
-        Map<Long, ProjectBean> sortedProjects = backup.getProjects() == null ? new HashMap<>() : restoreProjects(backup.getProjects(), sortedOrgs);
-        Map<Long, PaygradeBean> sortedPaygrades = backup.getPaygrades() == null ? new HashMap<>() : restorePaygrades(backup.getPaygrades());
-        Map<String, UserBean> sortedUsers = backup.getUsers() == null ? new HashMap<>() : restoreUsers(backup.getUsers(), sortedPaygrades);
-        if (backup.getMemberships() != null) restoreMemberships(backup.getMemberships());
-        Map<Long, ActivityBean> sortedActivities = backup.getActivities() == null ? new HashMap<>() : restoreActivities(backup.getActivities(), sortedProjects);
-        if (backup.getAssignments() != null)
-            restoreProjectAssignments(backup.getAssignments(), sortedProjects, sortedUsers);
-        if (backup.getWorklogs() != null) restoreWorklogs(backup.getWorklogs(), sortedActivities);
+        Map<String, OrganizationBean> sortedOrgs = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getOrganizations())) {
+            for (OrganizationBackup o : backup.getOrganizations()) {
+                OrganizationBean no = new OrganizationBean();
+                no.setId(o.getId());
+                no.setName(o.getName());
+                no.setDescription(o.getDescription());
+                sortedOrgs.put(o.getId(), super.update(no));
+            }
+        }
+        Map<Long, ProjectBean> sortedProjects = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getProjects())) {
+            for (ProjectBackup p : backup.getProjects()) {
+                ProjectBean np = new ProjectBean();
+                np.setId(p.getId());
+                np.setName(p.getName());
+                np.setDescription(p.getDescription());
+                np.setBillOvertime(p.getBillOvertime());
+                np.setAllowOvertime(np.getAllowOvertime());
+                np.setOrganization(sortedOrgs.get(p.getOrganizationId()));
+                sortedProjects.put(p.getId(), super.update(np));
+            }
+        }
+        Map<Long, PaygradeBean> sortedPaygrades = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getPaygrades())) {
+            for (PaygradeBackup p : backup.getPaygrades()) {
+                PaygradeBean np = new PaygradeBean();
+                np.setId(p.getId());
+                np.setName(p.getName());
+                np.setDescription(p.getDescription());
+                np.setHourlyRate(p.getHourlyRate());
+                sortedPaygrades.put(p.getId(), super.update(np));
+            }
+        }
+        Map<Long, ActivityBean> sortedActivities = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getActivities())) {
+            for (ActivityBackup a : backup.getActivities()) {
+                ActivityBean na = new ActivityBean();
+                na.setId(a.getId());
+                na.setName(a.getName());
+                na.setDescription(a.getDescription());
+                na.setBillable(a.getBillable());
+                na.setProject(sortedProjects.get(a.getProjectId()));
+                sortedActivities.put(a.getId(), super.update(na));
+            }
+        }
+        Map<String, UserBean> sortedUsers = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(backup.getUsers())) {
+            for (UserBackup u : backup.getUsers()) {
+                UserBean nu = new UserBean();
+                nu.setId(u.getId());
+                nu.setFirstName(u.getFirstName());
+                nu.setLastName(u.getLastName());
+                nu.setEmail(u.getEmail());
+                nu.setAdmin(u.getAdmin());
+                nu.setPaygrade(sortedPaygrades.get(u.getPaygradeId()));
+                nu.setDefaultHoursPerDay(u.getDefaultHoursPerDay());
+                nu.setDefaultActivity(u.getDefaultActivityId());
+                nu.setWorkdays(u.getWorkDays());
+                sortedUsers.put(u.getId(), super.create(nu));
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getMemberships())) {
+            for (MembershipBackup m : backup.getMemberships()) {
+                MembershipBean nm = new MembershipBean();
+                nm.setId(m.getId());
+                nm.setUserId(m.getUserId());
+                nm.setOrganizationId(m.getOrganizationId());
+                nm.setRoleId(m.getRoleId());
+                super.update(nm);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getAssignments())) {
+            for (ProjecAssignmentBackup p : backup.getAssignments()) {
+                ProjectBean pb = sortedProjects.get(p.getProjectId());
+                UserBean u = sortedUsers.get(p.getUserId());
+                if (pb.getAssignedUsers() == null) pb.setAssignedUsers(new ArrayList<>());
+                pb.getAssignedUsers().add(u);
+                super.update(pb);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(backup.getWorklogs())) {
+            for (WorklogBackup w : backup.getWorklogs()) {
+                WorklogBean nw = new WorklogBean();
+                nw.setId(w.getId());
+                nw.setUserId(w.getUserId());
+                nw.setActivity(sortedActivities.get(w.getActivityId()));
+                nw.setDay(w.getDay());
+                nw.setLoggedMinutes(w.getLoggedMinutes());
+                nw.setConfirmed(w.getConfirmed());
+                super.update(nw);
+            }
+        }
     }
 
 
@@ -256,6 +371,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public RoleBean updateRole(RoleBean role) {
+        return super.update(role);
+    }
+
+    @Override
     public UserBean updateUser(UserBean user) {
         return super.update(user);
     }
@@ -288,6 +408,11 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public void deleteProject(ProjectBean project) {
         super.delete(project);
+    }
+
+    @Override
+    public void deleteRole(RoleBean role) {
+        super.delete(role);
     }
 
     @Override
@@ -331,7 +456,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public List<OrganizationBean> listOrganizations() {
         return getActiveEntityManager()
-                .createQuery("SELECT o FROM OrganizationBean o")
+                .createQuery("SELECT o FROM OrganizationBean o", OrganizationBean.class)
                 .getResultList();
     }
 
@@ -344,7 +469,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public List<ProjectBean> listOrganizationProjects(String organizationId) {
         OrganizationBean org = getOrganization(organizationId);
         return getActiveEntityManager()
-                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId")
+                .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId", ProjectBean.class)
                 .setParameter("orgId", org.getId())
                 .getResultList();
     }
@@ -363,15 +488,54 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public List<ActivityBean> listProjectActivities(String organizationId, Long projectId) {
         ProjectBean proj = getProject(organizationId, projectId);
         return getActiveEntityManager()
-                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId")
+                .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId", ActivityBean.class)
                 .setParameter("orgId", proj.getOrganization().getId())
                 .setParameter("pId", proj.getId())
                 .getResultList();
     }
 
     @Override
-    public List<UserBean> listUsers() {
-        return getActiveEntityManager().createQuery("SELECT u FROM UserBean u").getResultList();
+    public List<UserBean> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email) {
+        // BASE
+        StringBuilder query = new StringBuilder("SELECT u FROM UserBean u");
+
+        boolean orgQualifier = StringUtils.isNotEmpty(organizationId);
+        boolean roleQualifier = StringUtils.isNotEmpty(roleId);
+        boolean uQualifier = StringUtils.isNotEmpty(userId);
+        boolean fnQualifier = StringUtils.isNotEmpty(firstName);
+        boolean lnQualifier = StringUtils.isNotEmpty(lastName);
+        boolean emQualifier = StringUtils.isNotEmpty(email);
+
+        // FROM
+        if (orgQualifier || roleQualifier) {
+            query.append(" JOIN u.memberships m");
+        }
+        if (orgQualifier || roleQualifier || uQualifier || fnQualifier || lnQualifier || emQualifier) {
+            query.append(" WHERE");
+        }
+
+        List<String> qualifiers = new ArrayList<>();
+        if (orgQualifier) qualifiers.add(" m.organizationId = :oId");
+        if (roleQualifier) qualifiers.add(" m.roleId = :rId");
+        if (uQualifier) qualifiers.add(" u.id = :uId");
+        if (fnQualifier) qualifiers.add(" u.firstName = :fn");
+        if (lnQualifier) qualifiers.add(" u.lastName = :ln");
+        if (emQualifier) qualifiers.add(" u.email = :em");
+        Iterator it = qualifiers.iterator();
+        while (it.hasNext()) {
+            query.append(it.next());
+            if (it.hasNext()) query.append(" AND");
+        }
+
+        TypedQuery<UserBean> q = getActiveEntityManager().createQuery(query.toString(), UserBean.class);
+        if (orgQualifier) q.setParameter("oId", organizationId);
+        if (roleQualifier) q.setParameter("rId", roleId);
+        if (uQualifier) q.setParameter("uId", userId);
+        if (fnQualifier) q.setParameter("fn", firstName);
+        if (lnQualifier) q.setParameter("ln", lastName);
+        if (emQualifier) q.setParameter("em", email);
+        log.debug("Search query: {}", query.toString());
+        return q.getResultList();
     }
 
     @Override
@@ -383,7 +547,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public List<WorklogBean> listActivityWorklogs(String organizationId, Long projectId, Long activityId) {
         ActivityBean activity = getActivity(organizationId, projectId, activityId);
         return getActiveEntityManager()
-                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity")
+                .createQuery("SELECT w FROM WorklogBean w WHERE w.activity = :activity", WorklogBean.class)
                 .setParameter("activity", activity)
                 .getResultList();
     }
@@ -422,7 +586,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     public Set<MembershipBean> getMemberships(String userId) {
         Set<MembershipBean> rval = new HashSet<>();
         rval.addAll(getActiveEntityManager()
-                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :userId")
+                .createQuery("SELECT m FROM MembershipBean m WHERE m.userId = :userId", MembershipBean.class)
                 .setParameter("userId", userId)
                 .getResultList());
         return rval;
@@ -472,6 +636,14 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public List<MembershipBean> findMembershipsByRole(String roleId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT m FROM MembershipBean m WHERE m.roleId = :rId", MembershipBean.class)
+                .setParameter("rId", roleId)
+                .getResultList();
+    }
+
+    @Override
     public OrganizationBean findOrganizationByName(String organizationName) {
         try {
             return (OrganizationBean) getActiveEntityManager()
@@ -510,6 +682,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
+    public RoleBean findRoleByName(String roleName) {
+        try {
+            return getActiveEntityManager()
+                    .createQuery("SELECT r FROM RoleBean r WHERE r.name = :rName", RoleBean.class)
+                    .setParameter("rName", roleName)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    @Override
     public UserBean findUserByEmail(String email) {
         try {
             return getActiveEntityManager()
@@ -519,6 +703,14 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         } catch (NoResultException ex) {
             return null;
         }
+    }
+
+    @Override
+    public List<UserBean> findUsersByPaygrade(Long paygradeId) {
+        return getActiveEntityManager()
+                .createQuery("SELECT u FROM UserBean u JOIN u.paygrade p WHERE p.id = :pId", UserBean.class)
+                .setParameter("pId", paygradeId)
+                .getResultList();
     }
 
     @Override
@@ -539,7 +731,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
                 .getSingleResult();
     }
 
-    public List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period) {
+    public List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<Date> period) {
         // BASE
         StringBuilder query = new StringBuilder("SELECT w FROM WorklogBean w");
 
@@ -580,147 +772,5 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         if (periodQualifier) q.setParameter("period", period);
         log.debug("Search query: {}", query.toString());
         return q.getResultList();
-    }
-
-    //Private helper methods
-
-    private void restoreRoles(Set<RoleBackup> rs) {
-        for (RoleBackup r : rs) {
-            RoleBean nr = new RoleBean();
-            nr.setId(r.getId());
-            nr.setName(r.getName());
-            nr.setDescription(r.getDescription());
-            nr.setAutoGrant(r.getAutoGrant());
-            nr.setPermissions(new ArrayList<>(r.getPermissions()));
-            super.update(nr);
-        }
-    }
-
-    private void restoreConfigs(Set<ConfigurationBackup> cbs) {
-        for (ConfigurationBackup c : cbs) {
-            ConfigBean nc = new ConfigBean();
-            nc.setId(c.getId());
-            nc.setConfigPath(c.getConfigPath());
-            nc.setDefaultConfig(c.getDefaultConfig());
-            nc.setDayOfMonthlyReminderEmail(c.getDayOfMonthlyReminderEmail());
-            nc.setLastDayOfMonth(c.getLastDayOfMonth());
-            super.update(nc);
-        }
-    }
-
-    private void restoreMailTemplates(Set<MailTemplateBackup> mbs) {
-        for (MailTemplateBackup m : mbs) {
-            MailTemplateBean nm = new MailTemplateBean();
-            nm.setId(m.getId());
-            nm.setSubject(m.getSubject());
-            nm.setContent(m.getContent());
-            super.update(nm);
-        }
-    }
-
-    private Map<Long, PaygradeBean> restorePaygrades(Set<PaygradeBackup> pbs) {
-        Map<Long, PaygradeBean> sortedPaygrades = new HashMap<>();
-        for (PaygradeBackup p : pbs) {
-            PaygradeBean np = new PaygradeBean();
-            np.setId(p.getId());
-            np.setName(p.getName());
-            np.setDescription(p.getDescription());
-            np.setHourlyRate(p.getHourlyRate());
-            sortedPaygrades.put(p.getId(), super.update(np));
-        }
-        return sortedPaygrades;
-    }
-
-    private Map<String, OrganizationBean> restoreOrganizations(Set<OrganizationBackup> obs) {
-        Map<String, OrganizationBean> sortedOrgs = new HashMap<>();
-        for (OrganizationBackup o : obs) {
-            OrganizationBean no = new OrganizationBean();
-            no.setId(o.getId());
-            no.setName(o.getName());
-            no.setDescription(o.getDescription());
-            sortedOrgs.put(o.getId(), super.update(no));
-        }
-        return sortedOrgs;
-    }
-
-    private Map<Long, ProjectBean> restoreProjects(Set<ProjectBackup> pbs, Map<String, OrganizationBean> os) {
-        Map<Long, ProjectBean> sortedProjects = new HashMap<>();
-        for (ProjectBackup p : pbs) {
-            ProjectBean np = new ProjectBean();
-            np.setId(p.getId());
-            np.setName(p.getName());
-            np.setDescription(p.getDescription());
-            np.setBillOvertime(p.getBillOvertime());
-            np.setAllowOvertime(np.getAllowOvertime());
-            np.setOrganization(os.get(p.getOrganizationId()));
-            sortedProjects.put(p.getId(), super.update(np));
-        }
-        return sortedProjects;
-    }
-
-    private Map<Long, ActivityBean> restoreActivities(Set<ActivityBackup> abs, Map<Long, ProjectBean> ps) {
-        Map<Long, ActivityBean> sortedActivities = new HashMap<>();
-        for (ActivityBackup a : abs) {
-            ActivityBean na = new ActivityBean();
-            na.setId(a.getId());
-            na.setName(a.getName());
-            na.setDescription(a.getDescription());
-            na.setBillable(a.getBillable());
-            na.setProject(ps.get(a.getProjectId()));
-            sortedActivities.put(a.getId(), super.update(na));
-        }
-        return sortedActivities;
-    }
-
-    private Map<String, UserBean> restoreUsers(Set<UserBackup> ubs, Map<Long, PaygradeBean> pgs) {
-        Map<String, UserBean> sortedUsers = new HashMap<>();
-        for (UserBackup u : ubs) {
-            UserBean nu = new UserBean();
-            nu.setId(u.getId());
-            nu.setFirstName(u.getFirstName());
-            nu.setLastName(u.getLastName());
-            nu.setEmail(u.getEmail());
-            nu.setAdmin(u.getAdmin());
-            nu.setPaygrade(pgs.get(u.getPaygradeId()));
-            nu.setDefaultHoursPerDay(u.getDefaultHoursPerDay());
-            nu.setDefaultActivity(u.getDefaultActivityId());
-            nu.setWorkdays(u.getWorkDays());
-            sortedUsers.put(u.getId(), super.update(nu));
-        }
-        return sortedUsers;
-    }
-
-    private void restoreMemberships(Set<MembershipBackup> mbs) {
-        for (MembershipBackup m : mbs) {
-            MembershipBean nm = new MembershipBean();
-            nm.setId(m.getId());
-            nm.setUserId(m.getUserId());
-            nm.setOrganizationId(m.getOrganizationId());
-            nm.setRoleId(m.getRoleId());
-            super.update(nm);
-        }
-    }
-
-    private void restoreProjectAssignments(Set<ProjecAssignmentBackup> pas, Map<Long, ProjectBean> ps, Map<String, UserBean> us) {
-        for (ProjecAssignmentBackup p : pas) {
-            ProjectBean pb = ps.get(p.getProjectId());
-            UserBean u = us.get(p.getUserId());
-            if (pb.getAssignedUsers() == null) pb.setAssignedUsers(new ArrayList<>());
-            pb.getAssignedUsers().add(u);
-            super.update(pb);
-        }
-    }
-
-    private void restoreWorklogs(Set<WorklogBackup> worklogs, Map<Long, ActivityBean> sortedActivities) {
-        for (WorklogBackup w : worklogs) {
-            WorklogBean nw = new WorklogBean();
-            nw.setId(w.getId());
-            nw.setUserId(w.getUserId());
-            nw.setActivity(sortedActivities.get(w.getActivityId()));
-            nw.setDay(w.getDay().toDate());
-            nw.setLoggedMinutes(w.getLoggedMinutes());
-            nw.setConfirmed(w.getConfirmed());
-            super.update(nw);
-        }
     }
 }

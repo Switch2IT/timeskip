@@ -23,7 +23,7 @@ public class SwaggerJaxrsConfig extends HttpServlet {
             //Scanner
             BeanConfig beanConfig = new BeanConfig();
             beanConfig.setTitle("Timeskip API");
-            beanConfig.setVersion("v0.5-SNAPSHOT");
+            beanConfig.setVersion("v0.6-SNAPSHOT");
             beanConfig.setBasePath("timeskip-web/api");
             beanConfig.setResourcePackage("be.ehb.rest.resources");
             beanConfig.setScan(true);

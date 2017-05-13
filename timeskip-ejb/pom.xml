@@ -22,7 +22,7 @@
     <parent>
         <artifactId>timeskip</artifactId>
         <groupId>be.ehb</groupId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>timeskip-ejb</artifactId>
@@ -229,6 +229,35 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+        </dependency>
+
+        <!-- always needed -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+        </dependency>
+
+        <!-- always needed -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+        </dependency>
+
+        <!-- only needed for forms -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>forms</artifactId>
+        </dependency>
+
+        <!-- only needed for hyphenation -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>hyph</artifactId>
         </dependency>
 
     </dependencies>
