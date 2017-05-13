@@ -41,7 +41,7 @@ public class ReportsResource {
     @Inject
     private ISecurityContext securityContext;
 
-    @ApiOperation(value = "Get Overtime Report", notes = "Get a report detailing which users have logged overtime. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Overtime Report", notes = "Get a report detailing which users have logged overtime. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = OverUnderTimeReportResponse.class, message = "Overtime report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -56,7 +56,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, reportsFacade.getOvertimeReport(organizationId, from, to));
     }
 
-    @ApiOperation(value = "Get Undertime Report", notes = "Get a report detailing which users have fewer hours than required. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Undertime Report", notes = "Get a report detailing which users have fewer hours than required. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = OverUnderTimeReportResponse.class, message = "Undertime report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -71,7 +71,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, reportsFacade.getUndertimeReport(organizationId, from, to));
     }
 
-    @ApiOperation(value = "Get Logged Time Report", notes = "Get a report detailing the total time that was logged per organization, project or activity for a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Logged Time Report", notes = "Get a report detailing the total time that was logged per organization, project or activity for a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = LoggedTimeReportResponse.class, message = "Logged time report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -88,7 +88,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, reportsFacade.getLoggedTimeReport(organizationId, projectId, activityId, from, to));
     }
 
-    @ApiOperation(value = "Get Current User Logged Time Report", notes = "Get a report detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Current User Logged Time Report", notes = "Get a report detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = UserLoggedTimeReportResponse.class, message = "Logged time report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -105,7 +105,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, reportsFacade.getCurrentUserReport(organizationId, projectId, activityId, from, to));
     }
 
-    @ApiOperation(value = "Get User Logged Time Report", notes = "Get a report detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get User Logged Time Report", notes = "Get a report detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = UserLoggedTimeReportResponse.class, message = "Logged time report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -125,7 +125,7 @@ public class ReportsResource {
     }
 
 
-    @ApiOperation(value = "Get Billing Report", notes = "Get a report detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Billing Report", notes = "Get a report detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = BillingReportResponse.class, message = "Billing report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -143,7 +143,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, reportsFacade.getBillingReport(organizationId, projectId, activityId, userId, from, to));
     }
 
-    @ApiOperation(value = "Get Overtime PDF Report", notes = "Get a report detailing which users have logged overtime in PDF format. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Overtime PDF Report", notes = "Get a report detailing which users have logged overtime in PDF format. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Overtime PDF report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -158,7 +158,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=OverTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfOvertimeReport(organizationId, from, to), null);
     }
 
-    @ApiOperation(value = "Get Undertime PDF Report", notes = "Get a report detailing which users have fewer hours than required in PDF format. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Undertime PDF Report", notes = "Get a report detailing which users have fewer hours than required in PDF format. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Undertime PDF report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -174,7 +174,7 @@ public class ReportsResource {
     }
 
 
-    @ApiOperation(value = "Get Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -191,7 +191,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=LoggedTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfLoggedTimeReport(organizationId, projectId, activityId, from, to), null);
     }
 
-    @ApiOperation(value = "Get Current User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Current User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -208,7 +208,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=CurrentUserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfCurrentUserReport(organizationId, projectId, activityId, from, to), null);
     }
 
-    @ApiOperation(value = "Get User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
@@ -227,7 +227,7 @@ public class ReportsResource {
         return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to), null);
     }
 
-    @ApiOperation(value = "Get Billing PDF Report", notes = "Get a report in PDF format detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
+    @ApiOperation(value = "Get Billing PDF Report", notes = "Get a report in PDF format detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = BillingReportResponse.class, message = "Billing PDF report"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")

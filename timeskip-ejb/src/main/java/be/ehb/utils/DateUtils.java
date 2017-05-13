@@ -16,11 +16,11 @@ import java.util.List;
  */
 public class DateUtils {
 
-    private static final String DATE_FORMAT = "dd-MM-yyyy";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     public static LocalDate convertStringToDate(String dateString) {
         try {
-            return LocalDate.parse(dateString, DateTimeFormat.forPattern("dd-MM-yyyy"));
+            return LocalDate.parse(dateString, DateTimeFormat.forPattern(DATE_FORMAT));
         } catch (Exception ex) {
             throw ExceptionFactory.invalidDateException(String.format("Date should have \"%s\" format", DATE_FORMAT));
         }
