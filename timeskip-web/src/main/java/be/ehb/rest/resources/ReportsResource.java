@@ -3,6 +3,7 @@ package be.ehb.rest.resources;
 import be.ehb.facades.IReportsFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionType;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,7 +119,7 @@ public class ReportsResource {
                                   @QueryParam("activity") Long activityId,
                                   @QueryParam("from") String from,
                                   @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         checkDates(from, to);
         return ResponseFactory.buildResponse(OK, reportsFacade.getUserReport(organizationId, projectId, activityId, userId, from, to));
     }
@@ -148,12 +150,12 @@ public class ReportsResource {
     })
     @GET
     @Path("overtime/pdf")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("application/pdf")
     public Response getPdfOvertimeReport(@QueryParam("organization") String organizationId,
                                          @QueryParam("from") String from,
                                          @QueryParam("to") String to) {
         checkOverUndertime(organizationId, from, to);
-        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfOvertimeReport(organizationId, from, to));
+        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=OverTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfOvertimeReport(organizationId, from, to), null);
     }
 
     @ApiOperation(value = "Get Undertime PDF Report", notes = "Get a report detailing which users have fewer hours than required in PDF format. Dates must have a \"dd-mm-yyyy\" format.")
@@ -162,13 +164,13 @@ public class ReportsResource {
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
-    @Path("/undertime/pdf")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("undertime/pdf")
+    @Produces("application/pdf")
     public Response getPdfUndertimeReport(@QueryParam("organization") String organizationId,
                                           @QueryParam("from") String from,
                                           @QueryParam("to") String to) {
         checkOverUndertime(organizationId, from, to);
-        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfUndertimeReport(organizationId, from, to));
+        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UnderTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfUndertimeReport(organizationId, from, to), null);
     }
 
 
@@ -179,14 +181,14 @@ public class ReportsResource {
     })
     @GET
     @Path("/loggedtime/pdf")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("application/pdf")
     public Response getPdfLoggedTimeReport(@QueryParam("organization") String organizationId,
                                            @QueryParam("project") Long projectId,
                                            @QueryParam("activity") Long activityId,
                                            @QueryParam("from") String from,
                                            @QueryParam("to") String to) {
         checkDates(from, to);
-        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfLoggedTimeReport(organizationId, projectId, activityId, from, to));
+        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=LoggedTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfLoggedTimeReport(organizationId, projectId, activityId, from, to), null);
     }
 
     @ApiOperation(value = "Get Current User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
@@ -196,13 +198,14 @@ public class ReportsResource {
     })
     @GET
     @Path("/loggedtime/users/current/pdf")
+    @Produces("application/pdf")
     public Response getPdfCurrentUserReport(@QueryParam("organization") String organizationId,
                                             @QueryParam("project") Long projectId,
                                             @QueryParam("activity") Long activityId,
                                             @QueryParam("from") String from,
                                             @QueryParam("to") String to) {
         checkDates(from, to);
-        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfCurrentUserReport(organizationId, projectId, activityId, from, to));
+        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=CurrentUserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfCurrentUserReport(organizationId, projectId, activityId, from, to), null);
     }
 
     @ApiOperation(value = "Get User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
@@ -212,16 +215,16 @@ public class ReportsResource {
     })
     @GET
     @Path("/loggedtime/users/{userId}/pdf")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("application/pdf")
     public Response getPdfUserReport(@PathParam("userId") String userId,
                                      @QueryParam("organization") String organizationId,
                                      @QueryParam("project") Long projectId,
                                      @QueryParam("activity") Long activityId,
                                      @QueryParam("from") String from,
                                      @QueryParam("to") String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         checkDates(from, to);
-        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to));
+        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to), null);
     }
 
     @ApiOperation(value = "Get Billing PDF Report", notes = "Get a report in PDF format detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"dd-mm-yyyy\" format.")
@@ -231,7 +234,7 @@ public class ReportsResource {
     })
     @GET
     @Path("billing/pdf")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("application/pdf")
     public Response getPdfBillingReport(@QueryParam("organization") String organizationId,
                                         @QueryParam("project") Long projectId,
                                         @QueryParam("activity") Long activityId,
@@ -239,18 +242,18 @@ public class ReportsResource {
                                         @QueryParam("from") String from,
                                         @QueryParam("to") String to) {
         checkDates(from, to);
-        return ResponseFactory.buildResponse(OK, reportsFacade.getPdfBillingReport(organizationId, projectId, activityId, userId, from, to));
+        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=BillinReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfBillingReport(organizationId, projectId, activityId, userId, from, to), null);
     }
 
     private void checkOverUndertime(String organizationId, String from, String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organization\" query string parameter must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("missingQueryString", "organization"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
             throw ExceptionFactory.unauthorizedException(organizationId);
         checkDates(from, to);
     }
 
     private void checkDates(String from, String to) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(from), "\"from\"-date query string parameter must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(to), "\"from\"-date query string parameter must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(from), Messages.i18n.format("missingQueryString", "from"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(to), Messages.i18n.format("missingQueryString", "to"));
     }
 }

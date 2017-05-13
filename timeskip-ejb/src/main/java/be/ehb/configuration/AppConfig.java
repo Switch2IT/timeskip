@@ -86,6 +86,8 @@ public class AppConfig implements Serializable, IAppConfig {
                 log.info("Notification mail will be sent from: {}", getNotificationMailFrom());
                 log.info("Startup notification mail will be sent to: {}", getNoticationStartupMailTo());
                 log.info(getReminderStartupLog());
+                log.info("Currency symbol to use: {}", getCurrencySymbol());
+                log.info("Location of PDF logo: {}", getPdfLogoLocation());
                 log.info("====================================================================================");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -166,6 +168,16 @@ public class AppConfig implements Serializable, IAppConfig {
     @Override
     public boolean getLastDayOfMonth() {
         return storage.getDefaultConfig().getLastDayOfMonth();
+    }
+
+    @Override
+    public String getCurrencySymbol() {
+        return config.getString(IConfig.GENERAL_CURRENCY_SYMBOL);
+    }
+
+    @Override
+    public String getPdfLogoLocation() {
+        return config.getString(IConfig.GENERAL_PDF_LOGO);
     }
 
     private String getReminderStartupLog() {

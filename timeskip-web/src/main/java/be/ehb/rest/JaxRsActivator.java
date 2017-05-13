@@ -18,6 +18,7 @@ package be.ehb.rest;
 
 import be.ehb.rest.mappers.IllegalArgumentExceptionMapper;
 import be.ehb.rest.mappers.NullPointerExceptionMapper;
+import be.ehb.rest.mappers.ReaderExceptionMapper;
 import be.ehb.rest.mappers.RestExceptionMapper;
 import be.ehb.rest.resources.*;
 import be.ehb.servlets.CORSFilter;
@@ -61,12 +62,14 @@ public class JaxRsActivator extends Application {
         //Exception mappers
         resources.add(IllegalArgumentExceptionMapper.class);
         resources.add(NullPointerExceptionMapper.class);
+        resources.add(ReaderExceptionMapper.class);
         resources.add(RestExceptionMapper.class);
 
         //REST resources
         resources.add(ConfigurationResource.class);
         resources.add(OrganizationsResource.class);
         resources.add(ReportsResource.class);
+        resources.add(RolesResource.class);
         resources.add(SystemResource.class);
         resources.add(UsersResource.class);
     }

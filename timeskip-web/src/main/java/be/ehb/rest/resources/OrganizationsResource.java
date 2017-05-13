@@ -3,6 +3,7 @@ package be.ehb.rest.resources;
 import be.ehb.facades.IOrganizationFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.requests.*;
 import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
@@ -56,7 +57,7 @@ public class OrganizationsResource {
     @Path("/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganization(@PathParam("organizationId") String organizationId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -73,8 +74,8 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrganization(@ApiParam NewOrganizationRequest request) {
-        Preconditions.checkNotNull(request, "Organization request must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "\"name\" must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), Messages.i18n.format("emptyField", "name"));
         return ResponseFactory.buildResponse(CREATED, orgFacade.createOrganization(request));
     }
 
@@ -89,11 +90,11 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response patchOrganization(@PathParam("organizationId") String organizationId, @ApiParam UpdateOrganizationRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateOrganization(organizationId, request));
     }
 
@@ -106,7 +107,7 @@ public class OrganizationsResource {
     @DELETE
     @Path("/{organizationId}")
     public Response deleteOrganization(@PathParam("organizationId") String organizationId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -124,7 +125,7 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listProjects(@PathParam("organizationId") String organizationId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -141,8 +142,8 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProject(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -160,9 +161,9 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createProject(@PathParam("organizationId") String organizationId, @ApiParam NewProjectRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(request, "Request body must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), "\"name\" must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), Messages.i18n.format("emptyField", "name"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -180,12 +181,12 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response patchProject(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @ApiParam UpdateProjectRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        Preconditions.checkNotNull(request, "Request body must not be empty");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateProject(organizationId, projectId, request));
     }
 
@@ -199,8 +200,8 @@ public class OrganizationsResource {
     @DELETE
     @Path("/{organizationId}/projects/{projectId}")
     public Response deleteProject(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -218,8 +219,8 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listProjectActivities(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
@@ -236,9 +237,9 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
@@ -256,13 +257,13 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @ApiParam NewActivityRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
-        Preconditions.checkNotNull(request, "Request body must not be empty");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "\"description\" must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), Messages.i18n.format("emptyField", "description"));
         return ResponseFactory.buildResponse(CREATED, orgFacade.createActivity(organizationId, projectId, request));
     }
 
@@ -277,14 +278,14 @@ public class OrganizationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response patchActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam UpdateActivityRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
-        Preconditions.checkNotNull(request, "Request body must not be empty");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), "\"description\" must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDescription()), Messages.i18n.format("emptyField", "description"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateActivity(organizationId, projectId, activityId, request));
     }
 
@@ -297,9 +298,9 @@ public class OrganizationsResource {
     @DELETE
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}")
     public Response deleteActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -317,9 +318,9 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listActivityWorklogs(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
         if (!securityContext.hasPermission(PermissionType.WORKLOG_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -335,10 +336,10 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
-        Preconditions.checkNotNull(worklogId, "Worklog ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
+        Preconditions.checkNotNull(worklogId, Messages.i18n.format("emptyPathParam", "Worklog ID"));
         if (!securityContext.hasPermission(PermissionType.WORKLOG_VIEW, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -356,16 +357,16 @@ public class OrganizationsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response logWork(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewAdminWorklogRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
         if (!securityContext.hasPermission(PermissionType.WORKLOG_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        Preconditions.checkNotNull(request, "Request body must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDay()), "\"day\" must be provided");
-        Preconditions.checkArgument(request.getLoggedMinutes() != null, "\"loggedMinutes\" must be provided");
-        Preconditions.checkArgument(request.getLoggedMinutes() > 0, "\"loggedMinutes\" must be greater than 0");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDay()), Messages.i18n.format("emptyField", "day"));
+        Preconditions.checkNotNull(request.getLoggedMinutes(), Messages.i18n.format("emptyField", "loggedMinutes"));
+        Preconditions.checkArgument(request.getLoggedMinutes() > 0, Messages.i18n.format("greaterThanZero", "loggedMinutes"));
         return ResponseFactory.buildResponse(CREATED, orgFacade.createWorkLog(organizationId, projectId, activityId, request));
     }
 
@@ -380,8 +381,7 @@ public class OrganizationsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response logWorkForCurrentUser(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewWorklogRequest request) {
-
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         NewAdminWorklogRequest req = new NewAdminWorklogRequest();
         req.setConfirmed(request.getConfirmed());
         req.setDay(request.getDay());
@@ -401,14 +401,14 @@ public class OrganizationsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId, UpdateWorklogRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
-        Preconditions.checkNotNull(projectId, "Project ID must be provided");
-        Preconditions.checkNotNull(activityId, "Activity ID must be provided");
-        Preconditions.checkNotNull(worklogId, "Worklog ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
+        Preconditions.checkNotNull(worklogId, Messages.i18n.format("emptyPathParam", "Worklog ID"));
         if (!securityContext.hasPermission(PermissionType.WORKLOG_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateWorklog(organizationId, projectId, activityId, request));
     }
 
@@ -421,6 +421,10 @@ public class OrganizationsResource {
     @DELETE
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
     public Response deleteWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
+        Preconditions.checkNotNull(worklogId, Messages.i18n.format("emptyPathParam", "Worklog ID"));
         if (!securityContext.hasPermission(PermissionType.WORKLOG_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException();
         }
