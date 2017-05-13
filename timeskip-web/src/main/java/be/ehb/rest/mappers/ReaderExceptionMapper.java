@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.spi.ReaderException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -38,6 +39,6 @@ public class ReaderExceptionMapper implements ExceptionMapper<ReaderException> {
         error.setMessage(Messages.i18n.format("invalidRequestBody"));
         error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
         error.setErrorCode(ErrorCodes.INVALID_INPUT);
-        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error);
+        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error, MediaType.APPLICATION_JSON);
     }
 }

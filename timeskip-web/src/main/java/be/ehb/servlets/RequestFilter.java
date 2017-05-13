@@ -2,6 +2,7 @@ package be.ehb.servlets;
 
 import be.ehb.configuration.IAppConfig;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.responses.ErrorResponse;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.JWTValidation;
@@ -73,7 +74,7 @@ public class RequestFilter implements ContainerRequestFilter {
                     log.error("Unauthorized user:{}", validatedUser);
                     ex.printStackTrace();
                     ErrorResponse err = new ErrorResponse();
-                    err.setMessage("User cannot access the resource:" + validatedUser);
+                    err.setMessage(Messages.i18n.format("invalidJWT", jwt));
                     err.setHttpCode(Response.Status.UNAUTHORIZED.getStatusCode());
                     containerRequestContext.abortWith(ResponseFactory.buildResponse(Response.Status.UNAUTHORIZED, err));
                 }

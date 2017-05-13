@@ -613,7 +613,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
                 .getSingleResult();
     }
 
-    public List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period) {
+    public List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<Date> period) {
         // BASE
         StringBuilder query = new StringBuilder("SELECT w FROM WorklogBean w");
 

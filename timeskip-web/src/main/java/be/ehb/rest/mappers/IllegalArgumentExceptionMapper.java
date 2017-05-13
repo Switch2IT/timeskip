@@ -7,6 +7,7 @@ import be.ehb.model.responses.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -33,6 +34,6 @@ public class IllegalArgumentExceptionMapper implements ExceptionMapper<IllegalAr
         }
         error.setHttpCode(Response.Status.BAD_REQUEST.getStatusCode());
         error.setErrorCode(ErrorCodes.INVALID_INPUT);
-        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error);
+        return ResponseFactory.buildResponse(Response.Status.BAD_REQUEST, "X-Timeskip-Error", "true", error, MediaType.APPLICATION_JSON);
     }
 }
