@@ -18,7 +18,6 @@ import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -723,7 +722,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public Long getUserLoggedMinutesForDay(String userId, LocalDate day) {
+    public Long getUserLoggedMinutesForDay(String userId, Date day) {
         return (Long) getActiveEntityManager()
                 .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
                 .setParameter("user", userId)

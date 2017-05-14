@@ -13,7 +13,6 @@ import be.ehb.entities.users.UserBean;
 import be.ehb.mail.MailTopic;
 import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
-import org.joda.time.LocalDate;
 
 import java.util.Date;
 import java.util.List;
@@ -177,7 +176,7 @@ public interface IStorageService {
 
     List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName);
 
-    Long getUserLoggedMinutesForDay(String userId, LocalDate day);
+    Long getUserLoggedMinutesForDay(String userId, Date day);
 
     List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<Date> period);
 }
