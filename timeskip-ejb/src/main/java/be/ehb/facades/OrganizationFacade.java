@@ -282,8 +282,9 @@ public class OrganizationFacade implements IOrganizationFacade {
             throw ExceptionFactory.userNotAssignedToProjectException(activity.getProject().getName());
         }
         //Check if the project allows overtime and if not, check if logging this work will exceed the limit
+        Long loggedMinutes = storage.getUserLoggedMinutesForDay(user.getId(), day.toDate());
         if (activity.getProject().getAllowOvertime() != null && !activity.getProject().getAllowOvertime()
-                && storage.getUserLoggedMinutesForDay(user.getId(), day.toDate()) + request.getLoggedMinutes() >
+                && (loggedMinutes == null ? 0L : loggedMinutes) + request.getLoggedMinutes() >
                 DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
             throw ExceptionFactory.noOverTimeAllowedException(activity.getProject().getName());
         }
