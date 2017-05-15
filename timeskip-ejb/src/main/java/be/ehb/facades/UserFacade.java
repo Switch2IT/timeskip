@@ -211,6 +211,6 @@ public class UserFacade implements IUserFacade, Serializable {
 
     @Override
     public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
-        return new ArrayList<>(storage.listUsersWorkloadActivity(new LocalDate(day)));
+        return new ArrayList<>(storage.listUsersWorkloadActivity(day));
     }
 }

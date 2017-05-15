@@ -726,7 +726,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(LocalDate day) {
+    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
         return getActiveEntityManager()
                 .createQuery("SELECT NEW be.ehb.entities.users.UsersWorkLoadActivityBO(u.id, u.firstName, u.lastName, u.email, w.day, w.loggedMinutes, w.confirmed, a.description) " +
                         "FROM UserBean u, WorklogBean w " +
@@ -735,5 +735,28 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
                         "ORDER BY u.id, w.day", UsersWorkLoadActivityBO.class)
                 .setParameter("date", day)
                 .getResultList();
+    }
+
+    @Override /*
+    public List<WorklogBean> searchWorklogsByIdAndDay(String userId, Date day) {
+        return getActiveEntityManager()
+                .createQuery("SELECT NEW be.ehb.entities.projects.WorklogBean(w.day, w.loggedMinutes, w.confirmed) " +
+                                "FROM WorklogBean w " +
+                                "WHERE w.userId = :userId AND w.day = :date"
+                        , WorklogBean.class)
+                .setParameter("date", day)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+    */
+    public WorklogBean searchWorklogsByIdAndDay(String userId, Date day) {
+        return getActiveEntityManager()
+                .createQuery("SELECT NEW be.ehb.entities.projects.WorklogBean(sum(w.loggedMinutes)) " +
+                                "FROM WorklogBean w " +
+                                "WHERE w.userId = :userId AND w.day = :date"
+                        , WorklogBean.class)
+                .setParameter("date", day)
+                .setParameter("userId", userId)
+                .getSingleResult();
     }
 }

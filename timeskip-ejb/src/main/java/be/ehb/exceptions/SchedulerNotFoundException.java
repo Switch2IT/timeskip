@@ -1,7 +1,8 @@
 package be.ehb.exceptions;
 
 /**
- * Created by Patrick Van den Bussche on 7/05/2017.
+ * @author Patrick Van den Bussche
+ * @since 2017
  */
 public class SchedulerNotFoundException extends AbstractNotFoundException {
 

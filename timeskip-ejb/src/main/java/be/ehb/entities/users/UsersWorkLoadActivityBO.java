@@ -3,7 +3,8 @@ package be.ehb.entities.users;
 import java.util.Date;
 
 /**
- * Created by Patrick Van den Busssche on 7/05/2017.
+ * @author Patrick Van den Bussche
+ * @since 2017
  */
 public class UsersWorkLoadActivityBO {
     //Users

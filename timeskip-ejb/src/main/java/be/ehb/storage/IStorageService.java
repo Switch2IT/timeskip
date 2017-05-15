@@ -16,6 +16,7 @@ import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
 import org.joda.time.LocalDate;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -141,7 +142,7 @@ public interface IStorageService {
 
     List<WorklogBean> listUserWorklogs(String userId);
 
-    List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(LocalDate day);
+    List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day);
 
     //Queries
 
@@ -170,4 +171,6 @@ public interface IStorageService {
     Long getUserLoggedMinutesForDay(String userId, LocalDate day);
 
     List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period);
+
+    WorklogBean searchWorklogsByIdAndDay(String userId, Date day);
 }
