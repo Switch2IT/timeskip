@@ -282,8 +282,9 @@ public class OrganizationFacade implements IOrganizationFacade {
             throw ExceptionFactory.userNotAssignedToProjectException(activity.getProject().getName());
         }
         //Check if the project allows overtime and if not, check if logging this work will exceed the limit
-        if (!activity.getProject().getAllowOvertime()
-                && storage.getUserLoggedMinutesForDay(user.getId(), day) + request.getLoggedMinutes() >
+        Long loggedMinutes = storage.getUserLoggedMinutesForDay(user.getId(), day.toDate());
+        if (activity.getProject().getAllowOvertime() != null && !activity.getProject().getAllowOvertime()
+                && (loggedMinutes == null ? 0L : loggedMinutes) + request.getLoggedMinutes() >
                 DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
             throw ExceptionFactory.noOverTimeAllowedException(activity.getProject().getName());
         }
@@ -294,6 +295,15 @@ public class OrganizationFacade implements IOrganizationFacade {
         newWorklog.setLoggedMinutes(request.getLoggedMinutes());
         newWorklog.setUserId(user.getId());
         return ResponseFactory.createWorklogResponse(storage.createWorklog(newWorklog));
+    }
+    @Override
+    public Boolean createPrefillWorklog(WorklogBean worklogBean) {
+        WorklogBean worklogBean1 = storage.createWorklog(worklogBean);
+        if (worklogBean1.getId() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -359,7 +369,7 @@ public class OrganizationFacade implements IOrganizationFacade {
             //Check if the changed minutes make
             if (!worklogToUpdate.getActivity().getProject().getAllowOvertime()
                     //Remove the current worklog's minutes before comparing it with the user's default hours
-                    && storage.getUserLoggedMinutesForDay(user.getId(), new LocalDate(worklogToUpdate.getDay())) + loggedMinutes - worklogToUpdate.getLoggedMinutes() >
+                    && storage.getUserLoggedMinutesForDay(user.getId(), worklogToUpdate.getDay()) + loggedMinutes - worklogToUpdate.getLoggedMinutes() >
                     DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
                 throw ExceptionFactory.noOverTimeAllowedException(worklogToUpdate.getActivity().getProject().getName());
             }

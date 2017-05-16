@@ -22,4 +22,7 @@ interface IConfig {
     String IDP_DEFAULT_NEW_USER_PASSWORD = "timeskip.idp.default_new_user_password";
 
     String SECURITY_JWT_VALIDATION = "timeskip.security.validate_jwt";
+
+    String GENERAL_CURRENCY_SYMBOL = "timeskip.general.currency_symbol";
+    String GENERAL_PDF_LOGO = "timeskip.general.pdf_logo_location";
 }

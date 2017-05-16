@@ -206,11 +206,6 @@ ALTER TABLE users
   ON UPDATE CASCADE
   ON DELETE SET NULL;
 
-ALTER TABLE users
-  ADD CONSTRAINT fk_users_2 FOREIGN KEY (default_activity_id) REFERENCES activities (id)
-  ON UPDATE CASCADE
-  ON DELETE SET NULL;
-
 ALTER TABLE user_workdays
   ADD CONSTRAINT fk_user_workdays_1 FOREIGN KEY (user_id) REFERENCES users (id)
   ON UPDATE CASCADE

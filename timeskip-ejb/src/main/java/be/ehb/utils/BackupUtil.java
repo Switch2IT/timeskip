@@ -18,7 +18,6 @@ import be.ehb.model.responses.BackUpResponse;
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.LocalDate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,7 +100,7 @@ public class BackupUtil {
             if (rval == null) rval = new BackUpResponse();
             rval.setWorklogs(worklogs.parallelStream().map(BackupUtil::createWorklogBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
-        if (rval != null) rval.setDateOfBackup(new LocalDate());
+        if (rval != null) rval.setDateOfBackup(new Date());
         return rval;
     }
 
@@ -237,7 +236,7 @@ public class BackupUtil {
             rval.setId(w.getId());
             rval.setActivityId(w.getActivity() == null ? null : w.getActivity().getId());
             rval.setUserId(w.getUserId());
-            rval.setDay(new LocalDate(w.getDay()));
+            rval.setDay(w.getDay());
             rval.setLoggedMinutes(w.getLoggedMinutes());
             rval.setConfirmed(w.getConfirmed());
         }
@@ -265,10 +264,10 @@ public class BackupUtil {
             Set<Long> apIds = projects != null ? activities.parallelStream().map(ActivityBackup::getProjectId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
             Set<UserBackup> users = backup.getUsers();
             Set<String> uIds = projects != null ? users.parallelStream().map(UserBackup::getId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
-            Set<Long> upIds = users != null ? users.parallelStream().map(UserBackup::getDefaultActivityId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
+            Set<Long> uaIds = users != null ? users.parallelStream().map(UserBackup::getDefaultActivityId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
             Set<Long> upayIds = users != null ? users.parallelStream().map(UserBackup::getPaygradeId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
             Set<ProjecAssignmentBackup> assignments = backup.getAssignments();
-            Set<String> uaIds = assignments != null ? assignments.parallelStream().map(ProjecAssignmentBackup::getUserId).filter(Objects::nonNull).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
+            Set<String> upIds = assignments != null ? assignments.parallelStream().map(ProjecAssignmentBackup::getUserId).filter(Objects::nonNull).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
             Set<Long> paIds = assignments != null ? assignments.parallelStream().map(ProjecAssignmentBackup::getProjectId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
             Set<RoleBackup> roles = backup.getRoles();
             Set<String> rIds = roles != null ? roles.parallelStream().map(RoleBackup::getId).filter(Objects::nonNull).collect(Collectors.toSet()) : new HashSet<>();
@@ -285,11 +284,11 @@ public class BackupUtil {
             //Check membership dependencies
             Preconditions.checkArgument(uIds.containsAll(muIds) && oIds.containsAll(moIds) && rIds.containsAll(mrIds), "Missing role, user or organization data for membership restoration");
             //Check project assignments dependencies
-            Preconditions.checkArgument(uIds.containsAll(uaIds) && pIds.containsAll(paIds), "Missing project or user data for project assignment restoration");
+            Preconditions.checkArgument(uIds.containsAll(upIds) && pIds.containsAll(paIds), "Missing project or user data for project assignment restoration");
             //Check project dependencies
             Preconditions.checkArgument(oIds.containsAll(poIds), "Missing organization data for project restoration");
             //Check user dependencies
-            Preconditions.checkArgument(payIds.containsAll(upayIds) && pIds.containsAll(upIds), "Missing paygrade or project data for user restoration");
+            Preconditions.checkArgument(payIds.containsAll(upayIds) && aIds.containsAll(uaIds), "Missing paygrade or project data for user restoration");
             //Check worklog dependencies
             Preconditions.checkArgument(aIds.containsAll(waId) && uIds.containsAll(wuId), "Missing user or activity data for worklog restoration");
         } catch (IllegalArgumentException ex) {

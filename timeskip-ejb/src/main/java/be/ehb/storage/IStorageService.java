@@ -14,7 +14,6 @@ import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.mail.MailTopic;
 import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
-import org.joda.time.LocalDate;
 
 import java.util.Date;
 import java.util.List;
@@ -62,6 +61,8 @@ public interface IStorageService {
 
     ProjectBean createProject(ProjectBean project);
 
+    RoleBean createRole(RoleBean role);
+
     UserBean createUser(UserBean user);
 
     WorklogBean createWorklog(WorklogBean worklog);
@@ -90,6 +91,8 @@ public interface IStorageService {
 
     ProjectBean updateProject(ProjectBean project);
 
+    RoleBean updateRole(RoleBean role);
+
     UserBean updateUser(UserBean user);
 
     WorklogBean updateWorklog(WorklogBean worklog);
@@ -105,6 +108,8 @@ public interface IStorageService {
     void deletePaygrade(PaygradeBean paygrade);
 
     void deleteProject(ProjectBean project);
+
+    void deleteRole(RoleBean role);
 
     void deleteUser(UserBean user);
 
@@ -134,7 +139,7 @@ public interface IStorageService {
 
     List<RoleBean> listRoles();
 
-    List<UserBean> listUsers();
+    List<UserBean> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email);
 
     List<WorklogBean> listWorklogs();
 
@@ -158,19 +163,25 @@ public interface IStorageService {
 
     MembershipBean findMembershipByUserAndOrganization(String userId, String organizationId);
 
+    List<MembershipBean> findMembershipsByRole(String roleId);
+
     OrganizationBean findOrganizationByName(String organizationName);
 
     PaygradeBean findPaygradeByName(String paygradeName);
 
     ProjectBean findProjectByName(String organizationId, String projectName);
 
+    RoleBean findRoleByName(String roleName);
+
     UserBean findUserByEmail(String email);
+
+    List<UserBean> findUsersByPaygrade(Long paygradeId);
 
     List<UserBean> findUsersByFirstAndLastName(String firstName, String lastName);
 
-    Long getUserLoggedMinutesForDay(String userId, LocalDate day);
+    Long getUserLoggedMinutesForDay(String userId, Date day);
 
-    List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<LocalDate> period);
+    List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<Date> period);
 
     WorklogBean searchWorklogsByIdAndDay(String userId, Date day);
 }

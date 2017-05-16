@@ -57,8 +57,8 @@ public class UserFacade implements IUserFacade, Serializable {
     private IIdpClient idpClient;
 
     @Override
-    public List<UserResponse> listUsers() {
-        return storage.listUsers().stream().map(ResponseFactory::createUserResponse).collect(Collectors.toList());
+    public List<UserResponse> listUsers(String organizationId, String roleId, String userId, String firstName, String lastName, String email) {
+        return storage.listUsers(organizationId, roleId, userId, firstName, lastName, email).parallelStream().map(ResponseFactory::createUserResponse).collect(Collectors.toList());
     }
 
     @Override

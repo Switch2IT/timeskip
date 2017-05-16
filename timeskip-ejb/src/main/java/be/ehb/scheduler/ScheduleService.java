@@ -2,6 +2,7 @@ package be.ehb.scheduler;
 
 
 import be.ehb.configuration.IAppConfig;
+import be.ehb.facades.IOrganizationFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.mail.IMailService;
 import be.ehb.storage.IStorageService;
@@ -34,6 +35,8 @@ public class ScheduleService {
     private IStorageService iss;
     @Inject
     private IAppConfig iAppConfig;
+    @Inject
+    private IOrganizationFacade iOrganizationFacade;
 
     public void ScheduleStart() {
         try {
@@ -49,6 +52,7 @@ public class ScheduleService {
         PrefillTimeSheetsJobContext prefillJob = new PrefillTimeSheetsJobContext();
         prefillJob.setIss(iss);
         prefillJob.setMailService(mailService);
+        prefillJob.setiof(iOrganizationFacade);
 
 
         JobDetail job1 = JobBuilder.newJob(EmailReminderJob.class).withIdentity("job1", "group1").build();

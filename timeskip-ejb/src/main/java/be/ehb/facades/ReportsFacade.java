@@ -1,5 +1,6 @@
 package be.ehb.facades;
 
+import be.ehb.configuration.IAppConfig;
 import be.ehb.entities.organizations.OrganizationBean;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
@@ -7,11 +8,21 @@ import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionType;
 import be.ehb.storage.IStorageService;
 import be.ehb.utils.DateUtils;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +32,16 @@ import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.itextpdf.kernel.geom.PageSize.A4;
 
 /**
  * @author Guillaume Vandecasteele
@@ -37,10 +54,16 @@ public class ReportsFacade implements IReportsFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ReportsFacade.class);
 
+    private static final String OVERTIME_KEY = "overtime";
+    private static final String UNDERTIME_KEY = "undertime";
+    private static final int FONT_SIZE = 6;
+
     @Inject
     private IStorageService storage;
     @Inject
     private ISecurityContext securityContext;
+    @Inject
+    private IAppConfig config;
 
     @Override
     public OverUnderTimeReportResponse getOvertimeReport(String organizationId, String from, String to) {
@@ -68,10 +91,11 @@ public class ReportsFacade implements IReportsFacade {
     public OverUnderTimeReportResponse getUndertimeReport(String organizationId, String from, String to) {
         try {
             OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
+            List<Date> dates = DateUtils.getDatesBetween(from, to);
             Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
-            Map<UserBean, Map<LocalDate, Long>> filteredData = new HashMap<>();
             List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
-            sorted.forEach((user, map) -> {
+            List<UserBean> orgUsers = storage.listUsers(organizationId, null, null, null, null, null);
+            sorted.forEach((UserBean user, Map<LocalDate, Long> map) -> {
                 if (user.getDefaultHoursPerDay() != null) {
                     List<WorkDayResponse> workdays = new ArrayList<>();
                     map.forEach((day, minutes) -> {
@@ -80,7 +104,30 @@ public class ReportsFacade implements IReportsFacade {
                             if (wd != null) workdays.add(wd);
                         }
                     });
+                    //Check for the days an employee was supposed to be working, but didn't log any hours
+                    dates.stream()
+                            .map(LocalDate::new)
+                            .filter(d -> !map.containsKey(d) && !user.getWorkdays().parallelStream().map(DayOfWeek::getValue).filter(dw -> dw == d.getDayOfWeek()).collect(Collectors.toList()).isEmpty())
+                            .forEach(d -> {
+                                WorkDayResponse wd = ResponseFactory.createWorkDayResponse(d, 0L);
+                                if (wd != null) workdays.add(wd);
+                            });
+
                     UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(user, workdays);
+                    if (uwd != null) userWorkDayResponses.add(uwd);
+                }
+            });
+            orgUsers.parallelStream().filter(u -> !sorted.keySet().parallelStream().map(UserBean::getId).collect(Collectors.toList()).contains(u.getId())).forEach(u -> {
+                if (CollectionUtils.isNotEmpty(u.getWorkdays())) {
+                    List<WorkDayResponse> workdays = new ArrayList<>();
+                    dates.stream()
+                            .map(LocalDate::new)
+                            .filter(d -> !u.getWorkdays().parallelStream().map(DayOfWeek::getValue).filter(dw -> dw == d.getDayOfWeek()).collect(Collectors.toList()).isEmpty())
+                            .forEach(d -> {
+                                WorkDayResponse wd = ResponseFactory.createWorkDayResponse(d, 0L);
+                                if (wd != null) workdays.add(wd);
+                            });
+                    UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(u, workdays);
                     if (uwd != null) userWorkDayResponses.add(uwd);
                 }
             });
@@ -158,7 +205,7 @@ public class ReportsFacade implements IReportsFacade {
             Optional<BigDecimal> totalHours = obr.parallelStream().map(OrganizationBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
             Optional<BigDecimal> totalAmount = obr.parallelStream().map(OrganizationBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
             BillingReportResponse rval = ResponseFactory.createBillingReportResponse(obr, totalHours, totalAmount);
-            if (rval == null) return new BillingReportResponse();
+            if (rval == null) return null;
             else return rval;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -171,32 +218,146 @@ public class ReportsFacade implements IReportsFacade {
 
     @Override
     public InputStream getPdfOvertimeReport(String organizationId, String from, String to) {
-        throw ExceptionFactory.unavailableException();
+        OverUnderTimeReportResponse rep = getOvertimeReport(organizationId, from, to);
+        return getPdfOverUnderTimeInternal(organizationId, rep, OVERTIME_KEY, from, to);
     }
 
     @Override
     public InputStream getPdfUndertimeReport(String organizationId, String from, String to) {
-        throw ExceptionFactory.unavailableException();
+        OverUnderTimeReportResponse rep = getUndertimeReport(organizationId, from, to);
+        return getPdfOverUnderTimeInternal(organizationId, rep, UNDERTIME_KEY, from, to);
     }
 
     @Override
     public InputStream getPdfBillingReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
-        throw ExceptionFactory.unavailableException();
+        BillingReportResponse rep = getBillingReport(organizationId, projectId, activityId, userId, from, to);
+        String cs = config.getCurrencySymbol();
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            if (rep != null) {
+                Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
+                doc = addLogoToDocument(doc);
+                doc.add(new Paragraph((Messages.i18n.format("invoice"))).setFontSize(24).setBold());
+                doc.add(new Paragraph((Messages.i18n.format("invoiceDescription", from, to))).setFontSize(14).setItalic());
+
+                Table outerTable = new Table(new float[]{2, 14});
+                outerTable.setWidthPercent(100);
+                outerTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("organization")).setFontSize(FONT_SIZE));
+
+                rep.getOrganizations().forEach(ob -> {
+
+                    Table dayTable = new Table(new float[]{3, 13});
+                    dayTable.setWidthPercent(100);
+                    dayTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("day")).setFontSize(FONT_SIZE));
+
+                    ob.getDays().forEach(db -> {
+
+                        Table projectTable = new Table(new float[]{5, 11});
+                        projectTable.setWidthPercent(100);
+                        projectTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("project")).setFontSize(FONT_SIZE));
+
+                        db.getProjects().forEach(pb -> {
+
+                            Table activityTable = new Table(new float[]{5, 11}).setMargin(0).setPadding(0);
+                            activityTable.setWidthPercent(100);
+                            activityTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("activity")).setFontSize(FONT_SIZE));
+
+                            pb.getActivities().forEach(ab -> {
+                                Table userTable = new Table(new float[]{6, 5, 5}).setMargin(0).setPadding(0);
+                                userTable.setWidthPercent(100);
+                                userTable.addHeaderCell(new Cell().setBold().add(Messages.i18n.format("employee")).setFontSize(FONT_SIZE));
+                                userTable.addHeaderCell(new Cell().setBold().add(Messages.i18n.format("billableHours")).setFontSize(FONT_SIZE));
+                                userTable.addHeaderCell(new Cell().setBold().add(Messages.i18n.format("amountDue")).setFontSize(FONT_SIZE));
+                                ab.getUsers().forEach(ub -> {
+                                    userTable.addCell(getSmallerFontCell(ub.getUser().getFirstName() + " " + ub.getUser().getLastName()));
+                                    userTable.addCell(getSmallerFontCell(Messages.i18n.format("xhours", ub.getTotalBillableHours().setScale(1, RoundingMode.HALF_UP).toString())));
+                                    userTable.addCell(getSmallerFontCell(Messages.i18n.format("xCurrency", ub.getTotalAmountDue().setScale(2, RoundingMode.HALF_UP).toString(), cs)));
+                                });
+                                userTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+                                userTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("xhours", ab.getTotalBillableHours().setScale(1, RoundingMode.HALF_UP).toString())));
+                                userTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("xCurrency", ab.getTotalAmountDue().setScale(2, RoundingMode.HALF_UP).toString(), cs)));
+                                activityTable.addCell(getSmallerFontCell(ab.getActivity().getName()));
+                                activityTable.addCell(getTableCell(userTable));
+                            });
+                            activityTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+                            activityTable.addFooterCell(getTotalCell(pb.getTotalBillableHours(), pb.getTotalAmountDue()));
+                            projectTable.addCell(getSmallerFontCell(pb.getProject().getName()));
+                            projectTable.addCell(getTableCell(activityTable));
+                        });
+                        projectTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+                        projectTable.addFooterCell(getTotalCell(db.getTotalBillableHours(), db.getTotalAmountDue()));
+                        dayTable.addCell(getSmallerFontCell(db.getDay()));
+                        dayTable.addCell(getTableCell(projectTable));
+                    });
+                    dayTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+                    dayTable.addFooterCell(getTotalCell(ob.getTotalBillableHours(), ob.getTotalAmountDue()));
+                    outerTable.addCell(getSmallerFontCell(ob.getOrganization().getName()));
+                    outerTable.addCell(getTableCell(dayTable));
+                });
+                outerTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+                outerTable.addFooterCell(getTotalCell(rep.getTotalBillableHours(), rep.getTotalAmountDue()));
+                doc.add(outerTable);
+
+                doc.close();
+            }
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception ex) {
+            throw ExceptionFactory.systemErrorException(ex);
+        }
     }
 
     @Override
     public InputStream getPdfLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw ExceptionFactory.unavailableException();
+        LoggedTimeReportResponse rep = getLoggedTimeReport(organizationId, projectId, activityId, from, to);
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            if (rep != null) {
+                Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
+                doc = addLogoToDocument(doc);
+                doc.add(new Paragraph((Messages.i18n.format("timelogReport"))).setFontSize(24).setBold());
+                doc.add(new Paragraph((Messages.i18n.format("timelogDesc", from, to))).setFontSize(14).setItalic());
+
+                Table outerTable = new Table(new float[]{2, 14});
+                outerTable.setWidthPercent(100);
+                outerTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("organization")).setFontSize(FONT_SIZE));
+                doc.add(populateLoggedTimeTable(outerTable, rep));
+                doc.close();
+            }
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception ex) {
+            throw ExceptionFactory.systemErrorException(ex);
+        }
     }
 
     @Override
     public InputStream getPdfUserReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
-        throw ExceptionFactory.unavailableException();
+        UserLoggedTimeReportResponse rep = getUserReport(organizationId, projectId, activityId, userId, from, to);
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            if (rep != null) {
+                Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
+                doc = addLogoToDocument(doc);
+                doc.add(new Paragraph((Messages.i18n.format("userTimelogReport"))).setFontSize(24).setBold());
+                doc.add(new Paragraph((Messages.i18n.format("userTimelogDesc", rep.getUser().getFirstName(), rep.getUser().getLastName(), from, to))).setFontSize(10).setItalic());
+
+                Table outerTable = new Table(new float[]{2, 14});
+                outerTable.setWidthPercent(100);
+                outerTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("organization")).setFontSize(FONT_SIZE));
+
+                doc.add(populateLoggedTimeTable(outerTable, rep.getReport()));
+                doc.close();
+            }
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception ex) {
+            throw ExceptionFactory.systemErrorException(ex);
+        }
     }
 
     @Override
     public InputStream getPdfCurrentUserReport(String organizationId, Long projectId, Long activityId, String from, String to) {
-        throw ExceptionFactory.unavailableException();
+        return getPdfUserReport(organizationId, projectId, activityId, securityContext.getCurrentUser(), from, to);
     }
 
     // PRIVATE METHODS
@@ -295,7 +456,7 @@ public class ReportsFacade implements IReportsFacade {
 
         storage.searchWorklogs(organizationId, projectId, activityId, userId, DateUtils.getDatesBetween(from, to)).forEach(w -> {
             ActivityBean a = w.getActivity();
-            if (a.getBillable()) {
+            if (a.getBillable() != null && a.getBillable()) {
                 ProjectBean p = a.getProject();
                 OrganizationBean o = p.getOrganization();
                 UserBean u = storage.getUser(w.getUserId());
@@ -361,4 +522,100 @@ public class ReportsFacade implements IReportsFacade {
         });
         return sorted;
     }
+
+    private InputStream getPdfOverUnderTimeInternal(String organizationId, OverUnderTimeReportResponse resp, String overUnderKey, String from, String to) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        if (resp != null) {
+            try {
+                Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4);
+                doc = addLogoToDocument(doc);
+                doc.add(new Paragraph((Messages.i18n.format("organizationTitle", storage.getOrganization(organizationId).getName()))).setFontSize(24).setBold());
+                doc.add(new Paragraph((Messages.i18n.format(overUnderKey, from, to))).setFontSize(14).setItalic());
+                Table table = new Table(new float[]{5, 11});
+                table.setWidthPercent(100);
+                table.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("employee"))).setFontSize(FONT_SIZE);
+                resp.getUserWorkdays().forEach(uwd -> {
+                    Table innerTable = new Table(new float[]{5, 11});
+                    innerTable.setWidthPercent(100);
+                    innerTable.addHeaderCell(Messages.i18n.format("day")).setFontSize(FONT_SIZE);
+                    innerTable.addHeaderCell(Messages.i18n.format("loggedtime")).setFontSize(FONT_SIZE);
+                    uwd.getWorkdays().forEach(wd -> {
+                        innerTable.addCell(getSmallerFontCell(wd.getDay()));
+                        innerTable.addCell(getSmallerFontCell(Messages.i18n.format("xhours", DateUtils.convertMinutesToHours(wd.getLoggedMinutes()).toString())));
+                    });
+                    table.addCell(getSmallerFontCell(uwd.getUser().getFirstName() + " " + uwd.getUser().getLastName()));
+                    table.addCell(getTableCell(innerTable));
+                });
+                doc.add(table);
+                doc.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                throw ExceptionFactory.systemErrorException(ex);
+            }
+        }
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    private Table populateLoggedTimeTable(Table outerTable, LoggedTimeReportResponse rep) {
+        rep.getOrganizations().forEach(o -> {
+
+            Table projectTable = new Table(new float[]{5, 11});
+            projectTable.setWidthPercent(100);
+            projectTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("project")).setFontSize(FONT_SIZE));
+
+            o.getProjects().forEach(p -> {
+
+                Table activityTable = new Table(new float[]{5, 11}).setMargin(0).setPadding(0);
+                activityTable.setWidthPercent(100);
+                activityTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("activity")).setFontSize(FONT_SIZE));
+
+                p.getActivities().forEach(a -> {
+                    activityTable.addCell(getSmallerFontCell(a.getActivity().getName()));
+                    activityTable.addCell(getSmallerFontCell(Messages.i18n.format("xhours", DateUtils.convertMinutesToHours(a.getTotalLoggedMinutes()))));
+                });
+                projectTable.addCell(getSmallerFontCell(p.getProject().getName()));
+                projectTable.addCell(getTableCell(activityTable));
+                projectTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+                projectTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("xhours", DateUtils.convertMinutesToHours(p.getTotalLoggedMinutes()))));
+            });
+            outerTable.addCell(getSmallerFontCell(o.getOrganization().getName()));
+            outerTable.addCell(getTableCell(projectTable));
+            outerTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("total")).setBold());
+            outerTable.addFooterCell(getSmallerFontCell(Messages.i18n.format("xhours", DateUtils.convertMinutesToHours(o.getTotalLoggedMinutes()))));
+        });
+        return outerTable;
+    }
+
+    private Cell getTableCell(Table table) {
+        return new Cell().add(table).setPadding(0).setMargin(0);
+    }
+
+    private Cell getSmallerFontCell(String content) {
+        return new Cell().add(content).setFontSize(FONT_SIZE);
+    }
+
+    private Cell getTotalCell(BigDecimal hours, BigDecimal amount) {
+        Cell cell = new Cell().setFontSize(FONT_SIZE).setPadding(0).setMargin(0);
+        Table total = new Table(new float[]{4, 4});
+        total.setWidthPercent(100);
+        total.addCell(Messages.i18n.format("xhours", hours.setScale(1, RoundingMode.HALF_UP).toString()));
+        total.addCell(Messages.i18n.format("xCurrency", amount.setScale(2, RoundingMode.HALF_UP).toString(), config.getCurrencySymbol()));
+        cell.add(total);
+        return cell;
+    }
+
+    private Document addLogoToDocument(Document document) {
+        Image img = null;
+        try {
+            img = new Image(ImageDataFactory.create(config.getPdfLogoLocation())).setWidthPercent(20);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if (img != null) {
+            document.add(img);
+        }
+        return document;
+    }
+
 }

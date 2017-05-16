@@ -5,6 +5,7 @@ import be.ehb.facades.IOrganizationFacade;
 import be.ehb.facades.IUserFacade;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.model.requests.*;
 import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
@@ -52,8 +53,8 @@ public class UsersResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response parseJwt(@ApiParam(value = "JWT") JWTParseRequest jwt) {
         //TODO - Use resource bundle for internationalization
-        Preconditions.checkNotNull(jwt, "Request must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(jwt.getJwt()), "JWT String required");
+        Preconditions.checkNotNull(jwt, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(jwt.getJwt()), Messages.i18n.format("emptyField", "jwt"));
         return ResponseFactory.buildResponse(OK, userFacade.parseJWT(jwt));
     }
 
@@ -80,7 +81,7 @@ public class UsersResource {
     @Path("/current")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCurrentUser(@ApiParam UpdateCurrentUserRequest request) {
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, userFacade.updateCurrentUser(request));
     }
 
@@ -92,8 +93,13 @@ public class UsersResource {
     })
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listUsers() {
-        return ResponseFactory.buildResponse(OK, userFacade.listUsers());
+    public Response listUsers(@QueryParam("organization") String organizationId,
+                              @QueryParam("role") String roleId,
+                              @QueryParam("id") String userId,
+                              @QueryParam("firstname") String firstName,
+                              @QueryParam("lastname") String lastName,
+                              @QueryParam("email") String email) {
+        return ResponseFactory.buildResponse(OK, userFacade.listUsers(organizationId, roleId, userId, firstName, lastName, email));
     }
 
     @ApiOperation(value = "Get user",
@@ -119,18 +125,18 @@ public class UsersResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(@ApiParam NewUserRequest request) {
-        Preconditions.checkNotNull(request, "Request body must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getFirstName()), "\"name\" must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getLastName()), "\"surname\" must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getEmail()), "\"email\" must be provided");
-        Preconditions.checkNotNull(request.getMemberships(), "\"memberships\" must be provided");
-        Preconditions.checkArgument(!request.getMemberships().isEmpty(), "At least one membership must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getFirstName()), Messages.i18n.format("emptyField", "firstName"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getLastName()), Messages.i18n.format("emptyField", "lastName"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getEmail()), Messages.i18n.format("emptyField", "email"));
+        Preconditions.checkNotNull(request.getMemberships(), Messages.i18n.format("emptyField", "memberships"));
+        Preconditions.checkArgument(!request.getMemberships().isEmpty(), Messages.i18n.format("emptyList", "memberships"));
         request.getMemberships().forEach(membership -> {
-            Preconditions.checkArgument(StringUtils.isNotEmpty(membership.getRole()), "\"role\" must be provdided");
-            Preconditions.checkNotNull(membership.getOrganizationId(), "\"organizationId\" must be provided");
+            Preconditions.checkArgument(StringUtils.isNotEmpty(membership.getRole()), Messages.i18n.format("emptyField", "role"));
+            Preconditions.checkNotNull(membership.getOrganizationId(), Messages.i18n.format("emptyField", "organizationId"));
         });
         if (request.getDefaultHoursPerDay() != null) {
-            Preconditions.checkArgument(request.getDefaultHoursPerDay() > 0, "\"defaultHoursPerDay\" must be greater than 0");
+            Preconditions.checkArgument(request.getDefaultHoursPerDay() > 0, Messages.i18n.format("greaterThanZero", "defaultHoursPerDay"));
         }
         return ResponseFactory.buildResponse(CREATED, userFacade.createUser(request));
     }
@@ -146,8 +152,8 @@ public class UsersResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("userId") String userId, @ApiParam UpdateUserRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
 
         return ResponseFactory.buildResponse(CREATED, userFacade.updateUser(userId, request));
     }
@@ -162,7 +168,7 @@ public class UsersResource {
     @Path("/{userId}/memberships")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listUserMemberships(@PathParam("userId") String userId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         return ResponseFactory.buildResponse(OK, managementFacade.listUserMemberships(userId));
     }
 
@@ -176,8 +182,8 @@ public class UsersResource {
     @Path("/{userId}/memberships/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listUserMemberships(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "Organization ID must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -195,9 +201,10 @@ public class UsersResource {
     @Path("/{userId}/memberships/organizations/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUserMembership(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId, @ApiParam MembershipChangeRequest request) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), "User ID must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), "\"organizationId\" must be provided");
-        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getRole()), "\"role\" must be provided");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getRole()), Messages.i18n.format("emptyField", "role"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
@@ -215,7 +222,7 @@ public class UsersResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCurrentUserWorklogs(@ApiParam UpdateCurrentUserWorklogRequestList request) {
-        Preconditions.checkNotNull(request, "Request body must be provided");
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateCurrentUserWorklogs(request));
     }
 }

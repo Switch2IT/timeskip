@@ -2,6 +2,7 @@ package be.ehb.scheduler;
 
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.facades.IOrganizationFacade;
 import be.ehb.mail.IMailService;
 import be.ehb.model.mail.PrefillTimeSheetMailBean;
 import be.ehb.storage.IStorageService;
@@ -16,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 /**
  * @author Patrick Van den Bussche
@@ -28,22 +30,27 @@ public class PrefillTimeSheetsJobContext {
 
         private IMailService mailService;
         private IStorageService iss;
+        private IOrganizationFacade iof;
 
         void setMailService(IMailService mailService) {
             this.mailService = mailService;
         }
 
-        void setIss(IStorageService iss) {
-            this.iss = iss;
+        void setiof(IOrganizationFacade iof) {
+            this.iof = iof;
         }
+
+        void setIss(IStorageService iss) {
+        this.iss = iss;
+    }
 
         void execute() throws JobExecutionException {
 
-            List<UserBean> usersList= iss.listUsers();
+            List<UserBean> usersList= iss.listUsers(null, null,null,null,null,null);
 
             if (!usersList.isEmpty()) {
                 Map<DayOfWeek,LocalDate > dayMap = new HashMap<>();
-                LocalDate firstDate = LocalDate.now();
+                LocalDate firstDate = LocalDate.now().with(DayOfWeek.MONDAY);
                 for (int i=0;i<7;i++) {
                     dayMap.put(DayOfWeek.of(i+1),firstDate.plusDays((long)i));
                 }
@@ -87,16 +94,10 @@ public class PrefillTimeSheetsJobContext {
                                         defaultHoursPerDay = new BigDecimal(0).setScale(2);
                                     } else {
                                         defaultHoursPerDay = defaultHoursPerDay.subtract(loggedHoursPerDay);
-//                                        WorklogBean wlb = new WorklogBean();
-//                                        wlb.setId(null);
-//                                        wlb.setUserId(entry.getId());
-//                                        wlb.setDay(searchDate);
-//                                        wlb.setLoggedMinutes(defaultHoursPerDay.longValue() / 60);
-//                                        wlb.setConfirmed(false);
-//                                        wlb.setActivity(iss.getActivity(entry.getDefaultActivity()));
-//                                        log.info(wlb.toString());
-//                                        iss.createWorklog(wlb);
+                                        this.createWorklogBean(entry, searchDate, defaultHoursPerDay);
                                     }
+                                } else {
+                                    this.createWorklogBean(entry,searchDate,defaultHoursPerDay);
                                 }
                                 worklogList
                                 .append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\">")
@@ -109,7 +110,8 @@ public class PrefillTimeSheetsJobContext {
                                 .append("</b>")
                                 .append("</td>")
                                 .append("<td>")
-                                .append(iss.getActivity(entry.getDefaultActivity()).getDescription())
+                                .append(defaultHoursPerDay.compareTo(BigDecimal.ZERO) > 0 ? iss.getActivity(entry.getDefaultActivity()).getDescription()
+                                                                                          : "dna - already project/actions filled in")
                                 .append("</td>")
                                 .append("</tr>");}
                             );}
@@ -119,5 +121,16 @@ public class PrefillTimeSheetsJobContext {
                     mailService.sendPrefillTimeSheet(prefill);
                 });
             }
+        }
+        private void createWorklogBean(UserBean userBean, Date searchDate, BigDecimal defaultHoursPerDay) {
+            WorklogBean wlb = new WorklogBean();
+            wlb.setId(null);
+            wlb.setUserId(userBean.getId());
+            wlb.setDay(searchDate);
+            wlb.setLoggedMinutes(defaultHoursPerDay.longValue() * 60);
+            wlb.setConfirmed(false);
+            wlb.setActivity(iss.getActivity(userBean.getDefaultActivity()));
+            log.info(wlb.toString());
+            iof.createPrefillWorklog(wlb);
         }
 }

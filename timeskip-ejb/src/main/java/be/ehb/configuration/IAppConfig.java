@@ -35,4 +35,8 @@ public interface IAppConfig {
     Integer getDayOfMonthlyReminderEmail();
 
     boolean getLastDayOfMonth();
+
+    String getCurrencySymbol();
+
+    String getPdfLogoLocation();
 }

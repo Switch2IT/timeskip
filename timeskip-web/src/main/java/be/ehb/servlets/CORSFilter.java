@@ -25,7 +25,7 @@ public class CORSFilter implements Filter {
         res.setHeader("Access-Control-Allow-Origin", req.getHeader("Origin"));
         res.setHeader("Access-Control-Allow-Credentials", "true");
         res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, DELETE, PUT, HEAD");
-        res.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        res.addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, access_token, keycloak-token");
         res.addHeader("Access-Control-Expose-Headers", "X-Timeskip-Error");
         chain.doFilter(request, response);
     }
