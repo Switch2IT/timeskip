@@ -88,7 +88,7 @@ public class DateUtilsTest {
 
         String startDate = "05-10-2017";;
         String endDate = "07-10-2017";;
-        List<LocalDate> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
+        List<Date> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
         List<LocalDate> datesBetweenManual = new ArrayList<>();
         LocalDate start = DateUtils.convertStringToDate(startDate);
         LocalDate between = DateUtils.convertStringToDate("06-10-2017");
@@ -104,7 +104,7 @@ public class DateUtilsTest {
     public void getDatesBetweenWrongDate() throws Exception {
         String startDate = "05-10-2017";;
         String endDate = "13-13-2017";;
-        List<LocalDate> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
+        List<Date> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
     }
 
     @Test
@@ -112,8 +112,8 @@ public class DateUtilsTest {
 
         String endDate = "05-10-2017";;
         String startDate = "07-10-2017";;
-        List<LocalDate> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
-        List<LocalDate> datesBetweenManual = new ArrayList<>();
+        List<Date> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
+        List<Date> datesBetweenManual = new ArrayList<>();
         Assert.assertArrayEquals(datesBetween.toArray(),datesBetweenManual.toArray());
     }
 
