@@ -6,6 +6,7 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.exceptions.InvalidDateException;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.i18n.Messages;
@@ -67,24 +68,30 @@ public class ReportsFacade implements IReportsFacade {
 
     @Override
     public OverUnderTimeReportResponse getOvertimeReport(String organizationId, String from, String to) {
-        OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
-        Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
-        List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
-        sorted.forEach((user, map) -> {
-            if (user.getDefaultHoursPerDay() != null) {
-                List<WorkDayResponse> workdays = new ArrayList<>();
-                map.forEach((day, minutes) -> {
-                    if (DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay()) < minutes) {
-                        WorkDayResponse wd = ResponseFactory.createWorkDayResponse(day, minutes);
-                        if (wd != null) workdays.add(wd);
-                    }
-                });
-                UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(user, workdays);
-                if (uwd != null) userWorkDayResponses.add(uwd);
-            }
-        });
-        rval.setUserWorkdays(userWorkDayResponses);
-        return rval;
+        try {
+            OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
+            Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
+            List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
+            sorted.forEach((user, map) -> {
+                if (user.getDefaultHoursPerDay() != null) {
+                    List<WorkDayResponse> workdays = new ArrayList<>();
+                    map.forEach((day, minutes) -> {
+                        if (DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay()) < minutes) {
+                            WorkDayResponse wd = ResponseFactory.createWorkDayResponse(day, minutes);
+                            if (wd != null) workdays.add(wd);
+                        }
+                    });
+                    UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(user, workdays);
+                    if (uwd != null) userWorkDayResponses.add(uwd);
+                }
+            });
+            rval.setUserWorkdays(userWorkDayResponses);
+            return rval;
+        } catch (InvalidDateException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw ExceptionFactory.systemErrorException(ex);
+        }
     }
 
     @Override
@@ -133,6 +140,8 @@ public class ReportsFacade implements IReportsFacade {
             });
             rval.setUserWorkdays(userWorkDayResponses);
             return rval;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -142,6 +151,8 @@ public class ReportsFacade implements IReportsFacade {
     public LoggedTimeReportResponse getLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
         try {
             return getLoggedTimeReportInternal(organizationId, projectId, activityId, null, from, to);
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -152,6 +163,8 @@ public class ReportsFacade implements IReportsFacade {
         try {
             UserBean user = storage.getUser(userId);
             return ResponseFactory.createUserLoggedTimeReportResponse(user, getLoggedTimeReportInternal(organizationId, projectId, activityId, userId, from, to));
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -207,6 +220,8 @@ public class ReportsFacade implements IReportsFacade {
             BillingReportResponse rval = ResponseFactory.createBillingReportResponse(obr, totalHours, totalAmount);
             if (rval == null) return null;
             else return rval;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ExceptionFactory.systemErrorException(ex);
@@ -304,6 +319,8 @@ public class ReportsFacade implements IReportsFacade {
             }
             if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
             else return null;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -331,6 +348,8 @@ public class ReportsFacade implements IReportsFacade {
             }
             if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
             else return null;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -359,6 +378,8 @@ public class ReportsFacade implements IReportsFacade {
             }
             if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
             else return null;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
