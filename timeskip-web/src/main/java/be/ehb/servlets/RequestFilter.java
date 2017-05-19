@@ -31,6 +31,7 @@ public class RequestFilter implements ContainerRequestFilter {
     private static final String HEADER_USER_AUTHORIZATION = "Authorization";
     private static final String KEYCLOAK_TOKEN = "keycloak-token";
     private static final String ACCESS_TOKEN = "access_token";
+    private static final String JWT = "jwt";
 
     //Exclusions
     private static final String BASE_PATH = "/timeskip-web/api";
@@ -57,6 +58,8 @@ public class RequestFilter implements ContainerRequestFilter {
                 jwt = containerRequestContext.getHeaderString(KEYCLOAK_TOKEN);
             } else if (containerRequestContext.getHeaders().containsKey(ACCESS_TOKEN)) {
                 jwt = containerRequestContext.getHeaderString(ACCESS_TOKEN);
+            } else if (containerRequestContext.getUriInfo().getQueryParameters().containsKey(JWT) && !containerRequestContext.getUriInfo().getQueryParameters().get(JWT).isEmpty()) {
+                jwt = containerRequestContext.getUriInfo().getQueryParameters().get(JWT).get(0);
             }
             if (jwt != null) {
                 //remove Bearer prefix

@@ -20,7 +20,9 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
 
 /**
@@ -148,6 +150,7 @@ public class ReportsResource {
     @ApiOperation(value = "Get Overtime PDF Report", notes = "Get a report detailing which users have logged overtime in PDF format. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Overtime PDF report"),
+            @ApiResponse(code = 204, message = "No content"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -157,12 +160,16 @@ public class ReportsResource {
                                          @QueryParam("from") String from,
                                          @QueryParam("to") String to) {
         checkOverUndertime(organizationId, from, to);
-        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=OverTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfOvertimeReport(organizationId, from, to), null);
+        InputStream pdf = reportsFacade.getPdfOvertimeReport(organizationId, from, to);
+        if (pdf != null)
+            return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=OverTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", pdf, null);
+        else return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     @ApiOperation(value = "Get Undertime PDF Report", notes = "Get a report detailing which users have fewer hours than required in PDF format. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Undertime PDF report"),
+            @ApiResponse(code = 204, message = "No content"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -172,13 +179,17 @@ public class ReportsResource {
                                           @QueryParam("from") String from,
                                           @QueryParam("to") String to) {
         checkOverUndertime(organizationId, from, to);
-        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UnderTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfUndertimeReport(organizationId, from, to), null);
+        InputStream pdf = reportsFacade.getPdfUndertimeReport(organizationId, from, to);
+        if (pdf != null)
+            return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UnderTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", pdf, null);
+        else return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
 
     @ApiOperation(value = "Get Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
+            @ApiResponse(code = 204, message = "No content"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -192,12 +203,16 @@ public class ReportsResource {
         checkDates(from, to);
         if (StringUtils.isNotEmpty(organizationId) && !securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
             throw ExceptionFactory.unauthorizedException();
-        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=LoggedTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfLoggedTimeReport(organizationId, projectId, activityId, from, to), null);
+        InputStream pdf = reportsFacade.getPdfLoggedTimeReport(organizationId, projectId, activityId, from, to);
+        if (pdf != null)
+            return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=LoggedTimeReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", pdf, null);
+        else return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     @ApiOperation(value = "Get Current User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for the current user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
+            @ApiResponse(code = 204, message = "No content"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -209,12 +224,16 @@ public class ReportsResource {
                                             @QueryParam("from") String from,
                                             @QueryParam("to") String to) {
         checkDates(from, to);
-        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=CurrentUserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfCurrentUserReport(organizationId, projectId, activityId, from, to), null);
+        InputStream pdf = reportsFacade.getPdfCurrentUserReport(organizationId, projectId, activityId, from, to);
+        if (pdf != null)
+            return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=CurrentUserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", pdf, null);
+        else return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     @ApiOperation(value = "Get User Logged Time PDF Report", notes = "Get a report in PDF format detailing the total time that was logged per organization, project or activity for a given user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = Response.class, message = "Logged time PDF report"),
+            @ApiResponse(code = 204, message = "No content"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -230,12 +249,16 @@ public class ReportsResource {
         if (StringUtils.isNotEmpty(organizationId) && !securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId))
             throw ExceptionFactory.unauthorizedException();
         checkDates(from, to);
-        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to), null);
+        InputStream pdf = reportsFacade.getPdfUserReport(organizationId, projectId, activityId, userId, from, to);
+        if (pdf != null)
+            return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=UserReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", pdf, null);
+        else return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     @ApiOperation(value = "Get Billing PDF Report", notes = "Get a report in PDF format detailing the total billable hours and amount due per organization, project, activity or user during a given period. Dates must have a \"yyyy-MM-dd\" format.")
     @ApiResponses({
             @ApiResponse(code = 200, response = BillingReportResponse.class, message = "Billing PDF report"),
+            @ApiResponse(code = 204, message = "No content"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
@@ -250,7 +273,10 @@ public class ReportsResource {
         checkDates(from, to);
         if (StringUtils.isNotEmpty(organizationId) && !securityContext.hasPermission(PermissionType.ORG_ADMIN, organizationId))
             throw ExceptionFactory.unauthorizedException();
-        return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=BillinReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", reportsFacade.getPdfBillingReport(organizationId, projectId, activityId, userId, from, to), null);
+        InputStream pdf = reportsFacade.getPdfBillingReport(organizationId, projectId, activityId, userId, from, to);
+        if (pdf != null)
+            return ResponseFactory.buildResponse(OK, "Content-Disposition", "attachment; filename=BillingReport-" + new LocalDate().toString("yyyy-MM-dd") + ".pdf", pdf, null);
+        else return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
     private void checkOverUndertime(String organizationId, String from, String to) {

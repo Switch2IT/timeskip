@@ -234,6 +234,7 @@ public class ReportsFacade implements IReportsFacade {
         String cs = config.getCurrencySymbol();
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
+            boolean documentCreated = false;
             if (rep != null) {
                 Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
                 doc = addLogoToDocument(doc);
@@ -299,8 +300,10 @@ public class ReportsFacade implements IReportsFacade {
                 doc.add(outerTable);
 
                 doc.close();
+                documentCreated = true;
             }
-            return new ByteArrayInputStream(out.toByteArray());
+            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+            else return null;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -309,6 +312,7 @@ public class ReportsFacade implements IReportsFacade {
     @Override
     public InputStream getPdfLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
         LoggedTimeReportResponse rep = getLoggedTimeReport(organizationId, projectId, activityId, from, to);
+        boolean documentCreated = false;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -323,8 +327,10 @@ public class ReportsFacade implements IReportsFacade {
                 outerTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("organization")).setFontSize(FONT_SIZE));
                 doc.add(populateLoggedTimeTable(outerTable, rep));
                 doc.close();
+                documentCreated = true;
             }
-            return new ByteArrayInputStream(out.toByteArray());
+            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+            else return null;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -333,6 +339,7 @@ public class ReportsFacade implements IReportsFacade {
     @Override
     public InputStream getPdfUserReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
         UserLoggedTimeReportResponse rep = getUserReport(organizationId, projectId, activityId, userId, from, to);
+        boolean documentCreated = false;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -348,8 +355,10 @@ public class ReportsFacade implements IReportsFacade {
 
                 doc.add(populateLoggedTimeTable(outerTable, rep.getReport()));
                 doc.close();
+                documentCreated = true;
             }
-            return new ByteArrayInputStream(out.toByteArray());
+            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+            else return null;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -526,6 +535,7 @@ public class ReportsFacade implements IReportsFacade {
     }
 
     private InputStream getPdfOverUnderTimeInternal(String organizationId, OverUnderTimeReportResponse resp, String overUnderKey, String from, String to) {
+        boolean documentCreated = false;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         if (resp != null) {
             try {
@@ -550,12 +560,14 @@ public class ReportsFacade implements IReportsFacade {
                 });
                 doc.add(table);
                 doc.close();
+                documentCreated = true;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 throw ExceptionFactory.systemErrorException(ex);
             }
         }
-        return new ByteArrayInputStream(out.toByteArray());
+        if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+        else return null;
     }
 
     private Table populateLoggedTimeTable(Table outerTable, LoggedTimeReportResponse rep) {
