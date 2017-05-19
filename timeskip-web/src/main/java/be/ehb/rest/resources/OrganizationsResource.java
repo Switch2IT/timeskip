@@ -367,6 +367,7 @@ public class OrganizationsResource {
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDay()), Messages.i18n.format("emptyField", "day"));
         Preconditions.checkNotNull(request.getLoggedMinutes(), Messages.i18n.format("emptyField", "loggedMinutes"));
         Preconditions.checkArgument(request.getLoggedMinutes() > 0, Messages.i18n.format("greaterThanZero", "loggedMinutes"));
+        Preconditions.checkArgument(request.getLoggedMinutes() <= 24 * 60, Messages.i18n.format("mustBeLessThan", "loggedMinutes", (60 * 24)));
         return ResponseFactory.buildResponse(CREATED, orgFacade.createWorkLog(organizationId, projectId, activityId, request));
     }
 
@@ -409,6 +410,10 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        if (request.getLoggedMinutes() != null) {
+            Preconditions.checkArgument(request.getLoggedMinutes() > 0, Messages.i18n.format("greaterThanZero", "loggedMinutes"));
+            Preconditions.checkArgument(request.getLoggedMinutes() <= 24 * 60, Messages.i18n.format("mustBeLessThan", "loggedMinutes", (60 * 24)));
+        }
         return ResponseFactory.buildResponse(OK, orgFacade.updateWorklog(organizationId, projectId, activityId, request));
     }
 
