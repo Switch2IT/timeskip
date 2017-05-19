@@ -126,7 +126,13 @@ public class UserFacade implements IUserFacade, Serializable {
         newUser.setLastName(request.getLastName());
         newUser.setDefaultHoursPerDay(request.getDefaultHoursPerDay());
         newUser.setWorkdays(request.getWorkDays());
-
+        if (request.getPaygradeId() != null) {
+            newUser.setPaygrade(storage.getPaygrade(request.getPaygradeId()));
+        }
+        //Retrieve the activity to check if it exists
+        if (request.getDefaultActivityId() != null) {
+            newUser.setDefaultActivity(storage.getActivity(request.getDefaultActivityId()).getId());
+        }
         //Create the user on the IDP and get the ID
         newUser = idpClient.createUser(newUser);
         storage.createUser(newUser);
@@ -155,6 +161,7 @@ public class UserFacade implements IUserFacade, Serializable {
             changed = true;
         }
         if (changed) {
+            idpClient.updateUser(cUser);
             return ResponseFactory.createUserResponse(storage.updateUser(cUser));
         } else return null;
     }
@@ -163,14 +170,15 @@ public class UserFacade implements IUserFacade, Serializable {
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         UserBean user = storage.getUser(userId);
         boolean changed;
-        changed = updateEmailIfChanged(user, request.getEmail());
+        boolean idpChanged;
+        idpChanged = changed = updateEmailIfChanged(user, request.getEmail());
         if (StringUtils.isNotEmpty(request.getFirstName()) && !request.getFirstName().equals(user.getFirstName())) {
             user.setFirstName(request.getFirstName());
-            changed = true;
+            idpChanged = changed = true;
         }
         if (StringUtils.isNotEmpty(request.getLastName()) && !request.getLastName().equals(user.getLastName())) {
-            user.setFirstName(request.getFirstName());
-            changed = true;
+            user.setLastName(request.getLastName());
+            idpChanged = changed = true;
         }
         if (request.getPaygradeId() != null && !request.getPaygradeId().equals(user.getPaygrade().getId())) {
             PaygradeBean paygrade = storage.getPaygrade(request.getPaygradeId());
@@ -191,6 +199,7 @@ public class UserFacade implements IUserFacade, Serializable {
             changed = true;
         }
         if (changed) {
+            if (idpChanged) idpClient.updateUser(user);
             return ResponseFactory.createUserResponse(storage.updateUser(user));
         } else return null;
     }

@@ -138,6 +138,8 @@ public class UsersResource {
         if (request.getDefaultHoursPerDay() != null) {
             Preconditions.checkArgument(request.getDefaultHoursPerDay() > 0, Messages.i18n.format("greaterThanZero", "defaultHoursPerDay"));
         }
+        if (request.getAdmin() != null && request.getAdmin() && !securityContext.isAdmin())
+            throw ExceptionFactory.unauthorizedException(Messages.i18n.format("adminRights"));
         return ResponseFactory.buildResponse(CREATED, userFacade.createUser(request));
     }
 
@@ -154,7 +156,8 @@ public class UsersResource {
     public Response updateUser(@PathParam("userId") String userId, @ApiParam UpdateUserRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
-
+        if (request.getAdmin() != null && request.getAdmin() && !securityContext.isAdmin())
+            throw ExceptionFactory.unauthorizedException(Messages.i18n.format("adminRights"));
         return ResponseFactory.buildResponse(CREATED, userFacade.updateUser(userId, request));
     }
 
