@@ -333,7 +333,6 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
 
-
     @Override
     public ActivityBean updateActivity(ActivityBean activity) {
         return super.update(activity);

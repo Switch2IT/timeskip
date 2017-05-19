@@ -459,42 +459,55 @@ public class ReportsFacade implements IReportsFacade {
             if (a.getBillable() != null && a.getBillable()) {
                 ProjectBean p = a.getProject();
                 OrganizationBean o = p.getOrganization();
-                UserBean u = storage.getUser(w.getUserId());
-                LocalDate d = new LocalDate(w.getDay());
-                if (sorted.containsKey(o)) {
-                    if (sorted.get(o).containsKey(d)) {
-                        if (sorted.get(o).get(d).containsKey(p)) {
-                            if (sorted.get(o).get(d).get(p).containsKey(a)) {
-                                if (sorted.get(o).get(d).get(p).get(a).containsKey(u)) {
-                                    if (!p.getBillOvertime()) {
-                                        Long alreadyLogged = sorted.get(o).get(d).get(p).get(a).get(u).parallelStream().mapToLong(WorklogBean::getLoggedMinutes).sum();
-                                        if (alreadyLogged + w.getLoggedMinutes() > u.getDefaultHoursPerDay()) {
-                                            w.setLoggedMinutes(alreadyLogged + w.getLoggedMinutes() - DateUtils.convertHoursToMinutes(u.getDefaultHoursPerDay()));
+                if (securityContext.hasPermission(PermissionType.ORG_EDIT, o.getId())) {
+                    UserBean u = storage.getUser(w.getUserId());
+                    LocalDate d = new LocalDate(w.getDay());
+                    if (sorted.containsKey(o)) {
+                        if (sorted.get(o).containsKey(d)) {
+                            if (sorted.get(o).get(d).containsKey(p)) {
+                                if (sorted.get(o).get(d).get(p).containsKey(a)) {
+                                    if (sorted.get(o).get(d).get(p).get(a).containsKey(u)) {
+                                        if (!p.getBillOvertime()) {
+                                            Long alreadyLogged = sorted.get(o).get(d).get(p).get(a).get(u).parallelStream().mapToLong(WorklogBean::getLoggedMinutes).sum();
+                                            if (alreadyLogged + w.getLoggedMinutes() > u.getDefaultHoursPerDay()) {
+                                                w.setLoggedMinutes(alreadyLogged + w.getLoggedMinutes() - DateUtils.convertHoursToMinutes(u.getDefaultHoursPerDay()));
+                                            }
                                         }
+                                        sorted.get(o).get(d).get(p).get(a).get(u).add(w);
+                                    } else {
+                                        List<WorklogBean> ws = new ArrayList<>();
+                                        ws.add(w);
+                                        sorted.get(o).get(d).get(p).get(a).put(u, ws);
                                     }
-                                    sorted.get(o).get(d).get(p).get(a).get(u).add(w);
                                 } else {
+                                    Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
                                     List<WorklogBean> ws = new ArrayList<>();
                                     ws.add(w);
-                                    sorted.get(o).get(d).get(p).get(a).put(u, ws);
+                                    uws.put(u, ws);
+                                    sorted.get(o).get(d).get(p).put(a, uws);
                                 }
                             } else {
+                                Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
                                 Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
                                 List<WorklogBean> ws = new ArrayList<>();
                                 ws.add(w);
                                 uws.put(u, ws);
-                                sorted.get(o).get(d).get(p).put(a, uws);
+                                auws.put(a, uws);
+                                sorted.get(o).get(d).put(p, auws);
                             }
                         } else {
+                            Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>> pauws = new HashMap<>();
                             Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
                             Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
                             List<WorklogBean> ws = new ArrayList<>();
                             ws.add(w);
                             uws.put(u, ws);
                             auws.put(a, uws);
-                            sorted.get(o).get(d).put(p, auws);
+                            pauws.put(p, auws);
+                            sorted.get(o).put(d, pauws);
                         }
                     } else {
+                        Map<LocalDate, Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>>> dpauws = new HashMap<>();
                         Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>> pauws = new HashMap<>();
                         Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
                         Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
@@ -503,20 +516,9 @@ public class ReportsFacade implements IReportsFacade {
                         uws.put(u, ws);
                         auws.put(a, uws);
                         pauws.put(p, auws);
-                        sorted.get(o).put(d, pauws);
+                        dpauws.put(d, pauws);
+                        sorted.put(o, dpauws);
                     }
-                } else {
-                    Map<LocalDate, Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>>> dpauws = new HashMap<>();
-                    Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>> pauws = new HashMap<>();
-                    Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
-                    Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
-                    List<WorklogBean> ws = new ArrayList<>();
-                    ws.add(w);
-                    uws.put(u, ws);
-                    auws.put(a, uws);
-                    pauws.put(p, auws);
-                    dpauws.put(d, pauws);
-                    sorted.put(o, dpauws);
                 }
             }
         });
@@ -617,5 +619,4 @@ public class ReportsFacade implements IReportsFacade {
         }
         return document;
     }
-
 }
