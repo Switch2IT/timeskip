@@ -1,5 +1,6 @@
 package be.ehb.facades;
 
+import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
@@ -131,7 +132,10 @@ public class UserFacade implements IUserFacade, Serializable {
         }
         //Retrieve the activity to check if it exists
         if (request.getDefaultActivityId() != null) {
-            newUser.setDefaultActivity(storage.getActivity(request.getDefaultActivityId()).getId());
+            ActivityBean activity = storage.getActivity(request.getDefaultActivityId());
+            newUser.setDefaultActivity(activity.getId());
+            activity.getProject().getAssignedUsers().add(newUser);
+            storage.updateProject(activity.getProject());
         }
         //Create the user on the IDP and get the ID
         newUser = idpClient.createUser(newUser);
@@ -194,7 +198,9 @@ public class UserFacade implements IUserFacade, Serializable {
             changed = true;
         }
         if (request.getDefaultActivity() != null && !request.getDefaultActivity().equals(user.getDefaultActivity())) {
-            storage.getActivity(request.getDefaultActivity());
+            ActivityBean activity = storage.getActivity(request.getDefaultActivity());
+            activity.getProject().getAssignedUsers().add(user);
+            storage.updateProject(activity.getProject());
             user.setDefaultActivity(request.getDefaultActivity());
             changed = true;
         }
