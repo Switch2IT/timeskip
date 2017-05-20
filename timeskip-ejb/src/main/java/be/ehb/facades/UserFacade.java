@@ -3,6 +3,7 @@ package be.ehb.facades;
 import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.model.requests.JWTParseRequest;
@@ -17,6 +18,7 @@ import be.ehb.security.JWTValidation;
 import be.ehb.security.idp.IIdpClient;
 import be.ehb.storage.IStorageService;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDate;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
@@ -27,12 +29,14 @@ import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 @Stateless
@@ -218,5 +222,10 @@ public class UserFacade implements IUserFacade, Serializable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
+        return new ArrayList<>(storage.listUsersWorkloadActivity(day));
     }
 }

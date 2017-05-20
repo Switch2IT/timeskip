@@ -318,6 +318,15 @@ public class OrganizationFacade implements IOrganizationFacade {
         newWorklog.setUserId(user.getId());
         return ResponseFactory.createWorklogResponse(storage.createWorklog(newWorklog));
     }
+    @Override
+    public Boolean createPrefillWorklog(WorklogBean worklogBean) {
+        WorklogBean worklogBean1 = storage.createWorklog(worklogBean);
+        if (worklogBean1.getId() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     public WorklogResponse updateWorklog(String organizationId, Long projectId, Long activityId, UpdateWorklogRequest request) {

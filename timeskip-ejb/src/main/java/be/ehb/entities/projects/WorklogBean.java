@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 @Entity
@@ -27,6 +27,18 @@ public class WorklogBean implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "activity_id", referencedColumnName = "id", nullable = false)
     private ActivityBean activity;
+
+    public WorklogBean() {}
+
+    public WorklogBean(Date day, Long loggedMinutes, Boolean confirmed){
+        this.day = day;
+        this.loggedMinutes = loggedMinutes;
+        this.confirmed = confirmed;
+    }
+
+    public WorklogBean(Long loggedMinutes){
+        this.loggedMinutes = loggedMinutes;
+    }
 
     public Long getId() {
         return id;

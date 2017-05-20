@@ -1,5 +1,6 @@
 package be.ehb.facades;
 
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.model.requests.*;
 import be.ehb.model.responses.ActivityResponse;
 import be.ehb.model.responses.OrganizationResponse;
@@ -193,6 +194,13 @@ public interface IOrganizationFacade {
      */
     WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewAdminWorklogRequest request);
 
+    /**
+     * prefill an worklog
+     *
+     * @param worklogBean    the object
+     * @return true or false the response
+     */
+    Boolean createPrefillWorklog(WorklogBean worklogBean);
     /**
      * Update a worklog
      *

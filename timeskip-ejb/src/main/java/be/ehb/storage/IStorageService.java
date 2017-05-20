@@ -10,6 +10,7 @@ import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.mail.MailTopic;
 import be.ehb.model.requests.RestoreBackupRequest;
 import be.ehb.security.PermissionBean;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 public interface IStorageService {
@@ -146,6 +147,8 @@ public interface IStorageService {
 
     List<WorklogBean> listUserWorklogs(String userId);
 
+    List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day);
+
     //Queries
 
     ConfigBean getDefaultConfig();
@@ -179,4 +182,6 @@ public interface IStorageService {
     Long getUserLoggedMinutesForDay(String userId, Date day);
 
     List<WorklogBean> searchWorklogs(String organizationId, Long projectId, Long activityId, String userId, List<Date> period);
+
+    WorklogBean searchWorklogsByIdAndDay(String userId, Date day);
 }
