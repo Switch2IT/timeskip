@@ -5,6 +5,7 @@ import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -92,8 +93,10 @@ public class DateUtilsTest {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         Date start = format.parse(startDate);
         Date between = format.parse("2017-10-06");
+        Date after = format.parse(endDate);
         datesBetweenManual.add(start);
         datesBetweenManual.add(between);
+        datesBetweenManual.add(after);
         Assert.assertArrayEquals(datesBetween.toArray(),datesBetweenManual.toArray());
         Assert.assertEquals(datesBetween.toArray()[0],datesBetweenManual.toArray()[0]);
         Assert.assertEquals(datesBetween.toArray()[1],datesBetweenManual.toArray()[1]);
@@ -107,14 +110,12 @@ public class DateUtilsTest {
         List<Date> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
     }
 
-    @Test
+    @Test(expected = InvalidDateException.class)
     public void getDatesBetweenStartAfterEnddate() throws Exception {
 
         String endDate = "2017-10-05";
         String startDate = "2017-10-07";
         List<Date> datesBetween = DateUtils.getDatesBetween(startDate,endDate);
-        List<Date> datesBetweenManual = new ArrayList<>();
-        Assert.assertArrayEquals(datesBetween.toArray(),datesBetweenManual.toArray());
     }
 
     @Test
@@ -123,6 +124,26 @@ public class DateUtilsTest {
         Date date = new GregorianCalendar(2017, Calendar.OCTOBER,05).getTime();
         LocalDate localDateToParse =  LocalDate.fromDateFields(date);
         Assert.assertEquals(parsedDate,DateUtils.convertDateToString(localDateToParse));
+    }
+
+    @Test
+    public void convertMinutesToHours() throws Exception {
+        long minutes = 150;
+        BigDecimal uitkomst = DateUtils.convertMinutesToHours(minutes);
+        Assert.assertEquals(new BigDecimal(2.5), uitkomst);
+    }
+
+    @Test
+    public void convertMinutesToHoursZero() throws Exception {
+        long minutes = 0;
+        BigDecimal uitkomst = DateUtils.convertMinutesToHours(minutes);
+        Assert.assertEquals(BigDecimal.ZERO.setScale(1), uitkomst);
+    }
+
+    @Test
+    public void convertMinutesToHoursNull() throws Exception {
+        BigDecimal uitkomst = DateUtils.convertMinutesToHours(null);
+        Assert.assertEquals(BigDecimal.ZERO, uitkomst);
     }
 
 }
