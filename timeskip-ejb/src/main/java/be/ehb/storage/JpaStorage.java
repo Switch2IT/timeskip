@@ -10,6 +10,7 @@ import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.security.RoleBean;
 import be.ehb.entities.users.PaygradeBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.entities.users.UsersWorkLoadActivityBO;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.mail.MailTopic;
 import be.ehb.model.backup.*;
@@ -18,7 +19,6 @@ import be.ehb.security.PermissionBean;
 import be.ehb.security.PermissionType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ import javax.persistence.TypedQuery;
 import java.util.*;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 @ApplicationScoped
@@ -50,8 +50,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ActivityBean getActivity(String organizationId, Long projectId, Long activityId) {
         try {
-            return (ActivityBean) getActiveEntityManager()
-                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE a.id = :aId AND p.id = :pId AND o.id = :orgId")
+            return getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE a.id = :aId AND p.id = :pId AND o.id = :orgId", ActivityBean.class)
                     .setParameter("aId", activityId)
                     .setParameter("pId", projectId)
                     .setParameter("orgId", organizationId)
@@ -92,8 +92,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ProjectBean getProject(String organizationId, Long projectId) {
         try {
-            return (ProjectBean) getActiveEntityManager()
-                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE p.id = :pId AND o.id = :orgId")
+            return getActiveEntityManager()
+                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE p.id = :pId AND o.id = :orgId", ProjectBean.class)
                     .setParameter("pId", projectId)
                     .setParameter("orgId", organizationId)
                     .getSingleResult();
@@ -119,8 +119,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public WorklogBean getWorklog(String organizationId, Long projectId, Long activityId, Long worklogId) {
         try {
-            return (WorklogBean) getActiveEntityManager()
-                    .createQuery("SELECT w FROM WorklogBean w JOIN w.activity a JOIN a.project p JOIN p.organization o WHERE w.id = :wId AND a.id = :aId AND p.id = :pId AND o.id = :orgId")
+            return getActiveEntityManager()
+                    .createQuery("SELECT w FROM WorklogBean w JOIN w.activity a JOIN a.project p JOIN p.organization o WHERE w.id = :wId AND a.id = :aId AND p.id = :pId AND o.id = :orgId", WorklogBean.class)
                     .setParameter("wId", worklogId)
                     .setParameter("aId", activityId)
                     .setParameter("pId", projectId)
@@ -332,7 +332,6 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             }
         }
     }
-
 
 
     @Override
@@ -563,7 +562,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ConfigBean getDefaultConfig() {
         try {
-            return (ConfigBean) getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE").getSingleResult();
+            return getActiveEntityManager().createQuery("SELECT c FROM ConfigBean c WHERE c.defaultConfig = TRUE", ConfigBean.class).getSingleResult();
         } catch (NoResultException ex) {
             log.error("No results found: {}", ex.getMessage());
             throw ExceptionFactory.defaultConfigNotFoundException();
@@ -573,8 +572,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public RoleBean getAutoGrantRole() {
         try {
-            return (RoleBean) getActiveEntityManager()
-                    .createQuery("SELECT r FROM RoleBean r WHERE r.autoGrant = TRUE")
+            return getActiveEntityManager()
+                    .createQuery("SELECT r FROM RoleBean r WHERE r.autoGrant = TRUE", RoleBean.class)
                     .getSingleResult();
         } catch (NoResultException ex) {
             log.warn("No role configured for auto-grant");
@@ -611,8 +610,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ActivityBean findActivityByName(String organizationId, Long projectId, String activityName) {
         try {
-            return (ActivityBean) getActiveEntityManager()
-                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId AND a.name = :aName")
+            return getActiveEntityManager()
+                    .createQuery("SELECT a FROM ActivityBean a JOIN a.project p JOIN p.organization o WHERE o.id = :orgId AND p.id = :pId AND a.name = :aName", ActivityBean.class)
                     .setParameter("orgId", organizationId)
                     .setParameter("pId", projectId)
                     .setParameter("aName", activityName)
@@ -646,8 +645,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public OrganizationBean findOrganizationByName(String organizationName) {
         try {
-            return (OrganizationBean) getActiveEntityManager()
-                    .createQuery("SELECT o FROM OrganizationBean o WHERE o.name = :orgName")
+            return getActiveEntityManager()
+                    .createQuery("SELECT o FROM OrganizationBean o WHERE o.name = :orgName", OrganizationBean.class)
                     .setParameter("orgName", organizationName)
                     .getSingleResult();
         } catch (NoResultException ex) {
@@ -670,8 +669,8 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ProjectBean findProjectByName(String organizationId, String projectName) {
         try {
-            return (ProjectBean) getActiveEntityManager()
-                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.name = :pName")
+            return getActiveEntityManager()
+                    .createQuery("SELECT p FROM ProjectBean p JOIN p.organization o WHERE o.id = :orgId AND p.name = :pName", ProjectBean.class)
                     .setParameter("orgId", organizationId)
                     .setParameter("pName", projectName)
                     .getSingleResult();
@@ -723,7 +722,7 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     }
 
     @Override
-    public Long getUserLoggedMinutesForDay(String userId, LocalDate day) {
+    public Long getUserLoggedMinutesForDay(String userId, Date day) {
         return (Long) getActiveEntityManager()
                 .createQuery("SELECT SUM(w.loggedMinutes) FROM WorklogBean w WHERE w.userId = :user AND w.day = :day")
                 .setParameter("user", userId)
@@ -772,5 +771,28 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         if (periodQualifier) q.setParameter("period", period);
         log.debug("Search query: {}", query.toString());
         return q.getResultList();
+    }
+    @Override
+    public List<UsersWorkLoadActivityBO> listUsersWorkloadActivity(Date day) {
+        return getActiveEntityManager()
+                .createQuery("SELECT NEW be.ehb.entities.users.UsersWorkLoadActivityBO(u.id, u.firstName, u.lastName, u.email, w.day, w.loggedMinutes, w.confirmed, a.description) " +
+                        "FROM UserBean u, WorklogBean w " +
+                        "JOIN w.activity a " +
+                        "WHERE u.id = w.userId AND w.day < :date AND w.confirmed = FALSE " +
+                        "ORDER BY u.id, w.day", UsersWorkLoadActivityBO.class)
+                .setParameter("date", day)
+                .getResultList();
+    }
+
+    @Override
+    public WorklogBean searchWorklogsByIdAndDay(String userId, Date day) {
+        return getActiveEntityManager()
+                .createQuery("SELECT NEW be.ehb.entities.projects.WorklogBean(sum(w.loggedMinutes)) " +
+                                "FROM WorklogBean w " +
+                                "WHERE w.userId = :userId AND w.day = :date"
+                        , WorklogBean.class)
+                .setParameter("date", day)
+                .setParameter("userId", userId)
+                .getSingleResult();
     }
 }

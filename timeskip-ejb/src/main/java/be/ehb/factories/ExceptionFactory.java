@@ -5,7 +5,7 @@ import be.ehb.i18n.Messages;
 import be.ehb.mail.MailTopic;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele/Patrick Van den Bussche
  * @since 2017
  */
 public class ExceptionFactory {
@@ -74,6 +74,22 @@ public class ExceptionFactory {
         return new ActivityNotFoundException(id.toString());
     }
 
+    public static SchedulerNotFoundException schedulerNotFoundException(String name) {
+        return new SchedulerNotFoundException(name);
+    }
+
+    public static SchedulerUnableToAddJobException schedulerUnableToAddJobException(String name) {
+        return new SchedulerUnableToAddJobException(name);
+    }
+
+    public static SchedulerUnableToStartException schedulerUnableToStartException(String name) {
+        return new SchedulerUnableToStartException(name);
+    }
+
+    public static SchedulerUnableToScheduleException schedulerUnableToScheduleException(String name) {
+        return new SchedulerUnableToScheduleException(name);
+    }
+
     public static InvalidDateException invalidDateException(String message) {
         return new InvalidDateException(message);
     }
@@ -136,5 +152,9 @@ public class ExceptionFactory {
 
     public static PaygradeStillInUseException paygradeStillInUseException(Long paygradeId) {
         return new PaygradeStillInUseException(Messages.i18n.format("stillInUse", "Payggrade", paygradeId.toString()));
+    }
+
+    public static NoMembershipException noMembershipException(String email, String organizationId) {
+        return new NoMembershipException(Messages.i18n.format("noMembership", email, organizationId));
     }
 }

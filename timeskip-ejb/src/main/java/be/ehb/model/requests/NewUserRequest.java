@@ -17,10 +17,12 @@ public class NewUserRequest implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
+    private Boolean admin;
     private List<NewMembershipRequest> memberships;
     private Double defaultHoursPerDay;
     private Set<DayOfWeek> workDays;
     private Long paygradeId;
+    private Long defaultActivityId;
 
     public String getEmail() {
         return email;
@@ -44,6 +46,14 @@ public class NewUserRequest implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
     }
 
     public List<NewMembershipRequest> getMemberships() {
@@ -78,16 +88,26 @@ public class NewUserRequest implements Serializable {
         this.paygradeId = paygradeId;
     }
 
+    public Long getDefaultActivityId() {
+        return defaultActivityId;
+    }
+
+    public void setDefaultActivityId(Long defaultActivityId) {
+        this.defaultActivityId = defaultActivityId;
+    }
+
     @Override
     public String toString() {
         return "NewUserRequest{" +
                 "email='" + email + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", admin=" + admin +
                 ", memberships=" + memberships +
                 ", defaultHoursPerDay=" + defaultHoursPerDay +
                 ", workDays=" + workDays +
                 ", paygradeId=" + paygradeId +
+                ", defaultActivityId=" + defaultActivityId +
                 '}';
     }
 }

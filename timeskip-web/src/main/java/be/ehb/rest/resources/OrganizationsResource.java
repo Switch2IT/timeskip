@@ -89,7 +89,8 @@ public class OrganizationsResource {
     @Path("/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response patchOrganization(@PathParam("organizationId") String organizationId, @ApiParam UpdateOrganizationRequest request) {
+    public Response patchOrganization(@PathParam("organizationId") String organizationId,
+                                      @ApiParam UpdateOrganizationRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
@@ -106,6 +107,7 @@ public class OrganizationsResource {
     })
     @DELETE
     @Path("/{organizationId}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteOrganization(@PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_ADMIN, organizationId)) {
@@ -141,7 +143,8 @@ public class OrganizationsResource {
     @GET
     @Path("/{organizationId}/projects/{projectId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProject(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId) {
+    public Response getProject(@PathParam("organizationId") String organizationId,
+                               @PathParam("projectId") Long projectId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW, organizationId)) {
@@ -160,7 +163,8 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createProject(@PathParam("organizationId") String organizationId, @ApiParam NewProjectRequest request) {
+    public Response createProject(@PathParam("organizationId") String organizationId,
+                                  @ApiParam NewProjectRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getName()), Messages.i18n.format("emptyField", "name"));
@@ -180,7 +184,9 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response patchProject(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @ApiParam UpdateProjectRequest request) {
+    public Response patchProject(@PathParam("organizationId") String organizationId,
+                                 @PathParam("projectId") Long projectId,
+                                 @ApiParam UpdateProjectRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, organizationId)) {
@@ -199,13 +205,51 @@ public class OrganizationsResource {
     })
     @DELETE
     @Path("/{organizationId}/projects/{projectId}")
-    public Response deleteProject(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProject(@PathParam("organizationId") String organizationId,
+                                  @PathParam("projectId") Long projectId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.PROJECT_ADMIN, organizationId)) {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         orgFacade.deleteProject(organizationId, projectId);
+        return ResponseFactory.buildResponse(NO_CONTENT);
+    }
+
+    @ApiOperation(value = "Assign user to project",
+            notes = "Assign a user to a project.")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Succesful, no content"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @POST
+    @Path("/{organizationId}/projects/{projectId}/users/assign")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response assignUserToProject(@PathParam("organizationId") String organizationId,
+                                        @PathParam("projectId") Long projectId,
+                                        @ApiParam AssignmentRequest request) {
+        checkProjectAssignment(organizationId, projectId, request);
+        orgFacade.assignUserToProject(organizationId, projectId, request);
+        return ResponseFactory.buildResponse(NO_CONTENT);
+    }
+
+    @ApiOperation(value = "Remove user from project",
+            notes = "Remove a user from a project.")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Succesful, no content"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @POST
+    @Path("/{organizationId}/projects/{projectId}/users/remove")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeUserFromProject(@PathParam("organizationId") String organizationId,
+                                          @PathParam("projectId") Long projectId,
+                                          @ApiParam AssignmentRequest request) {
+        checkProjectAssignment(organizationId, projectId, request);
+        orgFacade.removeUserFromProject(organizationId, projectId, request);
         return ResponseFactory.buildResponse(NO_CONTENT);
     }
 
@@ -218,7 +262,8 @@ public class OrganizationsResource {
     @GET
     @Path("/{organizationId}/projects/{projectId}/activities/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listProjectActivities(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId) {
+    public Response listProjectActivities(@PathParam("organizationId") String organizationId,
+                                          @PathParam("projectId") Long projectId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_VIEW, organizationId)) {
@@ -236,7 +281,9 @@ public class OrganizationsResource {
     @GET
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
+    public Response getActivity(@PathParam("organizationId") String organizationId,
+                                @PathParam("projectId") Long projectId,
+                                @PathParam("activityId") Long activityId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -256,7 +303,9 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @ApiParam NewActivityRequest request) {
+    public Response createActivity(@PathParam("organizationId") String organizationId,
+                                   @PathParam("projectId") Long projectId,
+                                   @ApiParam NewActivityRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         if (!securityContext.hasPermission(PermissionType.ACTIVITY_ADMIN, organizationId)) {
@@ -277,7 +326,10 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response patchActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam UpdateActivityRequest request) {
+    public Response patchActivity(@PathParam("organizationId") String organizationId,
+                                  @PathParam("projectId") Long projectId,
+                                  @PathParam("activityId") Long activityId,
+                                  @ApiParam UpdateActivityRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -297,7 +349,10 @@ public class OrganizationsResource {
     })
     @DELETE
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}")
-    public Response deleteActivity(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteActivity(@PathParam("organizationId") String organizationId,
+                                   @PathParam("projectId") Long projectId,
+                                   @PathParam("activityId") Long activityId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -317,7 +372,9 @@ public class OrganizationsResource {
     @GET
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listActivityWorklogs(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId) {
+    public Response listActivityWorklogs(@PathParam("organizationId") String organizationId,
+                                         @PathParam("projectId") Long projectId,
+                                         @PathParam("activityId") Long activityId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -335,7 +392,10 @@ public class OrganizationsResource {
     @GET
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId) {
+    public Response getWorklog(@PathParam("organizationId") String organizationId,
+                               @PathParam("projectId") Long projectId,
+                               @PathParam("activityId") Long activityId,
+                               @PathParam("worklogId") Long worklogId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -356,7 +416,10 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response logWork(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewAdminWorklogRequest request) {
+    public Response logWork(@PathParam("organizationId") String organizationId,
+                            @PathParam("projectId") Long projectId,
+                            @PathParam("activityId") Long activityId,
+                            @ApiParam NewAdminWorklogRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -367,6 +430,7 @@ public class OrganizationsResource {
         Preconditions.checkArgument(StringUtils.isNotEmpty(request.getDay()), Messages.i18n.format("emptyField", "day"));
         Preconditions.checkNotNull(request.getLoggedMinutes(), Messages.i18n.format("emptyField", "loggedMinutes"));
         Preconditions.checkArgument(request.getLoggedMinutes() > 0, Messages.i18n.format("greaterThanZero", "loggedMinutes"));
+        Preconditions.checkArgument(request.getLoggedMinutes() <= 24 * 60, Messages.i18n.format("mustBeLessThan", "loggedMinutes", (60 * 24)));
         return ResponseFactory.buildResponse(CREATED, orgFacade.createWorkLog(organizationId, projectId, activityId, request));
     }
 
@@ -380,7 +444,10 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/currentuser")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response logWorkForCurrentUser(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @ApiParam NewWorklogRequest request) {
+    public Response logWorkForCurrentUser(@PathParam("organizationId") String organizationId,
+                                          @PathParam("projectId") Long projectId,
+                                          @PathParam("activityId") Long activityId,
+                                          @ApiParam NewWorklogRequest request) {
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         NewAdminWorklogRequest req = new NewAdminWorklogRequest();
         req.setConfirmed(request.getConfirmed());
@@ -400,7 +467,11 @@ public class OrganizationsResource {
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId, UpdateWorklogRequest request) {
+    public Response updateWorklog(@PathParam("organizationId") String organizationId,
+                                  @PathParam("projectId") Long projectId,
+                                  @PathParam("activityId") Long activityId,
+                                  @PathParam("worklogId") Long worklogId,
+                                  @ApiParam UpdateWorklogRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -409,6 +480,10 @@ public class OrganizationsResource {
             throw ExceptionFactory.unauthorizedException(organizationId);
         }
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        if (request.getLoggedMinutes() != null) {
+            Preconditions.checkArgument(request.getLoggedMinutes() > 0, Messages.i18n.format("greaterThanZero", "loggedMinutes"));
+            Preconditions.checkArgument(request.getLoggedMinutes() <= 24 * 60, Messages.i18n.format("mustBeLessThan", "loggedMinutes", (60 * 24)));
+        }
         return ResponseFactory.buildResponse(OK, orgFacade.updateWorklog(organizationId, projectId, activityId, request));
     }
 
@@ -420,7 +495,11 @@ public class OrganizationsResource {
     })
     @DELETE
     @Path("/{organizationId}/projects/{projectId}/activities/{activityId}/worklogs/{worklogId}")
-    public Response deleteWorklog(@PathParam("organizationId") String organizationId, @PathParam("projectId") Long projectId, @PathParam("activityId") Long activityId, @PathParam("worklogId") Long worklogId) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteWorklog(@PathParam("organizationId") String organizationId,
+                                  @PathParam("projectId") Long projectId,
+                                  @PathParam("activityId") Long activityId,
+                                  @PathParam("worklogId") Long worklogId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
         Preconditions.checkNotNull(activityId, Messages.i18n.format("emptyPathParam", "Activity ID"));
@@ -430,5 +509,15 @@ public class OrganizationsResource {
         }
         orgFacade.deleteWorklog(organizationId, projectId, activityId, worklogId);
         return ResponseFactory.buildResponse(NO_CONTENT);
+    }
+
+    private void checkProjectAssignment(String organizationId, Long projectId, AssignmentRequest request) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
+        Preconditions.checkNotNull(projectId, Messages.i18n.format("emptyPathParam", "Project ID"));
+        Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
+        Preconditions.checkArgument(StringUtils.isNotEmpty(request.getUserId()), Messages.i18n.format("emptyField", "userId"));
+        if (!securityContext.hasPermission(PermissionType.PROJECT_EDIT, organizationId)) {
+            throw ExceptionFactory.unauthorizedException(organizationId);
+        }
     }
 }

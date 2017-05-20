@@ -6,6 +6,7 @@ import be.ehb.factories.ExceptionFactory;
 import be.ehb.mail.provider.IMailProvider;
 import be.ehb.model.mail.BaseMailBean;
 import be.ehb.model.mail.ConfirmationReminderMailBean;
+import be.ehb.model.mail.PrefillTimeSheetMailBean;
 import be.ehb.storage.IStorageService;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
- * @author Guillaume Vandecasteele
+ * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
 public class MailService implements IMailService {
@@ -54,6 +55,17 @@ public class MailService implements IMailService {
             throw ExceptionFactory.mailServiceException("\"requiredWorklogConfirmations\" must be provided in confirmation reminder");
         }
         completeAndSendTemplate(MailTopic.CONFIRMATION_REMINDER, reminder);
+    }
+
+    @Override
+    public void sendPrefillTimeSheet(PrefillTimeSheetMailBean prefill) {
+        if (StringUtils.isEmpty(prefill.getUserName())) {
+            throw ExceptionFactory.mailServiceException("\"userName\" must be provided in prefill time sheet ");
+        }
+        if (StringUtils.isEmpty(prefill.getPrefillWorklog())) {
+            throw ExceptionFactory.mailServiceException("\"prefillWorklog\" must be provided in prefill time sheet");
+        }
+        completeAndSendTemplate(MailTopic.PREFILL_TIME_SHEET, prefill);
     }
 
     private void completeAndSendTemplate(MailTopic topic, BaseMailBean bean) {

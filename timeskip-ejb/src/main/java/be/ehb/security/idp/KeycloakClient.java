@@ -3,6 +3,7 @@ package be.ehb.security.idp;
 import be.ehb.configuration.IAppConfig;
 import be.ehb.entities.users.UserBean;
 import be.ehb.factories.ExceptionFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.utils.CustomCollectors;
 import be.ehb.utils.KeyUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,10 +61,12 @@ public class KeycloakClient implements IIdpClient {
             UserRepresentation rep = new UserRepresentation();
             rep.setEmail(user.getEmail());
             rep.setEmailVerified(true);
+            rep.setFirstName(user.getFirstName());
+            rep.setLastName(user.getLastName());
             rep.setEnabled(true);
             rep.setUsername(rep.getEmail());
             users.create(rep);
-            users.search(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), null, null);
+            reps = users.search(user.getEmail(), user.getFirstName(), user.getLastName(), user.getEmail(), null, null);
             if (reps == null || reps.isEmpty()) {
                 throw ExceptionFactory.idpException("User creation on IDP failed");
             }
@@ -94,7 +97,23 @@ public class KeycloakClient implements IIdpClient {
             if (u != null) users.delete(user.getId());
         } catch (Exception ex) {
             log.error("Error deleting user from IDP: {}", ex);
-            throw ExceptionFactory.idpException("Failure to delete user from IDP");
+            throw ExceptionFactory.idpException(Messages.i18n.format("idpDeleteError"));
+        }
+    }
+
+    @Override
+    public UserBean updateUser(UserBean user) {
+        try {
+            UsersResource users = createKeycloakClient().realm(config.getIdpRealm()).users();
+            UserResource idpUser = users.get(user.getId());
+            UserRepresentation uRep = idpUser.toRepresentation();
+            uRep.setEmail(user.getEmail());
+            uRep.setFirstName(user.getFirstName());
+            uRep.setLastName(user.getLastName());
+            idpUser.update(uRep);
+            return user;
+        } catch (Exception ex) {
+            throw ExceptionFactory.idpException(Messages.i18n.format("userIdpUpdateError"));
         }
     }
 

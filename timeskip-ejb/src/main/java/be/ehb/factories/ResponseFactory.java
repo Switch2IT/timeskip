@@ -135,7 +135,7 @@ public class ResponseFactory {
             rval.setId(worklog.getId());
             rval.setActivity(createActivityResponse(worklog.getActivity()));
             rval.setConfirmed(worklog.getConfirmed());
-            rval.setDay(new LocalDate(worklog.getDay()));
+            rval.setDay(new LocalDate(worklog.getDay()).toString(DateUtils.DATE_FORMAT));
             rval.setLoggedMinutes(worklog.getLoggedMinutes());
             rval.setUserId(worklog.getUserId());
         }

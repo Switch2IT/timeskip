@@ -90,7 +90,8 @@ public class RolesResource {
     @Path("/{roleId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("roleId") String roleId, @ApiParam UpdateRoleRequest request) {
+    public Response update(@PathParam("roleId") String roleId,
+                           @ApiParam UpdateRoleRequest request) {
         if (!securityContext.isAdmin()) throw ExceptionFactory.unauthorizedException();
         Preconditions.checkArgument(StringUtils.isNotEmpty(roleId), Messages.i18n.format("emptyPathParam", "Role ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
