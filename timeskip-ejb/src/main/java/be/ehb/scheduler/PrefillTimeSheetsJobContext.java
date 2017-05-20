@@ -130,7 +130,6 @@ public class PrefillTimeSheetsJobContext {
             wlb.setLoggedMinutes(defaultHoursPerDay.longValue() * 60);
             wlb.setConfirmed(false);
             wlb.setActivity(iss.getActivity(userBean.getDefaultActivity()));
-            log.info(wlb.toString());
             iof.createPrefillWorklog(wlb);
         }
 }

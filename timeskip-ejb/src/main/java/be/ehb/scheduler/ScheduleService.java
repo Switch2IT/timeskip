@@ -65,16 +65,12 @@ public class ScheduleService {
             log.warn("Config DayOfMonthlyReminderEmail reset by Scheduler to \"1\"");
             dayOfMonthlyReminderEmail = 1;
         }
-        //seconds=0 minutes=0 hours=1 dayOfMonth=? month=every dayOfWeek=undefined year=every
-        //TODO change for production
-        // String cronTrigger1 = "0 0 1 " + dayOfMonthlyReminderEmail.toString() + " * ? *";
-        String cronTrigger1 = "0 0/1 * * * ? *";
+        //seconds=0 minutes=0 hours=1 dayOfMonth=set by config month=every dayOfWeek=undefined year=every
+        String cronTrigger1 = "0 0 1 " + dayOfMonthlyReminderEmail.toString() + " * ? *";
         log.info("cronTrigger EmailReminderJob = " + cronTrigger1 );
         CronTrigger trigger1 = TriggerBuilder.newTrigger().forJob(job1).withSchedule(CronScheduleBuilder.cronSchedule(cronTrigger1)).build();
         //seconds=0 minutes=0 hours=1 dayOfMonth=every month=every dayOfWeek=Monday year=every
-        //TODO change for production
-        //String cronTrigger2 = "0 0 1 ? * MON *";
-        String cronTrigger2 = "0 0/1 * * * ? *";
+        String cronTrigger2 = "0 0 1 ? * MON *";
         log.info("cronTrigger PrefillTimeSheetsJob = " + cronTrigger2 );
         CronTrigger trigger2 = TriggerBuilder.newTrigger().forJob(job2).withSchedule(CronScheduleBuilder.cronSchedule(cronTrigger2)).build();
         try {
