@@ -198,6 +198,28 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
 
     @Override
+    public void assignUserToProject(String organizationId, Long projectId, AssignmentRequest request) {
+        ProjectBean project = storage.getProject(organizationId, projectId);
+        UserBean user = storage.getUser(request.getUserId());
+        if (user.getMemberships().parallelStream().map(MembershipBean::getOrganizationId).filter(m -> m.equals(organizationId)).collect(Collectors.toList()).isEmpty()) {
+            throw ExceptionFactory.noMembershipException(user.getEmail(), organizationId);
+        }
+        project.getAssignedUsers().add(user);
+        storage.updateProject(project);
+    }
+
+    @Override
+    public void removeUserFromProject(String organizationId, Long projectId, AssignmentRequest request) {
+        ProjectBean project = storage.getProject(organizationId, projectId);
+        UserBean user = storage.getUser(request.getUserId());
+        if (!project.getAssignedUsers().contains(user)) {
+            throw ExceptionFactory.userNotAssignedToProjectException(project.getName());
+        }
+        project.getAssignedUsers().remove(user);
+        storage.updateProject(project);
+    }
+
+    @Override
     public List<ActivityResponse> listProjectActivities(String organizationId, Long projectId) {
         return storage.listProjectActivities(organizationId, projectId).stream()
                 .map(ResponseFactory::createActivityResponse)

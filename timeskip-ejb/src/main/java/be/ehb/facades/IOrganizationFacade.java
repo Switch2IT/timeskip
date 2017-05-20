@@ -97,6 +97,24 @@ public interface IOrganizationFacade {
     void deleteProject(String organizationId, Long projectId);
 
     /**
+     * Assign a user to a project
+     *
+     * @param organizationId the organization ID
+     * @param projectId      the project ID
+     * @param request        the request
+     */
+    void assignUserToProject(String organizationId, Long projectId, AssignmentRequest request);
+
+    /**
+     * Remove a user from a project
+     *
+     * @param organizationId the organization ID
+     * @param projectId      the project ID
+     * @param request        the request
+     */
+    void removeUserFromProject(String organizationId, Long projectId, AssignmentRequest request);
+
+    /**
      * List activities in project
      *
      * @param organizationId the organization id

@@ -20,13 +20,16 @@ public class ErrorCodes {
     static final int IDP_ERROR = 4000;
     static final int MAIL_SERVICE_ERROR = 9000;
 
-    // MEMBERSHIP RELATED
+    // MAIL TEMPLATE RELATED
 
     static final int MAIL_TEMPLATE_NOT_FOUND = 9004;
 
-    // ORGANIZATION RELATED
+    // MEMBERSHIP RELATED
 
-    static final int MEMBERSHIP_NOT_FOUND = 10004;
+    static final int NO_MEMBERSHIP = 11003;
+    static final int MEMBERSHIP_NOT_FOUND = 11004;
+
+    // ORGANIZATION RELATED
     static final int UNAUTHORIZED_FOR_ORGANIZATION = 1003;
     static final int ORGANIZATION_NOT_FOUND = 1004;
 
@@ -46,7 +49,6 @@ public class ErrorCodes {
     static final int ROLE_NOT_FOUND = 3001;
     static final int ROLE_ALREADY_EXISTS = 3009;
     static final int ROLE_STILL_IN_USE = 3010;
-
 
     // USER RELATED
 

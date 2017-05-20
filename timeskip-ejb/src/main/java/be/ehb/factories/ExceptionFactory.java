@@ -137,4 +137,8 @@ public class ExceptionFactory {
     public static PaygradeStillInUseException paygradeStillInUseException(Long paygradeId) {
         return new PaygradeStillInUseException(Messages.i18n.format("stillInUse", "Payggrade", paygradeId.toString()));
     }
+
+    public static NoMembershipException noMembershipException(String email, String organizationId) {
+        return new NoMembershipException(Messages.i18n.format("noMembership", email, organizationId));
+    }
 }

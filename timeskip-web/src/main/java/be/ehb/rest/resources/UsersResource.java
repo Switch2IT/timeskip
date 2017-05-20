@@ -153,7 +153,8 @@ public class UsersResource {
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@PathParam("userId") String userId, @ApiParam UpdateUserRequest request) {
+    public Response updateUser(@PathParam("userId") String userId,
+                               @ApiParam UpdateUserRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         if (request.getAdmin() != null && request.getAdmin() && !securityContext.isAdmin())
@@ -184,7 +185,8 @@ public class UsersResource {
     @DELETE
     @Path("/{userId}/memberships/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listUserMemberships(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId) {
+    public Response listUserMemberships(@PathParam("userId") String userId,
+                                        @PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
@@ -203,7 +205,9 @@ public class UsersResource {
     @PUT
     @Path("/{userId}/memberships/organizations/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUserMembership(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId, @ApiParam MembershipChangeRequest request) {
+    public Response createUserMembership(@PathParam("userId") String userId,
+                                         @PathParam("organizationId") String organizationId,
+                                         @ApiParam MembershipChangeRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
