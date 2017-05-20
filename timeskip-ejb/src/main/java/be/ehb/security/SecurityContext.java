@@ -3,6 +3,7 @@ package be.ehb.security;
 import be.ehb.entities.users.UserBean;
 import be.ehb.facades.IUserFacade;
 import be.ehb.factories.ExceptionFactory;
+import be.ehb.storage.IStorageService;
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
@@ -21,6 +22,8 @@ public class SecurityContext extends AbstractSecurityContext {
 
     @Inject
     private IUserFacade userFacade;
+    @Inject
+    private IStorageService storage;
     private String currentUser;
 
     @Override
@@ -41,7 +44,26 @@ public class SecurityContext extends AbstractSecurityContext {
     @Override
     public String setCurrentUser(JwtClaims claims) {
         try {
-            return setCurrentUser(claims.getSubject() != null ? claims.getSubject() : "");
+            String currentUser = setCurrentUser(claims.getSubject() != null ? claims.getSubject() : "");
+            UserBean cub = userFacade.get(currentUser);
+            String firstName = claims.getStringClaimValue(JWTConstants.GIVEN_NAME);
+            String lastName = claims.getStringClaimValue(JWTConstants.SURNAME);
+            String email = claims.getStringClaimValue(JWTConstants.EMAIL);
+            boolean changed = false;
+            if (StringUtils.isNotEmpty(firstName) && !firstName.trim().equals(cub.getFirstName().trim())) {
+                cub.setFirstName(firstName);
+                changed = true;
+            }
+            if (StringUtils.isNotEmpty(lastName) && !lastName.trim().equals(cub.getLastName().trim())) {
+                cub.setLastName(lastName);
+                changed = true;
+            }
+            if (StringUtils.isNotEmpty(email) && !email.trim().equals(cub.getEmail().trim())) {
+                cub.setEmail(email);
+                changed = true;
+            }
+            if (changed) storage.updateUser(cub);
+            return currentUser;
         } catch (MalformedClaimException ex) {
             throw ExceptionFactory.jwtValidationException("Invalid JWT claims");
         } catch (Exception ex) {

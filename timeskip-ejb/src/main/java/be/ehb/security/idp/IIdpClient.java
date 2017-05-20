@@ -14,4 +14,6 @@ public interface IIdpClient {
     UserBean createUser(UserBean user);
 
     void deleteUser(UserBean user);
+
+    UserBean updateUser(UserBean user);
 }

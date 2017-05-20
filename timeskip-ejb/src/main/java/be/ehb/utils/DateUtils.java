@@ -1,12 +1,14 @@
 package be.ehb.utils;
 
 import be.ehb.factories.ExceptionFactory;
+import be.ehb.i18n.Messages;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class DateUtils {
         try {
             return LocalDate.parse(dateString, DateTimeFormat.forPattern(DATE_FORMAT));
         } catch (Exception ex) {
-            throw ExceptionFactory.invalidDateException(String.format("Date should have \"%s\" format", DATE_FORMAT));
+            throw ExceptionFactory.invalidDateException(Messages.i18n.format("invalidDateFormat", DATE_FORMAT));
         }
     }
 
@@ -35,10 +37,14 @@ public class DateUtils {
     }
 
     public static List<Date> getDatesBetween(String from, String to) {
+        if (from.equals(to)) return Collections.singletonList(convertStringToDate(from).toDate());
         LocalDate startDate = convertStringToDate(from);
-        int days = Days.daysBetween(startDate, convertStringToDate(to)).getDays();
+        LocalDate endDate = convertStringToDate(to);
+        if (startDate.isAfter(endDate))
+            throw ExceptionFactory.invalidDateException(Messages.i18n.format("toBeforeFromDate"));
+        int days = Days.daysBetween(startDate, endDate).getDays();
         List<Date> dates = new ArrayList<>();
-        for (int i = 0; i < days; i++) {
+        for (int i = 0; i <= days; i++) {
             LocalDate temp = startDate.plusDays(i);
             dates.add(temp.toDate());
         }
