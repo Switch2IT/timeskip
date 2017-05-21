@@ -232,4 +232,41 @@ public class UsersResource {
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateCurrentUserWorklogs(request));
     }
+
+    @ApiOperation(value = "Get current user worklogs",
+            notes = "Get a list of the current user's worklogs. Results can be filtered with \"organization\", \"project\", \"activity\", \"from\" and \"to\" query string parameters. If no \'from\" and \"to\" date have been provided, only the data from the last 30 days will be returned.")
+    @ApiResponses({
+            @ApiResponse(code = 200, responseContainer = "List", response = WorklogResponse.class, message = "Worklogs"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/current/worklogs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCurrentUserWorklogs(@QueryParam("organization") String organizationId,
+                                           @QueryParam("project") Long projectId,
+                                           @QueryParam("activity") Long activityId,
+                                           @QueryParam("from") String from,
+                                           @QueryParam("to") String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(securityContext.getCurrentUser()), Messages.i18n.format("noCurrentUser"));
+        return ResponseFactory.buildResponse(OK, orgFacade.findWorklogs(organizationId, projectId, activityId, securityContext.getCurrentUser(), from, to));
+    }
+
+    @ApiOperation(value = "Get user worklogs",
+            notes = "Get a list of worklogs on a user basis. Results can be filtered with \"organization\", \"project\", \"activity\", \"user\", \"from\" and \"to\" query string parameters. If no \'from\" and \"to\" date have been provided, only the data from the last 30 days will be returned.")
+    @ApiResponses({
+            @ApiResponse(code = 200, responseContainer = "List", response = WorklogResponse.class, message = "Worklogs"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/worklogs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserWorklogs(@QueryParam("organization") String organizationId,
+                                    @QueryParam("project") Long projectId,
+                                    @QueryParam("activity") Long activityId,
+                                    @QueryParam("user") String userId,
+                                    @QueryParam("from") String from,
+                                    @QueryParam("to") String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(securityContext.getCurrentUser()), Messages.i18n.format("noCurrentUser"));
+        return ResponseFactory.buildResponse(OK, orgFacade.findWorklogs(organizationId, projectId, activityId, userId, from, to));
+    }
 }
