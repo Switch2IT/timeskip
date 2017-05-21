@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -345,27 +344,23 @@ public class OrganizationFacade implements IOrganizationFacade {
 
     @Override
     public List<WorklogResponse> updateCurrentUserWorklogs(UpdateCurrentUserWorklogRequestList request) {
-        List<WorklogResponse> rval = new ArrayList<>();
         UserBean user = userFacade.get(securityContext.getCurrentUser());
-        for (UpdateCurrentUserWorklogRequest req : request.getUpdateCurrentUserWorklogRequests()) {
-            WorklogBean w = null;
+        return request.getUpdateCurrentUserWorklogRequests().stream().filter(req -> {
+            //Check if the worklog exists, that the user has the right to edit them and that the user is assigned to the
+            //worklog's activity's project
+            WorklogBean worklogToUpdate = null;
             try {
-                w = storage.getWorklog(req.getId());
+                worklogToUpdate = storage.getWorklog(req.getId());
             } catch (WorklogNotFoundException ex) {
                 //Do nothing
             }
-            if (w != null
-                    && securityContext.hasPermission(PermissionType.WORKLOG_EDIT, w.getActivity().getProject().getOrganization().getId())
-                    && w.getActivity().getProject().getAssignedUsers().contains(user)) {
-                if (StringUtils.isNotEmpty(req.getDay()))
-                    w.setDay(DateUtils.convertStringToDate(req.getDay()).toDate());
-                if (req.getConfirmed() != null) w.setConfirmed(req.getConfirmed());
-                if (req.getLoggedMinutes() != null) w.setLoggedMinutes(req.getLoggedMinutes());
-                storage.updateWorklog(w);
-                rval.add(ResponseFactory.createWorklogResponse(w));
-            }
-        }
-        return rval;
+            return worklogToUpdate != null
+                    && securityContext.hasPermission(PermissionType.WORKLOG_EDIT, worklogToUpdate.getActivity().getProject().getOrganization().getId())
+                    && worklogToUpdate.getActivity().getProject().getAssignedUsers().contains(user);
+        }).map(req -> {
+            WorklogBean worklog = storage.getWorklog(req.getId());
+            return ResponseFactory.createWorklogResponse(updateWorklog(worklog, user, req.getDay(), req.getLoggedMinutes(), req.getConfirmed()));
+        }).collect(Collectors.toList());
     }
 
     @Override
