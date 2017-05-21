@@ -2,6 +2,7 @@ package be.ehb.utils;
 
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.i18n.Messages;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -37,6 +38,9 @@ public class DateUtils {
     }
 
     public static List<Date> getDatesBetween(String from, String to) {
+        // If no dates are provided, just return dates from the last 30 days
+        if (StringUtils.isEmpty(from) || StringUtils.isEmpty(to))
+            return getDatesBetween(LocalDate.now().minusDays(30).toString(DATE_FORMAT), LocalDate.now().toString(DATE_FORMAT));
         if (from.equals(to)) return Collections.singletonList(convertStringToDate(from).toDate());
         LocalDate startDate = convertStringToDate(from);
         LocalDate endDate = convertStringToDate(to);

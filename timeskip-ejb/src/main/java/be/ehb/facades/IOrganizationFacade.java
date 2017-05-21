@@ -230,4 +230,17 @@ public interface IOrganizationFacade {
      * @return list of updated worklogs
      */
     List<WorklogResponse> updateCurrentUserWorklogs(UpdateCurrentUserWorklogRequestList request);
+
+    /**
+     * Retrieve a list of worklogs matching the provided parameters
+     *
+     * @param organizationId the organization ID
+     * @param projectId      the project ID
+     * @param activityId     the activity ID
+     * @param userId         the user ID
+     * @param from           the from-date
+     * @param to             the to-date
+     * @return Worklogs
+     */
+    List<WorklogResponse> findWorklogs(String organizationId, Long projectId, Long activityId, String userId, String from, String to);
 }
