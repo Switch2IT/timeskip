@@ -78,7 +78,8 @@ public class ConfigurationResource {
     @Path("/mail/templates/{topic}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateMailTemplate(@PathParam("topic") MailTopic topic, @ApiParam UpdateMailTemplateRequest request) {
+    public Response updateMailTemplate(@PathParam("topic") MailTopic topic,
+                                       @ApiParam UpdateMailTemplateRequest request) {
         Preconditions.checkNotNull(topic, Messages.i18n.format("emptyPathParam", "Topic"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         if (!securityContext.isAdmin()) {
@@ -122,14 +123,14 @@ public class ConfigurationResource {
         return ResponseFactory.buildResponse(OK, managementFacade.updateDayOfMonthlyReminder(request));
     }
 
-    @ApiOperation(value = "List mail templates",
-            notes = "List all available mail templates")
+    @ApiOperation(value = "List paygrades",
+            notes = "List all available paygrades")
     @ApiResponses({
             @ApiResponse(code = 200, responseContainer = "List", response = MailTemplateResponse.class, message = "Mail template"),
             @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
     })
     @GET
-    @Path("/mail/templates")
+    @Path("/mail/paygrades")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listPaygrades() {
         return ResponseFactory.buildResponse(OK, managementFacade.listPaygrades());
@@ -180,7 +181,8 @@ public class ConfigurationResource {
     @Path("/paygrades/{paygradeId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updatePaygrade(@PathParam("paygradeId") Long paygradeId, @ApiParam UpdatePaygradeRequest request) {
+    public Response updatePaygrade(@PathParam("paygradeId") Long paygradeId,
+                                   @ApiParam UpdatePaygradeRequest request) {
         Preconditions.checkNotNull(paygradeId, Messages.i18n.format("emptyPathParam", "Paygrade ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         Preconditions.checkNotNull(request.getHourlyRate(), Messages.i18n.format("emptyField", "hourlyRate"));

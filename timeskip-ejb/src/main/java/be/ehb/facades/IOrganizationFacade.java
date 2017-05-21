@@ -1,5 +1,6 @@
 package be.ehb.facades;
 
+import be.ehb.entities.projects.WorklogBean;
 import be.ehb.model.requests.*;
 import be.ehb.model.responses.ActivityResponse;
 import be.ehb.model.responses.OrganizationResponse;
@@ -97,6 +98,24 @@ public interface IOrganizationFacade {
     void deleteProject(String organizationId, Long projectId);
 
     /**
+     * Assign a user to a project
+     *
+     * @param organizationId the organization ID
+     * @param projectId      the project ID
+     * @param request        the request
+     */
+    void assignUserToProject(String organizationId, Long projectId, AssignmentRequest request);
+
+    /**
+     * Remove a user from a project
+     *
+     * @param organizationId the organization ID
+     * @param projectId      the project ID
+     * @param request        the request
+     */
+    void removeUserFromProject(String organizationId, Long projectId, AssignmentRequest request);
+
+    /**
      * List activities in project
      *
      * @param organizationId the organization id
@@ -176,6 +195,13 @@ public interface IOrganizationFacade {
     WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewAdminWorklogRequest request);
 
     /**
+     * prefill an worklog
+     *
+     * @param worklogBean    the object
+     * @return true or false the response
+     */
+    Boolean createPrefillWorklog(WorklogBean worklogBean);
+    /**
      * Update a worklog
      *
      * @param organizationId the organization id
@@ -204,4 +230,17 @@ public interface IOrganizationFacade {
      * @return list of updated worklogs
      */
     List<WorklogResponse> updateCurrentUserWorklogs(UpdateCurrentUserWorklogRequestList request);
+
+    /**
+     * Retrieve a list of worklogs matching the provided parameters
+     *
+     * @param organizationId the organization ID
+     * @param projectId      the project ID
+     * @param activityId     the activity ID
+     * @param userId         the user ID
+     * @param from           the from-date
+     * @param to             the to-date
+     * @return Worklogs
+     */
+    List<WorklogResponse> findWorklogs(String organizationId, Long projectId, Long activityId, String userId, String from, String to);
 }

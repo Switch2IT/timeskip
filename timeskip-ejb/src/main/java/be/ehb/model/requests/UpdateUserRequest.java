@@ -16,6 +16,7 @@ public class UpdateUserRequest implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
+    private Boolean admin;
     private Double defaultHoursPerDay;
     private Set<DayOfWeek> workDays;
     private Long paygradeId;
@@ -43,6 +44,14 @@ public class UpdateUserRequest implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
     }
 
     public Double getDefaultHoursPerDay() {
@@ -83,6 +92,7 @@ public class UpdateUserRequest implements Serializable {
                 "email='" + email + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", admin=" + admin +
                 ", defaultHoursPerDay=" + defaultHoursPerDay +
                 ", workDays=" + workDays +
                 ", paygradeId=" + paygradeId +

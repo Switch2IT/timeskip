@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.ehb</groupId>
     <artifactId>timeskip</artifactId>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <url>http://wildfly.org</url>
@@ -122,6 +122,8 @@
         <jodatime.version>2.9.9</jodatime.version>
         <itext.version>7.0.1</itext.version>
 
+
+        <version.quartz>2.2.1</version.quartz>
 
         <buildNumber>${maven.build.timestamp}</buildNumber>
     </properties>
@@ -372,6 +374,13 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${jodatime.version}</version>
+            </dependency>
+
+            <!-- quartz -->
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${version.quartz}</version>
             </dependency>
 
             <!-- ITEXT -->

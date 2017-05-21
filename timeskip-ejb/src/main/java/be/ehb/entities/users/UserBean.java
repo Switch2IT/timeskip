@@ -5,7 +5,6 @@ import be.ehb.entities.organizations.MembershipBean;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.DayOfWeek;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,7 +40,7 @@ public class UserBean implements Serializable {
     private Long defaultActivity;
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private List<MembershipBean> memberships;
+    private Set<MembershipBean> memberships;
 
     public String getId() {
         return id;
@@ -115,11 +114,11 @@ public class UserBean implements Serializable {
         this.defaultActivity = defaultActivity;
     }
 
-    public List<MembershipBean> getMemberships() {
+    public Set<MembershipBean> getMemberships() {
         return memberships;
     }
 
-    public void setMemberships(List<MembershipBean> memberships) {
+    public void setMemberships(Set<MembershipBean> memberships) {
         this.memberships = memberships;
     }
 

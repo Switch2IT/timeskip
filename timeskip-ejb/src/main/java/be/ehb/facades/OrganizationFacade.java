@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -198,6 +197,28 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
 
     @Override
+    public void assignUserToProject(String organizationId, Long projectId, AssignmentRequest request) {
+        ProjectBean project = storage.getProject(organizationId, projectId);
+        UserBean user = storage.getUser(request.getUserId());
+        if (user.getMemberships().parallelStream().map(MembershipBean::getOrganizationId).filter(m -> m.equals(organizationId)).collect(Collectors.toList()).isEmpty()) {
+            throw ExceptionFactory.noMembershipException(user.getEmail(), organizationId);
+        }
+        project.getAssignedUsers().add(user);
+        storage.updateProject(project);
+    }
+
+    @Override
+    public void removeUserFromProject(String organizationId, Long projectId, AssignmentRequest request) {
+        ProjectBean project = storage.getProject(organizationId, projectId);
+        UserBean user = storage.getUser(request.getUserId());
+        if (!project.getAssignedUsers().contains(user)) {
+            throw ExceptionFactory.userNotAssignedToProjectException(project.getName());
+        }
+        project.getAssignedUsers().remove(user);
+        storage.updateProject(project);
+    }
+
+    @Override
     public List<ActivityResponse> listProjectActivities(String organizationId, Long projectId) {
         return storage.listProjectActivities(organizationId, projectId).stream()
                 .map(ResponseFactory::createActivityResponse)
@@ -282,8 +303,9 @@ public class OrganizationFacade implements IOrganizationFacade {
             throw ExceptionFactory.userNotAssignedToProjectException(activity.getProject().getName());
         }
         //Check if the project allows overtime and if not, check if logging this work will exceed the limit
-        if (!activity.getProject().getAllowOvertime()
-                && storage.getUserLoggedMinutesForDay(user.getId(), day) + request.getLoggedMinutes() >
+        Long loggedMinutes = storage.getUserLoggedMinutesForDay(user.getId(), day.toDate());
+        if (activity.getProject().getAllowOvertime() != null && !activity.getProject().getAllowOvertime()
+                && (loggedMinutes == null ? 0L : loggedMinutes) + request.getLoggedMinutes() >
                 DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
             throw ExceptionFactory.noOverTimeAllowedException(activity.getProject().getName());
         }
@@ -294,6 +316,11 @@ public class OrganizationFacade implements IOrganizationFacade {
         newWorklog.setLoggedMinutes(request.getLoggedMinutes());
         newWorklog.setUserId(user.getId());
         return ResponseFactory.createWorklogResponse(storage.createWorklog(newWorklog));
+    }
+    @Override
+    public Boolean createPrefillWorklog(WorklogBean worklogBean) {
+        WorklogBean worklogBean1 = storage.createWorklog(worklogBean);
+        return worklogBean1.getId() > 0;
     }
 
     @Override
@@ -317,7 +344,6 @@ public class OrganizationFacade implements IOrganizationFacade {
 
     @Override
     public List<WorklogResponse> updateCurrentUserWorklogs(UpdateCurrentUserWorklogRequestList request) {
-        List<WorklogResponse> rval = new ArrayList<>();
         UserBean user = userFacade.get(securityContext.getCurrentUser());
         return request.getUpdateCurrentUserWorklogRequests().stream().filter(req -> {
             //Check if the worklog exists, that the user has the right to edit them and that the user is assigned to the
@@ -335,6 +361,19 @@ public class OrganizationFacade implements IOrganizationFacade {
             WorklogBean worklog = storage.getWorklog(req.getId());
             return ResponseFactory.createWorklogResponse(updateWorklog(worklog, user, req.getDay(), req.getLoggedMinutes(), req.getConfirmed()));
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorklogResponse> findWorklogs(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
+        List<WorklogBean> logs = storage.searchWorklogs(organizationId, projectId, activityId, userId, DateUtils.getDatesBetween(from, to));
+        if (StringUtils.isNotEmpty(userId)
+                && StringUtils.isNotEmpty(securityContext.getCurrentUser())
+                && !StringUtils.equals(userId.trim(), securityContext.getCurrentUser().trim())) {
+            return logs.parallelStream()
+                    .filter(w -> securityContext.hasPermission(PermissionType.WORKLOG_VIEW_ALL, w.getActivity().getProject().getOrganization().getId()))
+                    .map(ResponseFactory::createWorklogResponse).collect(Collectors.toList());
+        }
+        return logs.parallelStream().map(ResponseFactory::createWorklogResponse).collect(Collectors.toList());
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
@@ -359,7 +398,7 @@ public class OrganizationFacade implements IOrganizationFacade {
             //Check if the changed minutes make
             if (!worklogToUpdate.getActivity().getProject().getAllowOvertime()
                     //Remove the current worklog's minutes before comparing it with the user's default hours
-                    && storage.getUserLoggedMinutesForDay(user.getId(), new LocalDate(worklogToUpdate.getDay())) + loggedMinutes - worklogToUpdate.getLoggedMinutes() >
+                    && storage.getUserLoggedMinutesForDay(user.getId(), worklogToUpdate.getDay()) + loggedMinutes - worklogToUpdate.getLoggedMinutes() >
                     DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay())) {
                 throw ExceptionFactory.noOverTimeAllowedException(worklogToUpdate.getActivity().getProject().getName());
             }

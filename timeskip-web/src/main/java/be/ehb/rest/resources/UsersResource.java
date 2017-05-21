@@ -138,6 +138,8 @@ public class UsersResource {
         if (request.getDefaultHoursPerDay() != null) {
             Preconditions.checkArgument(request.getDefaultHoursPerDay() > 0, Messages.i18n.format("greaterThanZero", "defaultHoursPerDay"));
         }
+        if (request.getAdmin() != null && request.getAdmin() && !securityContext.isAdmin())
+            throw ExceptionFactory.unauthorizedException(Messages.i18n.format("adminRights"));
         return ResponseFactory.buildResponse(CREATED, userFacade.createUser(request));
     }
 
@@ -151,10 +153,12 @@ public class UsersResource {
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@PathParam("userId") String userId, @ApiParam UpdateUserRequest request) {
+    public Response updateUser(@PathParam("userId") String userId,
+                               @ApiParam UpdateUserRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
-
+        if (request.getAdmin() != null && request.getAdmin() && !securityContext.isAdmin())
+            throw ExceptionFactory.unauthorizedException(Messages.i18n.format("adminRights"));
         return ResponseFactory.buildResponse(CREATED, userFacade.updateUser(userId, request));
     }
 
@@ -181,7 +185,8 @@ public class UsersResource {
     @DELETE
     @Path("/{userId}/memberships/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listUserMemberships(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId) {
+    public Response listUserMemberships(@PathParam("userId") String userId,
+                                        @PathParam("organizationId") String organizationId) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         if (!securityContext.hasPermission(PermissionType.ORG_EDIT, organizationId)) {
@@ -200,7 +205,9 @@ public class UsersResource {
     @PUT
     @Path("/{userId}/memberships/organizations/{organizationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUserMembership(@PathParam("userId") String userId, @PathParam("organizationId") String organizationId, @ApiParam MembershipChangeRequest request) {
+    public Response createUserMembership(@PathParam("userId") String userId,
+                                         @PathParam("organizationId") String organizationId,
+                                         @ApiParam MembershipChangeRequest request) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(userId), Messages.i18n.format("emptyPathParam", "User ID"));
         Preconditions.checkArgument(StringUtils.isNotEmpty(organizationId), Messages.i18n.format("emptyPathParam", "Organization ID"));
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
@@ -224,5 +231,42 @@ public class UsersResource {
     public Response updateCurrentUserWorklogs(@ApiParam UpdateCurrentUserWorklogRequestList request) {
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         return ResponseFactory.buildResponse(OK, orgFacade.updateCurrentUserWorklogs(request));
+    }
+
+    @ApiOperation(value = "Get current user worklogs",
+            notes = "Get a list of the current user's worklogs. Results can be filtered with \"organization\", \"project\", \"activity\", \"from\" and \"to\" query string parameters. If no \'from\" and \"to\" date have been provided, only the data from the last 30 days will be returned.")
+    @ApiResponses({
+            @ApiResponse(code = 200, responseContainer = "List", response = WorklogResponse.class, message = "Worklogs"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/current/worklogs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCurrentUserWorklogs(@QueryParam("organization") String organizationId,
+                                           @QueryParam("project") Long projectId,
+                                           @QueryParam("activity") Long activityId,
+                                           @QueryParam("from") String from,
+                                           @QueryParam("to") String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(securityContext.getCurrentUser()), Messages.i18n.format("noCurrentUser"));
+        return ResponseFactory.buildResponse(OK, orgFacade.findWorklogs(organizationId, projectId, activityId, securityContext.getCurrentUser(), from, to));
+    }
+
+    @ApiOperation(value = "Get user worklogs",
+            notes = "Get a list of worklogs on a user basis. Results can be filtered with \"organization\", \"project\", \"activity\", \"user\", \"from\" and \"to\" query string parameters. If no \'from\" and \"to\" date have been provided, only the data from the last 30 days will be returned.")
+    @ApiResponses({
+            @ApiResponse(code = 200, responseContainer = "List", response = WorklogResponse.class, message = "Worklogs"),
+            @ApiResponse(code = 400, response = ErrorResponse.class, message = "Error occurred")
+    })
+    @GET
+    @Path("/worklogs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserWorklogs(@QueryParam("organization") String organizationId,
+                                    @QueryParam("project") Long projectId,
+                                    @QueryParam("activity") Long activityId,
+                                    @QueryParam("user") String userId,
+                                    @QueryParam("from") String from,
+                                    @QueryParam("to") String to) {
+        Preconditions.checkArgument(StringUtils.isNotEmpty(securityContext.getCurrentUser()), Messages.i18n.format("noCurrentUser"));
+        return ResponseFactory.buildResponse(OK, orgFacade.findWorklogs(organizationId, projectId, activityId, userId, from, to));
     }
 }

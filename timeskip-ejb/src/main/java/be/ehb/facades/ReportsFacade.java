@@ -6,6 +6,7 @@ import be.ehb.entities.projects.ActivityBean;
 import be.ehb.entities.projects.ProjectBean;
 import be.ehb.entities.projects.WorklogBean;
 import be.ehb.entities.users.UserBean;
+import be.ehb.exceptions.InvalidDateException;
 import be.ehb.factories.ExceptionFactory;
 import be.ehb.factories.ResponseFactory;
 import be.ehb.i18n.Messages;
@@ -22,6 +23,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,38 +68,15 @@ public class ReportsFacade implements IReportsFacade {
 
     @Override
     public OverUnderTimeReportResponse getOvertimeReport(String organizationId, String from, String to) {
-        OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
-        Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
-        List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
-        sorted.forEach((user, map) -> {
-            if (user.getDefaultHoursPerDay() != null) {
-                List<WorkDayResponse> workdays = new ArrayList<>();
-                map.forEach((day, minutes) -> {
-                    if (DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay()) < minutes) {
-                        WorkDayResponse wd = ResponseFactory.createWorkDayResponse(day, minutes);
-                        if (wd != null) workdays.add(wd);
-                    }
-                });
-                UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(user, workdays);
-                if (uwd != null) userWorkDayResponses.add(uwd);
-            }
-        });
-        rval.setUserWorkdays(userWorkDayResponses);
-        return rval;
-    }
-
-    @Override
-    public OverUnderTimeReportResponse getUndertimeReport(String organizationId, String from, String to) {
         try {
             OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
             Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
-            Map<UserBean, Map<LocalDate, Long>> filteredData = new HashMap<>();
             List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
             sorted.forEach((user, map) -> {
                 if (user.getDefaultHoursPerDay() != null) {
                     List<WorkDayResponse> workdays = new ArrayList<>();
                     map.forEach((day, minutes) -> {
-                        if (DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay()) > minutes) {
+                        if (DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay()) < minutes) {
                             WorkDayResponse wd = ResponseFactory.createWorkDayResponse(day, minutes);
                             if (wd != null) workdays.add(wd);
                         }
@@ -107,6 +87,61 @@ public class ReportsFacade implements IReportsFacade {
             });
             rval.setUserWorkdays(userWorkDayResponses);
             return rval;
+        } catch (InvalidDateException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw ExceptionFactory.systemErrorException(ex);
+        }
+    }
+
+    @Override
+    public OverUnderTimeReportResponse getUndertimeReport(String organizationId, String from, String to) {
+        try {
+            OverUnderTimeReportResponse rval = new OverUnderTimeReportResponse();
+            List<Date> dates = DateUtils.getDatesBetween(from, to);
+            Map<UserBean, Map<LocalDate, Long>> sorted = getLoggedMinutesPerUserPerDay(organizationId, null, null, null, from, to);
+            List<UserWorkDayResponse> userWorkDayResponses = new ArrayList<>();
+            List<UserBean> orgUsers = storage.listUsers(organizationId, null, null, null, null, null);
+            sorted.forEach((UserBean user, Map<LocalDate, Long> map) -> {
+                if (user.getDefaultHoursPerDay() != null) {
+                    List<WorkDayResponse> workdays = new ArrayList<>();
+                    map.forEach((day, minutes) -> {
+                        if (DateUtils.convertHoursToMinutes(user.getDefaultHoursPerDay()) > minutes) {
+                            WorkDayResponse wd = ResponseFactory.createWorkDayResponse(day, minutes);
+                            if (wd != null) workdays.add(wd);
+                        }
+                    });
+                    //Check for the days an employee was supposed to be working, but didn't log any hours
+                    dates.stream()
+                            .map(LocalDate::new)
+                            .filter(d -> !map.containsKey(d) && !user.getWorkdays().parallelStream().map(DayOfWeek::getValue).filter(dw -> dw == d.getDayOfWeek()).collect(Collectors.toList()).isEmpty())
+                            .forEach(d -> {
+                                WorkDayResponse wd = ResponseFactory.createWorkDayResponse(d, 0L);
+                                if (wd != null) workdays.add(wd);
+                            });
+
+                    UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(user, workdays);
+                    if (uwd != null) userWorkDayResponses.add(uwd);
+                }
+            });
+            orgUsers.parallelStream().filter(u -> !sorted.keySet().parallelStream().map(UserBean::getId).collect(Collectors.toList()).contains(u.getId())).forEach(u -> {
+                if (CollectionUtils.isNotEmpty(u.getWorkdays())) {
+                    List<WorkDayResponse> workdays = new ArrayList<>();
+                    dates.stream()
+                            .map(LocalDate::new)
+                            .filter(d -> !u.getWorkdays().parallelStream().map(DayOfWeek::getValue).filter(dw -> dw == d.getDayOfWeek()).collect(Collectors.toList()).isEmpty())
+                            .forEach(d -> {
+                                WorkDayResponse wd = ResponseFactory.createWorkDayResponse(d, 0L);
+                                if (wd != null) workdays.add(wd);
+                            });
+                    UserWorkDayResponse uwd = ResponseFactory.createUserWorkDayResponse(u, workdays);
+                    if (uwd != null) userWorkDayResponses.add(uwd);
+                }
+            });
+            rval.setUserWorkdays(userWorkDayResponses);
+            return rval;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -116,6 +151,8 @@ public class ReportsFacade implements IReportsFacade {
     public LoggedTimeReportResponse getLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
         try {
             return getLoggedTimeReportInternal(organizationId, projectId, activityId, null, from, to);
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -126,6 +163,8 @@ public class ReportsFacade implements IReportsFacade {
         try {
             UserBean user = storage.getUser(userId);
             return ResponseFactory.createUserLoggedTimeReportResponse(user, getLoggedTimeReportInternal(organizationId, projectId, activityId, userId, from, to));
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -179,8 +218,10 @@ public class ReportsFacade implements IReportsFacade {
             Optional<BigDecimal> totalHours = obr.parallelStream().map(OrganizationBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
             Optional<BigDecimal> totalAmount = obr.parallelStream().map(OrganizationBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
             BillingReportResponse rval = ResponseFactory.createBillingReportResponse(obr, totalHours, totalAmount);
-            if (rval == null) return new BillingReportResponse();
+            if (rval == null) return null;
             else return rval;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ExceptionFactory.systemErrorException(ex);
@@ -208,6 +249,7 @@ public class ReportsFacade implements IReportsFacade {
         String cs = config.getCurrencySymbol();
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
+            boolean documentCreated = false;
             if (rep != null) {
                 Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
                 doc = addLogoToDocument(doc);
@@ -273,8 +315,12 @@ public class ReportsFacade implements IReportsFacade {
                 doc.add(outerTable);
 
                 doc.close();
+                documentCreated = true;
             }
-            return new ByteArrayInputStream(out.toByteArray());
+            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+            else return null;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -283,6 +329,7 @@ public class ReportsFacade implements IReportsFacade {
     @Override
     public InputStream getPdfLoggedTimeReport(String organizationId, Long projectId, Long activityId, String from, String to) {
         LoggedTimeReportResponse rep = getLoggedTimeReport(organizationId, projectId, activityId, from, to);
+        boolean documentCreated = false;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -297,8 +344,12 @@ public class ReportsFacade implements IReportsFacade {
                 outerTable.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("organization")).setFontSize(FONT_SIZE));
                 doc.add(populateLoggedTimeTable(outerTable, rep));
                 doc.close();
+                documentCreated = true;
             }
-            return new ByteArrayInputStream(out.toByteArray());
+            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+            else return null;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -307,6 +358,7 @@ public class ReportsFacade implements IReportsFacade {
     @Override
     public InputStream getPdfUserReport(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
         UserLoggedTimeReportResponse rep = getUserReport(organizationId, projectId, activityId, userId, from, to);
+        boolean documentCreated = false;
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -322,8 +374,12 @@ public class ReportsFacade implements IReportsFacade {
 
                 doc.add(populateLoggedTimeTable(outerTable, rep.getReport()));
                 doc.close();
+                documentCreated = true;
             }
-            return new ByteArrayInputStream(out.toByteArray());
+            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+            else return null;
+        } catch (InvalidDateException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw ExceptionFactory.systemErrorException(ex);
         }
@@ -430,45 +486,58 @@ public class ReportsFacade implements IReportsFacade {
 
         storage.searchWorklogs(organizationId, projectId, activityId, userId, DateUtils.getDatesBetween(from, to)).forEach(w -> {
             ActivityBean a = w.getActivity();
-            if (a.getBillable()) {
+            if (a.getBillable() != null && a.getBillable()) {
                 ProjectBean p = a.getProject();
                 OrganizationBean o = p.getOrganization();
-                UserBean u = storage.getUser(w.getUserId());
-                LocalDate d = new LocalDate(w.getDay());
-                if (sorted.containsKey(o)) {
-                    if (sorted.get(o).containsKey(d)) {
-                        if (sorted.get(o).get(d).containsKey(p)) {
-                            if (sorted.get(o).get(d).get(p).containsKey(a)) {
-                                if (sorted.get(o).get(d).get(p).get(a).containsKey(u)) {
-                                    if (!p.getBillOvertime()) {
-                                        Long alreadyLogged = sorted.get(o).get(d).get(p).get(a).get(u).parallelStream().mapToLong(WorklogBean::getLoggedMinutes).sum();
-                                        if (alreadyLogged + w.getLoggedMinutes() > u.getDefaultHoursPerDay()) {
-                                            w.setLoggedMinutes(alreadyLogged + w.getLoggedMinutes() - DateUtils.convertHoursToMinutes(u.getDefaultHoursPerDay()));
+                if (securityContext.hasPermission(PermissionType.ORG_EDIT, o.getId())) {
+                    UserBean u = storage.getUser(w.getUserId());
+                    LocalDate d = new LocalDate(w.getDay());
+                    if (sorted.containsKey(o)) {
+                        if (sorted.get(o).containsKey(d)) {
+                            if (sorted.get(o).get(d).containsKey(p)) {
+                                if (sorted.get(o).get(d).get(p).containsKey(a)) {
+                                    if (sorted.get(o).get(d).get(p).get(a).containsKey(u)) {
+                                        if (!p.getBillOvertime()) {
+                                            Long alreadyLogged = sorted.get(o).get(d).get(p).get(a).get(u).parallelStream().mapToLong(WorklogBean::getLoggedMinutes).sum();
+                                            if (alreadyLogged + w.getLoggedMinutes() > u.getDefaultHoursPerDay()) {
+                                                w.setLoggedMinutes(alreadyLogged + w.getLoggedMinutes() - DateUtils.convertHoursToMinutes(u.getDefaultHoursPerDay()));
+                                            }
                                         }
+                                        sorted.get(o).get(d).get(p).get(a).get(u).add(w);
+                                    } else {
+                                        List<WorklogBean> ws = new ArrayList<>();
+                                        ws.add(w);
+                                        sorted.get(o).get(d).get(p).get(a).put(u, ws);
                                     }
-                                    sorted.get(o).get(d).get(p).get(a).get(u).add(w);
                                 } else {
+                                    Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
                                     List<WorklogBean> ws = new ArrayList<>();
                                     ws.add(w);
-                                    sorted.get(o).get(d).get(p).get(a).put(u, ws);
+                                    uws.put(u, ws);
+                                    sorted.get(o).get(d).get(p).put(a, uws);
                                 }
                             } else {
+                                Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
                                 Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
                                 List<WorklogBean> ws = new ArrayList<>();
                                 ws.add(w);
                                 uws.put(u, ws);
-                                sorted.get(o).get(d).get(p).put(a, uws);
+                                auws.put(a, uws);
+                                sorted.get(o).get(d).put(p, auws);
                             }
                         } else {
+                            Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>> pauws = new HashMap<>();
                             Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
                             Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
                             List<WorklogBean> ws = new ArrayList<>();
                             ws.add(w);
                             uws.put(u, ws);
                             auws.put(a, uws);
-                            sorted.get(o).get(d).put(p, auws);
+                            pauws.put(p, auws);
+                            sorted.get(o).put(d, pauws);
                         }
                     } else {
+                        Map<LocalDate, Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>>> dpauws = new HashMap<>();
                         Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>> pauws = new HashMap<>();
                         Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
                         Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
@@ -477,20 +546,9 @@ public class ReportsFacade implements IReportsFacade {
                         uws.put(u, ws);
                         auws.put(a, uws);
                         pauws.put(p, auws);
-                        sorted.get(o).put(d, pauws);
+                        dpauws.put(d, pauws);
+                        sorted.put(o, dpauws);
                     }
-                } else {
-                    Map<LocalDate, Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>>> dpauws = new HashMap<>();
-                    Map<ProjectBean, Map<ActivityBean, Map<UserBean, List<WorklogBean>>>> pauws = new HashMap<>();
-                    Map<ActivityBean, Map<UserBean, List<WorklogBean>>> auws = new HashMap<>();
-                    Map<UserBean, List<WorklogBean>> uws = new HashMap<>();
-                    List<WorklogBean> ws = new ArrayList<>();
-                    ws.add(w);
-                    uws.put(u, ws);
-                    auws.put(a, uws);
-                    pauws.put(p, auws);
-                    dpauws.put(d, pauws);
-                    sorted.put(o, dpauws);
                 }
             }
         });
@@ -498,6 +556,7 @@ public class ReportsFacade implements IReportsFacade {
     }
 
     private InputStream getPdfOverUnderTimeInternal(String organizationId, OverUnderTimeReportResponse resp, String overUnderKey, String from, String to) {
+        boolean documentCreated = false;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         if (resp != null) {
             try {
@@ -522,12 +581,14 @@ public class ReportsFacade implements IReportsFacade {
                 });
                 doc.add(table);
                 doc.close();
+                documentCreated = true;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 throw ExceptionFactory.systemErrorException(ex);
             }
         }
-        return new ByteArrayInputStream(out.toByteArray());
+        if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
+        else return null;
     }
 
     private Table populateLoggedTimeTable(Table outerTable, LoggedTimeReportResponse rep) {
@@ -591,5 +652,4 @@ public class ReportsFacade implements IReportsFacade {
         }
         return document;
     }
-
 }

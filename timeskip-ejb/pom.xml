@@ -22,7 +22,7 @@
     <parent>
         <artifactId>timeskip</artifactId>
         <groupId>be.ehb</groupId>
-        <version>0.5</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>timeskip-ejb</artifactId>
@@ -79,6 +79,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>[1.9,]</version>
             <scope>test</scope>
         </dependency>
 
@@ -210,6 +217,26 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
 
         <dependency>
             <groupId>com.itextpdf</groupId>
@@ -238,6 +265,12 @@
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>hyph</artifactId>
+        </dependency>
+
+        <!-- quartz -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
         </dependency>
 
     </dependencies>

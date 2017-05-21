@@ -2,9 +2,9 @@ package be.ehb.model.responses;
 
 import be.ehb.model.backup.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.joda.time.LocalDate;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -14,7 +14,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BackUpResponse implements Serializable {
 
-    private LocalDate dateOfBackup;
+    private Date dateOfBackup;
     private Set<OrganizationBackup> organizations;
     private Set<ProjectBackup> projects;
     private Set<ActivityBackup> activities;
@@ -27,11 +27,11 @@ public class BackUpResponse implements Serializable {
     private Set<ConfigurationBackup> configurations;
     private Set<WorklogBackup> worklogs;
 
-    public LocalDate getDateOfBackup() {
+    public Date getDateOfBackup() {
         return dateOfBackup;
     }
 
-    public void setDateOfBackup(LocalDate dateOfBackup) {
+    public void setDateOfBackup(Date dateOfBackup) {
         this.dateOfBackup = dateOfBackup;
     }
 
