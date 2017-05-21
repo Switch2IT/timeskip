@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.*;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -321,11 +320,7 @@ public class OrganizationFacade implements IOrganizationFacade {
     @Override
     public Boolean createPrefillWorklog(WorklogBean worklogBean) {
         WorklogBean worklogBean1 = storage.createWorklog(worklogBean);
-        if (worklogBean1.getId() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return worklogBean1.getId() > 0;
     }
 
     @Override
@@ -349,7 +344,6 @@ public class OrganizationFacade implements IOrganizationFacade {
 
     @Override
     public List<WorklogResponse> updateCurrentUserWorklogs(UpdateCurrentUserWorklogRequestList request) {
-        List<WorklogResponse> rval = new ArrayList<>();
         UserBean user = userFacade.get(securityContext.getCurrentUser());
         return request.getUpdateCurrentUserWorklogRequests().stream().filter(req -> {
             //Check if the worklog exists, that the user has the right to edit them and that the user is assigned to the
@@ -367,6 +361,19 @@ public class OrganizationFacade implements IOrganizationFacade {
             WorklogBean worklog = storage.getWorklog(req.getId());
             return ResponseFactory.createWorklogResponse(updateWorklog(worklog, user, req.getDay(), req.getLoggedMinutes(), req.getConfirmed()));
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorklogResponse> findWorklogs(String organizationId, Long projectId, Long activityId, String userId, String from, String to) {
+        List<WorklogBean> logs = storage.searchWorklogs(organizationId, projectId, activityId, userId, DateUtils.getDatesBetween(from, to));
+        if (StringUtils.isNotEmpty(userId)
+                && StringUtils.isNotEmpty(securityContext.getCurrentUser())
+                && !StringUtils.equals(userId.trim(), securityContext.getCurrentUser().trim())) {
+            return logs.parallelStream()
+                    .filter(w -> securityContext.hasPermission(PermissionType.WORKLOG_VIEW_ALL, w.getActivity().getProject().getOrganization().getId()))
+                    .map(ResponseFactory::createWorklogResponse).collect(Collectors.toList());
+        }
+        return logs.parallelStream().map(ResponseFactory::createWorklogResponse).collect(Collectors.toList());
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
