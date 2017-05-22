@@ -55,6 +55,13 @@ The application will be running at the following URL: <http://localhost:8080/tim
         
 ## Release Notes
 
+### v0.6.1
+
+#### Bugfixes
+
+* Adjusted basic import script for errors with auto-increment values
+* Fixed permission bug where permission was wrongfully denied for projects
+
 ### v0.6
 
 #### Upgrade path
