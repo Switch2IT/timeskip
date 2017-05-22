@@ -196,7 +196,7 @@ public class UserFacade implements IUserFacade, Serializable {
             user.setDefaultHoursPerDay(request.getDefaultHoursPerDay());
             changed = true;
         }
-        if (request.getWorkDays() != null && request.getWorkDays().isEmpty() && !new HashSet<>(request.getWorkDays()).equals(new HashSet<>(user.getWorkdays()))) {
+        if (request.getWorkDays() != null && !new HashSet<>(request.getWorkDays()).equals(new HashSet<>(user.getWorkdays()))) {
             user.setWorkdays(request.getWorkDays());
             changed = true;
         }

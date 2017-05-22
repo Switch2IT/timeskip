@@ -159,7 +159,7 @@ public class UsersResource {
         Preconditions.checkNotNull(request, Messages.i18n.format("emptyRequestBody"));
         if (request.getAdmin() != null && request.getAdmin() && !securityContext.isAdmin())
             throw ExceptionFactory.unauthorizedException(Messages.i18n.format("adminRights"));
-        return ResponseFactory.buildResponse(CREATED, userFacade.updateUser(userId, request));
+        return ResponseFactory.buildResponse(OK, userFacade.updateUser(userId, request));
     }
 
     @ApiOperation(value = "List user memberships",
