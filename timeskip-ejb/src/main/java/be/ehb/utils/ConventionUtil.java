@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 public class ConventionUtil {
 
     public static String idFromName(String name) {
+        if (name == null) {
+            return null;
+        }
         if (StringUtils.isNotEmpty(name.trim())) {
             return name.replaceAll("[^\\w-\\.]", "").toLowerCase();
         } else return null;
