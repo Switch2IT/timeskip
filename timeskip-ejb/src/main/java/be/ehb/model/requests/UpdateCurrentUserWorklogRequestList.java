@@ -1,5 +1,6 @@
 package be.ehb.model.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.List;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateCurrentUserWorklogRequestList implements Serializable {
 
     private List<UpdateCurrentUserWorklogRequest> updateCurrentUserWorklogRequests;
