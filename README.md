@@ -1,5 +1,8 @@
 Timeskip: A RESTful API for Timesheet Management
 ==============================================================================================
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e3b950eaefc3405db14fc9d2f55a6707)](https://www.codacy.com/app/Switch2IT/timeskip-api?utm_source=github.com&utm_medium=referral&utm_content=Switch2IT/timeskip-api&utm_campaign=badger)
+
 Author: Christophe Devos, Stephan Ghequiere, Timothy Pecceu, Patrick Van den Bussche, Guillaume Vandecasteele, Olivier Vanderstede.
 Level: Intermediate
 Technologies: EAR, JPA, Swagger
