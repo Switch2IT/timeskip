@@ -1,222 +1,226 @@
--- Tables
-CREATE TABLE IF NOT EXISTS activities (
-  id          BIGINT       NOT NULL AUTO_INCREMENT,
-  name        VARCHAR(255) NOT NULL,
-  description TEXT                  DEFAULT NULL,
-  project_id  BIGINT       NOT NULL,
-  billable    BOOLEAN               DEFAULT TRUE
+CREATE TABLE activities
+(
+  id          BIGINT AUTO_INCREMENT
+    PRIMARY KEY,
+  name        VARCHAR(255)           NOT NULL,
+  description TEXT                   NULL,
+  project_id  BIGINT                 NOT NULL,
+  billable    TINYINT(1) DEFAULT '1' NULL,
+  CONSTRAINT uk_activities_1
+  UNIQUE (project_id, name)
 );
 
-CREATE TABLE IF NOT EXISTS config (
-  id                            BIGINT       NOT NULL AUTO_INCREMENT,
-  config_path                   VARCHAR(255) NOT NULL,
-  default_config                BOOLEAN               DEFAULT NULL,
-  day_of_monthly_reminder_email INTEGER               DEFAULT 1,
-  last_day_of_month             BOOLEAN               DEFAULT FALSE
+CREATE TABLE config
+(
+  id                            BIGINT AUTO_INCREMENT
+    PRIMARY KEY,
+  config_path                   VARCHAR(255)           NOT NULL,
+  default_config                TINYINT(1)             NULL,
+  day_of_monthly_reminder_email INT                    NULL,
+  last_day_of_month             TINYINT(1) DEFAULT '0' NULL,
+  CONSTRAINT uk_config_1
+  UNIQUE (default_config)
 );
 
-CREATE TABLE IF NOT EXISTS mail_templates (
-  topic   VARCHAR(255) NOT NULL,
+CREATE TABLE mail_templates
+(
+  topic   VARCHAR(255) NOT NULL
+    PRIMARY KEY,
   subject TEXT         NOT NULL,
   content TEXT         NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS memberships
+CREATE TABLE memberships
 (
-  id              BIGINT       NOT NULL AUTO_INCREMENT,
+  id              BIGINT AUTO_INCREMENT
+    PRIMARY KEY,
   organization_id VARCHAR(255) NOT NULL,
   role_id         VARCHAR(255) NOT NULL,
-  user_id         VARCHAR(255) NOT NULL
+  user_id         VARCHAR(255) NOT NULL,
+  CONSTRAINT uk_organization_memberships_1
+  UNIQUE (user_id, role_id, organization_id)
 );
 
-CREATE TABLE IF NOT EXISTS organizations (
-  id          VARCHAR(255) NOT NULL,
+CREATE INDEX fk_memberships_2
+  ON memberships (role_id);
+
+CREATE INDEX fk_memberships_3
+  ON memberships (organization_id);
+
+CREATE TABLE organizations
+(
+  id          VARCHAR(255) NOT NULL
+    PRIMARY KEY,
   name        VARCHAR(255) NOT NULL,
-  description TEXT DEFAULT NULL
-);
-
-CREATE TABLE IF NOT EXISTS paygrades (
-  id          BIGINT       NOT NULL AUTO_INCREMENT,
-  name        VARCHAR(255) NOT NULL,
-  description TEXT                  DEFAULT NULL,
-  hourly_rate DOUBLE       NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS permissions (
-  role_id    VARCHAR(255) NOT NULL,
-  permission INT          NULL
-);
-
-CREATE TABLE IF NOT EXISTS project_assignments (
-  user_id    VARCHAR(255) NOT NULL,
-  project_id BIGINT       NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS projects (
-  id              BIGINT       NOT NULL AUTO_INCREMENT,
-  name            VARCHAR(255) NOT NULL,
-  description     TEXT                  DEFAULT NULL,
-  allow_overtime  BOOLEAN               DEFAULT TRUE,
-  bill_overtime   BOOLEAN               DEFAULT TRUE,
-  organization_id VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS roles (
-  id          VARCHAR(255) NOT NULL,
-  auto_grant  BOOLEAN      NULL,
   description TEXT         NULL,
-  name        VARCHAR(255) NULL
+  CONSTRAINT uk_organizations_1
+  UNIQUE (name)
 );
-
-CREATE TABLE IF NOT EXISTS users (
-  id                    VARCHAR(255) NOT NULL,
-  first_name            VARCHAR(255) NOT NULL,
-  last_name             VARCHAR(255) NOT NULL,
-  email                 VARCHAR(255) DEFAULT NULL,
-  admin                 BOOLEAN      DEFAULT FALSE,
-  paygrade_id           BIGINT       DEFAULT NULL,
-  default_hours_per_day DOUBLE       DEFAULT 8,
-  default_activity_id   BIGINT       DEFAULT NULL
-);
-
-CREATE TABLE IF NOT EXISTS user_workdays (
-  user_id  VARCHAR(255) NOT NULL,
-  week_day VARCHAR(9)   NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS worklogs (
-  id             BIGINT       NOT NULL AUTO_INCREMENT,
-  user_id        VARCHAR(255) NOT NULL,
-  activity_id    BIGINT       NOT NULL,
-  day            DATE         NOT NULL,
-  logged_minutes BIGINT       NOT NULL,
-  confirmed      BOOLEAN               DEFAULT FALSE
-);
-
--- Unique indexes
-
-ALTER TABLE activities
-  ADD CONSTRAINT uk_activities_1 UNIQUE (project_id, name);
-
-ALTER TABLE config
-  ADD CONSTRAINT uk_config_1 UNIQUE (default_config);
 
 ALTER TABLE memberships
-  ADD CONSTRAINT uk_organization_memberships_1 UNIQUE (user_id, role_id, organization_id);
+  ADD CONSTRAINT fk_memberships_3
+FOREIGN KEY (organization_id) REFERENCES timeskip.organizations (id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE;
 
-ALTER TABLE organizations
-  ADD CONSTRAINT uk_organizations_1 UNIQUE (name);
+CREATE TABLE paygrades
+(
+  id          BIGINT AUTO_INCREMENT
+    PRIMARY KEY,
+  name        VARCHAR(255) NOT NULL,
+  description TEXT         NULL,
+  hourly_rate DOUBLE       NOT NULL,
+  CONSTRAINT uk_paygrades_1
+  UNIQUE (name)
+);
 
-ALTER TABLE paygrades
-  ADD CONSTRAINT uk_paygrades_1 UNIQUE (name);
-
-ALTER TABLE permissions
-  ADD CONSTRAINT uk_permissions_1 UNIQUE (role_id, permission);
-
-ALTER TABLE projects
-  ADD CONSTRAINT uk_projects_1 UNIQUE (organization_id, name);
-
-ALTER TABLE user_workdays
-  ADD CONSTRAINT uk_user_workdays_1 UNIQUE (user_id, week_day);
-
--- Indexes
+CREATE TABLE permissions
+(
+  role_id    VARCHAR(255) NOT NULL,
+  permission INT          NULL,
+  CONSTRAINT uk_permissions_1
+  UNIQUE (role_id, permission)
+);
 
 CREATE INDEX idx_permissions_1
   ON permissions (role_id);
 
-CREATE INDEX idx_users_1
-  ON users (email);
+CREATE TABLE project_assignments
+(
+  user_id    VARCHAR(255) NOT NULL,
+  project_id BIGINT       NOT NULL
+);
 
--- Primary keys
+CREATE INDEX fk_project_assignments_1
+  ON project_assignments (user_id);
 
-ALTER TABLE activities
-  ADD PRIMARY KEY (id);
+CREATE INDEX fk_project_assignments_2
+  ON project_assignments (project_id);
 
-ALTER TABLE config
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE mail_templates
-  ADD PRIMARY KEY (topic);
-
-ALTER TABLE memberships
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE organizations
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE paygrades
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE projects
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE roles
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE users
-  ADD PRIMARY KEY (id);
-
-ALTER TABLE worklogs
-  ADD PRIMARY KEY (id);
-
--- Foreign keys
+CREATE TABLE projects
+(
+  id              BIGINT AUTO_INCREMENT
+    PRIMARY KEY,
+  name            VARCHAR(255)           NOT NULL,
+  description     TEXT                   NULL,
+  allow_overtime  TINYINT(1) DEFAULT '1' NULL,
+  bill_overtime   TINYINT(1) DEFAULT '1' NULL,
+  organization_id VARCHAR(255)           NOT NULL,
+  CONSTRAINT uk_projects_1
+  UNIQUE (organization_id, name),
+  CONSTRAINT fk_projects_1
+  FOREIGN KEY (organization_id) REFERENCES timeskip.organizations (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);
 
 ALTER TABLE activities
-  ADD CONSTRAINT fk_activities_1 FOREIGN KEY (project_id) REFERENCES projects (id)
+  ADD CONSTRAINT fk_activities_1
+FOREIGN KEY (project_id) REFERENCES timeskip.projects (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
 
-ALTER TABLE memberships
-  ADD CONSTRAINT fk_memberships_1 FOREIGN KEY (user_id) REFERENCES users (id)
+ALTER TABLE project_assignments
+  ADD CONSTRAINT fk_project_assignments_2
+FOREIGN KEY (project_id) REFERENCES timeskip.projects (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
 
-ALTER TABLE memberships
-  ADD CONSTRAINT fk_memberships_2 FOREIGN KEY (role_id) REFERENCES roles (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE;
+CREATE TABLE roles
+(
+  id          VARCHAR(255) NOT NULL
+    PRIMARY KEY,
+  auto_grant  TINYINT(1)   NULL,
+  description TEXT         NULL,
+  name        VARCHAR(255) NULL
+);
 
 ALTER TABLE memberships
-  ADD CONSTRAINT fk_memberships_3 FOREIGN KEY (organization_id) REFERENCES organizations (id)
+  ADD CONSTRAINT fk_memberships_2
+FOREIGN KEY (role_id) REFERENCES timeskip.roles (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
 
 ALTER TABLE permissions
-  ADD CONSTRAINT fk_permissions_1 FOREIGN KEY (role_id) REFERENCES roles (id)
+  ADD CONSTRAINT fk_permissions_1
+FOREIGN KEY (role_id) REFERENCES timeskip.roles (id)
+  ON UPDATE CASCADE
+  ON DELETE CASCADE;
+
+CREATE TABLE user_workdays
+(
+  user_id  VARCHAR(255) NOT NULL,
+  week_day VARCHAR(9)   NOT NULL,
+  CONSTRAINT uk_user_workdays_1
+  UNIQUE (user_id, week_day)
+);
+
+CREATE TABLE users
+(
+  id                    VARCHAR(255)           NOT NULL
+    PRIMARY KEY,
+  first_name            VARCHAR(255)           NOT NULL,
+  last_name             VARCHAR(255)           NOT NULL,
+  email                 VARCHAR(255)           NOT NULL,
+  admin                 TINYINT(1) DEFAULT '0' NULL,
+  paygrade_id           BIGINT                 NULL,
+  default_hours_per_day DOUBLE DEFAULT '8'     NULL,
+  default_activity_id   BIGINT                 NULL,
+  CONSTRAINT fk_users_1
+  FOREIGN KEY (paygrade_id) REFERENCES timeskip.paygrades (id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+);
+
+CREATE INDEX fk_users_1
+  ON users (paygrade_id);
+
+CREATE INDEX fk_users_2
+  ON users (default_activity_id);
+
+CREATE INDEX idx_users_1
+  ON users (email);
+
+ALTER TABLE memberships
+  ADD CONSTRAINT fk_memberships_1
+FOREIGN KEY (user_id) REFERENCES timeskip.users (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
 
 ALTER TABLE project_assignments
-  ADD CONSTRAINT fk_project_assignments_1 FOREIGN KEY (user_id) REFERENCES users (id)
+  ADD CONSTRAINT fk_project_assignments_1
+FOREIGN KEY (user_id) REFERENCES timeskip.users (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
-
-ALTER TABLE project_assignments
-  ADD CONSTRAINT fk_project_assignments_2 FOREIGN KEY (project_id) REFERENCES projects (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE;
-
-ALTER TABLE projects
-  ADD CONSTRAINT fk_projects_1 FOREIGN KEY (organization_id) REFERENCES organizations (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE;
-
-ALTER TABLE users
-  ADD CONSTRAINT fk_users_1 FOREIGN KEY (paygrade_id) REFERENCES paygrades (id)
-  ON UPDATE CASCADE
-  ON DELETE SET NULL;
 
 ALTER TABLE user_workdays
-  ADD CONSTRAINT fk_user_workdays_1 FOREIGN KEY (user_id) REFERENCES users (id)
+  ADD CONSTRAINT fk_user_workdays_1
+FOREIGN KEY (user_id) REFERENCES timeskip.users (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE;
 
-ALTER TABLE worklogs
-  ADD CONSTRAINT fk_worklogs_1 FOREIGN KEY (user_id) REFERENCES users (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE;
+CREATE TABLE worklogs
+(
+  id             BIGINT AUTO_INCREMENT
+    PRIMARY KEY,
+  user_id        VARCHAR(255)           NOT NULL,
+  activity_id    BIGINT                 NOT NULL,
+  day            DATE                   NOT NULL,
+  logged_minutes BIGINT                 NOT NULL,
+  confirmed      TINYINT(1) DEFAULT '0' NULL,
+  CONSTRAINT fk_worklogs_1
+  FOREIGN KEY (user_id) REFERENCES timeskip.users (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT fk_worklogs_2
+  FOREIGN KEY (activity_id) REFERENCES timeskip.activities (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);
 
-ALTER TABLE worklogs
-  ADD CONSTRAINT fk_worklogs_2 FOREIGN KEY (activity_id) REFERENCES activities (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE;
+CREATE INDEX fk_worklogs_1
+  ON worklogs (user_id);
+
+CREATE INDEX fk_worklogs_2
+  ON worklogs (activity_id);
+

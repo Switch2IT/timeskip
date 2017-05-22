@@ -140,7 +140,7 @@ public class OrganizationFacade implements IOrganizationFacade {
     @Override
     public ProjectResponse getProject(String organizationId, Long projectId) {
         ProjectBean project = storage.getProject(organizationId, projectId);
-        if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW_ALL, organizationId) || !project.getAssignedUsers().contains(userFacade.get(securityContext.getCurrentUser()))) {
+        if (!securityContext.hasPermission(PermissionType.PROJECT_VIEW_ALL, organizationId) && !project.getAssignedUsers().contains(userFacade.get(securityContext.getCurrentUser()))) {
             throw ExceptionFactory.unauthorizedException(projectId);
         }
         return ResponseFactory.createProjectResponse(project);
