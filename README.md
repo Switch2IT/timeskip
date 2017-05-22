@@ -55,6 +55,29 @@ The application will be running at the following URL: <http://localhost:8080/tim
         
 ## Release Notes
 
+### v0.6
+
+#### Upgrade path
+
+Execute the v0.6-update.ddl script in the `timeskip-ejb/src/main/resources/ddl` folder
+
+#### Additions
+
+* Scheduling service for monthly reminder e-mail & prefilling timesheets with user defaults.
+* JUnit tests.
+* JWT now allowed as query string parameter in addition of previous headers.
+* Additional endpoints for querying worklogs on a user basis.
+
+#### Bugfixes
+
+* Storage casting issue between Data and LocalDate.
+* Validation that from-date comes before to-date.
+* To-date is now inclusive.
+* Logged Minutes cannot exceed amount of minutes in a day.
+* Loosened CORS filter to allow PATCH method and additional headers.
+* Updating user in API or on IDP now updates the other as well.
+* When changing the user's default activity, the user is automatically assigned to that activity's project.
+
 ### v0.5
 
 #### Upgrade path

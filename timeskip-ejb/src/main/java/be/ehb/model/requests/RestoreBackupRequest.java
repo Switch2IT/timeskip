@@ -1,6 +1,7 @@
 package be.ehb.model.requests;
 
 import be.ehb.model.backup.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.util.Set;
  * @since 2017
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RestoreBackupRequest implements Serializable {
 
     private Date dateOfBackup;
