@@ -18,7 +18,6 @@ import be.ehb.security.JWTValidation;
 import be.ehb.security.idp.IIdpClient;
 import be.ehb.storage.IStorageService;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.LocalDate;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
@@ -134,6 +133,9 @@ public class UserFacade implements IUserFacade, Serializable {
         if (request.getPaygradeId() != null) {
             newUser.setPaygrade(storage.getPaygrade(request.getPaygradeId()));
         }
+        //Create the user on the IDP and get the ID
+        newUser = idpClient.createUser(newUser);
+        storage.createUser(newUser);
         //Retrieve the activity to check if it exists
         if (request.getDefaultActivityId() != null) {
             ActivityBean activity = storage.getActivity(request.getDefaultActivityId());
@@ -141,9 +143,6 @@ public class UserFacade implements IUserFacade, Serializable {
             activity.getProject().getAssignedUsers().add(newUser);
             storage.updateProject(activity.getProject());
         }
-        //Create the user on the IDP and get the ID
-        newUser = idpClient.createUser(newUser);
-        storage.createUser(newUser);
         String userId = newUser.getId();
 
         //Create the memberships
@@ -197,7 +196,7 @@ public class UserFacade implements IUserFacade, Serializable {
             user.setDefaultHoursPerDay(request.getDefaultHoursPerDay());
             changed = true;
         }
-        if (request.getWorkDays() != null && request.getWorkDays().isEmpty() && !new HashSet<>(request.getWorkDays()).equals(new HashSet<>(user.getWorkdays()))) {
+        if (request.getWorkDays() != null && !new HashSet<>(request.getWorkDays()).equals(new HashSet<>(user.getWorkdays()))) {
             user.setWorkdays(request.getWorkDays());
             changed = true;
         }
