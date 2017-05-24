@@ -8,9 +8,6 @@ import javax.ws.rs.core.Response;
  */
 public class NoUserContextException extends AbstractUserException {
 
-    public NoUserContextException() {
-    }
-
     @Override
     public Response.Status getHttpCode() {
         return Response.Status.UNAUTHORIZED;

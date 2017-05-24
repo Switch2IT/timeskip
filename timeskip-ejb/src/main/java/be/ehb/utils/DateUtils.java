@@ -33,21 +33,27 @@ public final class DateUtils {
     }
 
     public static Long convertHoursToMinutes(Double hours) {
-        if (hours != null) {
+        if (hours == null) {
+            return 0L;
+        } else {
             return Math.round(hours * 60);
-        } else return 0L;
+        }
 
     }
 
     public static List<Date> getDatesBetween(String from, String to) {
         // If no dates are provided, just return dates from the last 30 days
-        if (StringUtils.isEmpty(from) || StringUtils.isEmpty(to))
+        if (StringUtils.isEmpty(from) || StringUtils.isEmpty(to)) {
             return getDatesBetween(LocalDate.now().minusDays(30).toString(DATE_FORMAT), LocalDate.now().toString(DATE_FORMAT));
-        if (from.equals(to)) return Collections.singletonList(convertStringToDate(from).toDate());
+        }
+        if (from.equals(to)) {
+            return Collections.singletonList(convertStringToDate(from).toDate());
+        }
         LocalDate startDate = convertStringToDate(from);
         LocalDate endDate = convertStringToDate(to);
-        if (startDate.isAfter(endDate))
+        if (startDate.isAfter(endDate)) {
             throw ExceptionFactory.invalidDateException(Messages.i18n.format("toBeforeFromDate"));
+        }
         int days = Days.daysBetween(startDate, endDate).getDays();
         List<Date> dates = new ArrayList<>();
         for (int i = 0; i <= days; i++) {
@@ -62,8 +68,10 @@ public final class DateUtils {
     }
 
     public static BigDecimal convertMinutesToHours(Long minutes) {
-        if (minutes != null) {
+        if (minutes == null) {
+            return BigDecimal.ZERO;
+        } else {
             return new BigDecimal(minutes.doubleValue() / 60).setScale(1, BigDecimal.ROUND_HALF_UP);
-        } else return BigDecimal.ZERO;
+        }
     }
 }

@@ -41,7 +41,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public ActivityBean getActivity(Long activityId) {
         ActivityBean activity = super.get(activityId, ActivityBean.class);
-        if (activity == null) throw ExceptionFactory.activityNotFoundException(activityId);
+        if (activity == null) {
+            throw ExceptionFactory.activityNotFoundException(activityId);
+        }
         return activity;
     }
 
@@ -62,28 +64,36 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public MailTemplateBean getMailTemplate(MailTopic topic) {
         MailTemplateBean template = super.get(topic, MailTemplateBean.class);
-        if (template == null) throw ExceptionFactory.mailTemplateNotFoundException(topic);
+        if (template == null) {
+            throw ExceptionFactory.mailTemplateNotFoundException(topic);
+        }
         return template;
     }
 
     @Override
     public MembershipBean getMembership(Long membershipId) {
         MembershipBean membership = super.get(membershipId, MembershipBean.class);
-        if (membership == null) throw ExceptionFactory.membershipNotFoundException(membershipId);
+        if (membership == null) {
+            throw ExceptionFactory.membershipNotFoundException(membershipId);
+        }
         return membership;
     }
 
     @Override
     public OrganizationBean getOrganization(String organizationId) {
         OrganizationBean org = super.get(organizationId, OrganizationBean.class);
-        if (org == null) throw ExceptionFactory.organizationNotFoundException(organizationId);
+        if (org == null) {
+            throw ExceptionFactory.organizationNotFoundException(organizationId);
+        }
         return org;
     }
 
     @Override
     public PaygradeBean getPaygrade(Long paygradeId) {
         PaygradeBean paygrade = super.get(paygradeId, PaygradeBean.class);
-        if (paygrade == null) throw ExceptionFactory.paygradeNotFoundException(paygradeId);
+        if (paygrade == null) {
+            throw ExceptionFactory.paygradeNotFoundException(paygradeId);
+        }
         return paygrade;
     }
 
@@ -103,14 +113,18 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public RoleBean getRole(String roleId) {
         RoleBean role = super.get(roleId, RoleBean.class);
-        if (role == null) throw ExceptionFactory.roleNotFoundException(roleId);
+        if (role == null) {
+            throw ExceptionFactory.roleNotFoundException(roleId);
+        }
         return role;
     }
 
     @Override
     public UserBean getUser(String userId) {
         UserBean user = super.get(userId, UserBean.class);
-        if (user == null) throw ExceptionFactory.userNotFoundException(userId);
+        if (user == null) {
+            throw ExceptionFactory.userNotFoundException(userId);
+        }
         return user;
     }
 
@@ -132,7 +146,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
     @Override
     public WorklogBean getWorklog(Long worklogId) {
         WorklogBean worklog = super.get(worklogId, WorklogBean.class);
-        if (worklog == null) throw ExceptionFactory.worklogNotFoundException(worklogId);
+        if (worklog == null) {
+            throw ExceptionFactory.worklogNotFoundException(worklogId);
+        }
         return worklog;
     }
 
@@ -307,7 +323,9 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             for (ProjecAssignmentBackup p : backup.getAssignments()) {
                 ProjectBean pb = sortedProjects.get(p.getProjectId());
                 UserBean u = sortedUsers.get(p.getUserId());
-                if (pb.getAssignedUsers() == null) pb.setAssignedUsers(new ArrayList<>());
+                if (pb.getAssignedUsers() == null) {
+                    pb.setAssignedUsers(new ArrayList<>());
+                }
                 pb.getAssignedUsers().add(u);
                 super.update(pb);
             }
@@ -507,25 +525,51 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         }
 
         List<String> qualifiers = new ArrayList<>();
-        if (orgQualifier) qualifiers.add(" m.organizationId = :oId");
-        if (roleQualifier) qualifiers.add(" m.roleId = :rId");
-        if (uQualifier) qualifiers.add(" u.id = :uId");
-        if (fnQualifier) qualifiers.add(" u.firstName = :fn");
-        if (lnQualifier) qualifiers.add(" u.lastName = :ln");
-        if (emQualifier) qualifiers.add(" u.email = :em");
+        if (orgQualifier) {
+            qualifiers.add(" m.organizationId = :oId");
+        }
+        if (roleQualifier) {
+            qualifiers.add(" m.roleId = :rId");
+        }
+        if (uQualifier) {
+            qualifiers.add(" u.id = :uId");
+        }
+        if (fnQualifier) {
+            qualifiers.add(" u.firstName = :fn");
+        }
+        if (lnQualifier) {
+            qualifiers.add(" u.lastName = :ln");
+        }
+        if (emQualifier) {
+            qualifiers.add(" u.email = :em");
+        }
         Iterator it = qualifiers.iterator();
         while (it.hasNext()) {
             query.append(it.next());
-            if (it.hasNext()) query.append(" AND");
+            if (it.hasNext()) {
+                query.append(" AND");
+            }
         }
 
         TypedQuery<UserBean> q = getActiveEntityManager().createQuery(query.toString(), UserBean.class);
-        if (orgQualifier) q.setParameter("oId", organizationId);
-        if (roleQualifier) q.setParameter("rId", roleId);
-        if (uQualifier) q.setParameter("uId", userId);
-        if (fnQualifier) q.setParameter("fn", firstName);
-        if (lnQualifier) q.setParameter("ln", lastName);
-        if (emQualifier) q.setParameter("em", email);
+        if (orgQualifier) {
+            q.setParameter("oId", organizationId);
+        }
+        if (roleQualifier) {
+            q.setParameter("rId", roleId);
+        }
+        if (uQualifier) {
+            q.setParameter("uId", userId);
+        }
+        if (fnQualifier) {
+            q.setParameter("fn", firstName);
+        }
+        if (lnQualifier) {
+            q.setParameter("ln", lastName);
+        }
+        if (emQualifier) {
+            q.setParameter("em", email);
+        }
         log.debug("Search query: {}", query.toString());
         return q.getResultList();
     }
@@ -745,23 +789,45 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
             query.append(" WHERE");
         }
         List<String> qualifiers = new ArrayList<>();
-        if (orgQualifier) qualifiers.add(" o.id = :oId");
-        if (projQualifier) qualifiers.add(" p.id = :pId");
-        if (actQualifier) qualifiers.add(" a.id = :aId");
-        if (uQualifier) qualifiers.add(" w.userId = :uId");
-        if (periodQualifier) qualifiers.add(" w.day IN :period");
+        if (orgQualifier) {
+            qualifiers.add(" o.id = :oId");
+        }
+        if (projQualifier) {
+            qualifiers.add(" p.id = :pId");
+        }
+        if (actQualifier) {
+            qualifiers.add(" a.id = :aId");
+        }
+        if (uQualifier) {
+            qualifiers.add(" w.userId = :uId");
+        }
+        if (periodQualifier) {
+            qualifiers.add(" w.day IN :period");
+        }
         Iterator it = qualifiers.iterator();
         while (it.hasNext()) {
             query.append(it.next());
-            if (it.hasNext()) query.append(" AND");
+            if (it.hasNext()) {
+                query.append(" AND");
+            }
         }
 
         TypedQuery<WorklogBean> q = getActiveEntityManager().createQuery(query.toString(), WorklogBean.class);
-        if (orgQualifier) q.setParameter("oId", organizationId);
-        if (projQualifier) q.setParameter("pId", projectId);
-        if (actQualifier) q.setParameter("aId", activityId);
-        if (uQualifier) q.setParameter("uId", userId);
-        if (periodQualifier) q.setParameter("period", period);
+        if (orgQualifier) {
+            q.setParameter("oId", organizationId);
+        }
+        if (projQualifier) {
+            q.setParameter("pId", projectId);
+        }
+        if (actQualifier) {
+            q.setParameter("aId", activityId);
+        }
+        if (uQualifier) {
+            q.setParameter("uId", userId);
+        }
+        if (periodQualifier) {
+            q.setParameter("period", period);
+        }
         log.debug("Search query: {}", query.toString());
         return q.getResultList();
     }

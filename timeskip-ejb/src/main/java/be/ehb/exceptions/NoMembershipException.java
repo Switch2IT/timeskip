@@ -8,8 +8,8 @@ import javax.ws.rs.core.Response;
  */
 public class NoMembershipException extends AbstractUserException {
 
-    public NoMembershipException(String noMembership) {
-        super(noMembership);
+    public NoMembershipException(String message) {
+        super(message);
     }
 
     @Override

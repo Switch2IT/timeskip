@@ -188,34 +188,47 @@ public class ReportsFacade implements IReportsFacade {
                                 if (u.getPaygrade() != null) {
                                     Long totalMinutes = ws.parallelStream().mapToLong(WorklogBean::getLoggedMinutes).sum();
                                     UserBillingResponse ub = ResponseFactory.createUserBillingResponse(u, totalMinutes);
-                                    if (ub != null) ubr.add(ub);
+                                    if (ub != null) {
+                                        ubr.add(ub);
+                                    }
                                 }
                             });
                             Optional<BigDecimal> totalHours = ubr.parallelStream().map(UserBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
                             Optional<BigDecimal> amountDue = ubr.parallelStream().map(UserBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
                             ActivityBillingResponse ab = ResponseFactory.createActivityBillingResponse(a, ubr, totalHours, amountDue);
-                            if (ab != null) abr.add(ab);
+                            if (ab != null) {
+                                abr.add(ab);
+                            }
                         });
                         Optional<BigDecimal> totalHours = abr.parallelStream().map(ActivityBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
                         Optional<BigDecimal> totalAmount = abr.parallelStream().map(ActivityBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
                         ProjectBillingResponse pb = ResponseFactory.createProjectBillingResponse(p, abr, totalHours, totalAmount);
-                        if (pb != null) pbr.add(pb);
+                        if (pb != null) {
+                            pbr.add(pb);
+                        }
                     });
                     Optional<BigDecimal> totalHours = pbr.parallelStream().map(ProjectBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
                     Optional<BigDecimal> totalAmount = pbr.parallelStream().map(ProjectBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
                     DayBillingResponse db = ResponseFactory.createDayBillingResponse(d, pbr, totalHours, totalAmount);
-                    if (db != null) dbr.add(db);
+                    if (db != null) {
+                        dbr.add(db);
+                    }
                 });
                 Optional<BigDecimal> totalHours = dbr.parallelStream().map(DayBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
                 Optional<BigDecimal> totalAmount = dbr.parallelStream().map(DayBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
                 OrganizationBillingResponse ob = ResponseFactory.createOrganizationBillingResponse(o, dbr, totalHours, totalAmount);
-                if (ob != null) obr.add(ob);
+                if (ob != null) {
+                    obr.add(ob);
+                }
             });
             Optional<BigDecimal> totalHours = obr.parallelStream().map(OrganizationBillingResponse::getTotalBillableHours).reduce(BigDecimal::add);
             Optional<BigDecimal> totalAmount = obr.parallelStream().map(OrganizationBillingResponse::getTotalAmountDue).reduce(BigDecimal::add);
             BillingReportResponse rval = ResponseFactory.createBillingReportResponse(obr, totalHours, totalAmount);
-            if (rval == null) return null;
-            else return rval;
+            if (rval == null) {
+                return null;
+            } else {
+                return rval;
+            }
         } catch (InvalidDateException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -249,8 +262,8 @@ public class ReportsFacade implements IReportsFacade {
             if (rep != null) {
                 Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
                 doc = addLogoToDocument(doc);
-                doc.add(new Paragraph((Messages.i18n.format("invoice"))).setFontSize(24).setBold());
-                doc.add(new Paragraph((Messages.i18n.format("invoiceDescription", from, to))).setFontSize(14).setItalic());
+                doc.add(new Paragraph(Messages.i18n.format("invoice")).setFontSize(24).setBold());
+                doc.add(new Paragraph(Messages.i18n.format("invoiceDescription", from, to)).setFontSize(14).setItalic());
 
                 Table outerTable = new Table(new float[]{2, 14});
                 outerTable.setWidthPercent(100);
@@ -313,8 +326,11 @@ public class ReportsFacade implements IReportsFacade {
                 doc.close();
                 documentCreated = true;
             }
-            if (documentCreated) return new ByteArrayInputStream(out.toByteArray());
-            else return null;
+            if (documentCreated) {
+                return new ByteArrayInputStream(out.toByteArray());
+            } else {
+                return null;
+            }
         } catch (InvalidDateException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -332,8 +348,8 @@ public class ReportsFacade implements IReportsFacade {
             if (rep != null) {
                 Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
                 doc = addLogoToDocument(doc);
-                doc.add(new Paragraph((Messages.i18n.format("timelogReport"))).setFontSize(24).setBold());
-                doc.add(new Paragraph((Messages.i18n.format("timelogDesc", from, to))).setFontSize(14).setItalic());
+                doc.add(new Paragraph(Messages.i18n.format("timelogReport")).setFontSize(24).setBold());
+                doc.add(new Paragraph(Messages.i18n.format("timelogDesc", from, to)).setFontSize(14).setItalic());
 
                 Table outerTable = new Table(new float[]{2, 14});
                 outerTable.setWidthPercent(100);
@@ -361,8 +377,8 @@ public class ReportsFacade implements IReportsFacade {
             if (rep != null) {
                 Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4).setFontSize(12);
                 doc = addLogoToDocument(doc);
-                doc.add(new Paragraph((Messages.i18n.format("userTimelogReport"))).setFontSize(24).setBold());
-                doc.add(new Paragraph((Messages.i18n.format("userTimelogDesc", rep.getUser().getFirstName(), rep.getUser().getLastName(), from, to))).setFontSize(10).setItalic());
+                doc.add(new Paragraph(Messages.i18n.format("userTimelogReport")).setFontSize(24).setBold());
+                doc.add(new Paragraph(Messages.i18n.format("userTimelogDesc", rep.getUser().getFirstName(), rep.getUser().getLastName(), from, to)).setFontSize(10).setItalic());
 
                 Table outerTable = new Table(new float[]{2, 14});
                 outerTable.setWidthPercent(100);
@@ -464,13 +480,19 @@ public class ReportsFacade implements IReportsFacade {
                 List<ActivityLoggedTimeResponse> alts = new ArrayList<>();
                 as.forEach((a, ws) -> {
                     ActivityLoggedTimeResponse alt = ResponseFactory.createActivityLoggedTimeResponse(a, ws.parallelStream().mapToLong(WorklogBean::getLoggedMinutes).sum());
-                    if (alt != null) alts.add(alt);
+                    if (alt != null) {
+                        alts.add(alt);
+                    }
                 });
                 ProjectLoggedTimeResponse plt = ResponseFactory.createProjectLoggedTimeResponse(p, alts, alts.parallelStream().mapToLong(ActivityLoggedTimeResponse::getTotalLoggedMinutes).sum());
-                if (plt != null) plts.add(plt);
+                if (plt != null) {
+                    plts.add(plt);
+                }
             });
             OrganizationLoggedTimeResponse olt = ResponseFactory.createOrganizationLoggedTimeResponse(o, plts, plts.parallelStream().mapToLong(ProjectLoggedTimeResponse::getTotalLoggedMinutes).sum());
-            if (olt != null) olts.add(olt);
+            if (olt != null) {
+                olts.add(olt);
+            }
         });
         LoggedTimeReportResponse rval = new LoggedTimeReportResponse();
         rval.setOrganizations(olts);
@@ -558,8 +580,8 @@ public class ReportsFacade implements IReportsFacade {
             try {
                 Document doc = new Document(new PdfDocument(new PdfWriter(out)), A4);
                 doc = addLogoToDocument(doc);
-                doc.add(new Paragraph((Messages.i18n.format("organizationTitle", storage.getOrganization(organizationId).getName()))).setFontSize(24).setBold());
-                doc.add(new Paragraph((Messages.i18n.format(overUnderKey, from, to))).setFontSize(14).setItalic());
+                doc.add(new Paragraph(Messages.i18n.format("organizationTitle", storage.getOrganization(organizationId).getName())).setFontSize(24).setBold());
+                doc.add(new Paragraph(Messages.i18n.format(overUnderKey, from, to)).setFontSize(14).setItalic());
                 Table table = new Table(new float[]{5, 11});
                 table.setWidthPercent(100);
                 table.addHeaderCell(new Cell(1, 2).setBold().add(Messages.i18n.format("employee"))).setFontSize(FONT_SIZE);

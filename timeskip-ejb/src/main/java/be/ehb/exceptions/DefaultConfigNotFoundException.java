@@ -6,9 +6,6 @@ package be.ehb.exceptions;
  */
 public class DefaultConfigNotFoundException extends AbstractSystemException {
 
-    public DefaultConfigNotFoundException() {
-    }
-
     @Override
     public int getErrorCode() {
         return ErrorCodes.getSystemError();

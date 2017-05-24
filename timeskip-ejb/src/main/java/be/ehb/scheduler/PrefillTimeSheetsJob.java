@@ -71,53 +71,35 @@ public class PrefillTimeSheetsJob implements Job {
                     prefill.setUserName(user.getFirstName());
                     prefill.setTo(user.getEmail());
                     StringBuilder worklogList = new StringBuilder("<table bgcolor=\"#f6f6f6\">");
-                    worklogList.append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\">")
-                            .append("<td style=\"padding-right:20px\">")
-                            .append("<b><i>Date</i></b>")
-                            .append("</td>")
-                            .append("<td style=\"padding-right:20px\">")
-                            .append("<b><i>Hours pre filled</i></b>")
-                            .append("</td>")
-                            .append("<td>")
-                            .append("<b><i>Project/Action</i></b>")
-                            .append("</td>")
-                            .append("</tr>");
+                    worklogList.append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\"><td style=\"padding-right:20px\"><b><i>Date</i></b></td><td style=\"padding-right:20px\"><b><i>Hours pre filled</i></b></td><td><b><i>Project/Action</i></b></td></tr>");
 
                     Set<DayOfWeek> sDayOfWeeks = new TreeSet<>();
                     sDayOfWeeks.addAll(user.getWorkdays());
                     sDayOfWeeks.forEach(dayOfWeek -> {
-                                Date searchDate = Date.from(dayMap.get(dayOfWeek).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-                                WorklogBean worklogBean = storage.searchWorklogsByIdAndDay(user.getId(), searchDate);
-                                BigDecimal defaultHoursPerDay = new BigDecimal(user.getDefaultHoursPerDay()).setScale(2, BigDecimal.ROUND_HALF_UP);
-                                if (worklogBean.getLoggedMinutes() != null) {
-                                    BigDecimal loggedHoursPerDay = new BigDecimal(worklogBean.getLoggedMinutes().doubleValue() / 60).setScale(2, BigDecimal.ROUND_HALF_UP);
-                                    if (loggedHoursPerDay.compareTo(defaultHoursPerDay) >= 0) {
-                                        defaultHoursPerDay = new BigDecimal(0).setScale(2, BigDecimal.ROUND_HALF_UP);
-                                    } else {
-                                        defaultHoursPerDay = defaultHoursPerDay.subtract(loggedHoursPerDay);
-                                        orgFacade.createPrefillWorklog(createWorklogBean(user, searchDate, defaultHoursPerDay, userDefaultActivity));
-                                    }
-                                } else {
-                                    orgFacade.createPrefillWorklog(createWorklogBean(user, searchDate, defaultHoursPerDay, userDefaultActivity));
-                                }
-                                worklogList
-                                        .append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\">")
-                                        .append("<td style=\"padding-right:20px\">")
-                                        .append(dayMap.get(dayOfWeek).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                                        .append("</td>")
-                                        .append("<td style=\"padding-right:20px\">")
-                                        .append("<b>")
-                                        .append(defaultHoursPerDay)
-                                        .append("</b>")
-                                        .append("</td>")
-                                        .append("<td>")
-                                        .append(defaultHoursPerDay.compareTo(BigDecimal.ZERO) > 0 ? userDefaultActivity.getDescription()
-                                                : "dna - already project/actions filled in")
-                                        .append("</td>")
-                                        .append("</tr>");
+                        Date searchDate = Date.from(dayMap.get(dayOfWeek).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                        WorklogBean worklogBean = storage.searchWorklogsByIdAndDay(user.getId(), searchDate);
+                        BigDecimal defaultHoursPerDay = new BigDecimal(user.getDefaultHoursPerDay()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                        if (worklogBean.getLoggedMinutes() == null) {
+                            orgFacade.createPrefillWorklog(createWorklogBean(user, searchDate, defaultHoursPerDay, userDefaultActivity));
+                        } else {
+                            BigDecimal loggedHoursPerDay = new BigDecimal(worklogBean.getLoggedMinutes().doubleValue() / 60).setScale(2, BigDecimal.ROUND_HALF_UP);
+                            if (loggedHoursPerDay.compareTo(defaultHoursPerDay) >= 0) {
+                                defaultHoursPerDay = new BigDecimal(0).setScale(2, BigDecimal.ROUND_HALF_UP);
+                            } else {
+                                defaultHoursPerDay = defaultHoursPerDay.subtract(loggedHoursPerDay);
+                                orgFacade.createPrefillWorklog(createWorklogBean(user, searchDate, defaultHoursPerDay, userDefaultActivity));
                             }
-
-                    );
+                        }
+                        worklogList
+                                .append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\"><td style=\"padding-right:20px\">")
+                                .append(dayMap.get(dayOfWeek).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                                .append("</td><td style=\"padding-right:20px\"><b>")
+                                .append(defaultHoursPerDay)
+                                .append("</b></td><td>")
+                                .append(defaultHoursPerDay.compareTo(BigDecimal.ZERO) > 0 ? userDefaultActivity.getDescription()
+                                        : "dna - already project/actions filled in")
+                                .append("</td></tr>");
+                    });
                     worklogList.append("</table>");
                     prefill.setPrefillWorklog(worklogList.toString());
                     mailService.sendPrefillTimeSheet(prefill);

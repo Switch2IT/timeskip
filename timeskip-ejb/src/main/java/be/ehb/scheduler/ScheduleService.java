@@ -32,6 +32,8 @@ public class ScheduleService implements IScheduleService {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduleService.class);
 
+    private static final String SCHEDULER_UNAVAILABLE = "Scheduler unavailable";
+
     private static final String REMINDER_JOB_NAME = "reminderEmailJob";
     private static final String PREFILL_JOB_NAME = "prefillJob";
     private static final String JOB_GROUP = "recurringTasks";
@@ -97,7 +99,7 @@ public class ScheduleService implements IScheduleService {
         } catch (SchedulerException ex) {
             log.error("Unable to add reminder email job to scheduler: {}", ex);
         } catch (SchedulerUnableToStartException | SchedulerNotFoundException ex) {
-            log.error("Scheduler unavailable");
+            log.error(SCHEDULER_UNAVAILABLE);
         }
     }
 
@@ -129,7 +131,7 @@ public class ScheduleService implements IScheduleService {
         } catch (SchedulerException ex) {
             log.error("Unable to add prefill job to scheduler: {}", ex);
         } catch (SchedulerUnableToStartException | SchedulerNotFoundException ex) {
-            log.error("Scheduler unavailable");
+            log.error(SCHEDULER_UNAVAILABLE);
         }
     }
 

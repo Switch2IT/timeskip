@@ -2,6 +2,7 @@ package be.ehb.configuration;
 
 import be.ehb.entities.config.ConfigBean;
 import be.ehb.factories.ExceptionFactory;
+import be.ehb.i18n.Messages;
 import be.ehb.storage.IStorageService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -30,6 +31,7 @@ import java.util.Properties;
 public class AppConfig implements Serializable, IAppConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
+    private static final String PROP_NOT_FOUND = "configPropertyFileNotFound";
 
     private static Config config;
     private static Properties properties;
@@ -60,15 +62,17 @@ public class AppConfig implements Serializable, IAppConfig {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else throw ExceptionFactory.systemErrorException("Timeskip basic property file not found.");
+        } else {
+            throw ExceptionFactory.systemErrorException(Messages.i18n.format(PROP_NOT_FOUND));
+        }
 
         if (!configPath.toFile().exists()) {
-            throw ExceptionFactory.systemErrorException("Config property file not found.");
+            throw ExceptionFactory.systemErrorException(Messages.i18n.format(PROP_NOT_FOUND));
         }
         config = ConfigFactory.parseFile(configPath.toFile());
 
         if (config == null) {
-            throw ExceptionFactory.systemErrorException("Config property file not found.");
+            throw ExceptionFactory.systemErrorException(Messages.i18n.format(PROP_NOT_FOUND));
         } else {
             try {
                 log.info("============================== Timeskip Configuration ==============================");

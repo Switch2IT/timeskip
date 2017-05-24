@@ -6,10 +6,6 @@ package be.ehb.exceptions;
  */
 public class SchedulerNotFoundException extends AbstractSystemException {
 
-    public SchedulerNotFoundException() {
-        super();
-    }
-
     @Override
     public int getErrorCode() {
         return ErrorCodes.getSchedulerNotFound();

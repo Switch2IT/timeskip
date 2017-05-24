@@ -6,10 +6,6 @@ package be.ehb.exceptions;
  */
 public class SchedulerUnableToStartException extends AbstractSystemException {
 
-    public SchedulerUnableToStartException() {
-        super();
-    }
-
     @Override
     public int getErrorCode() {
         return ErrorCodes.getSchedulerUnableToStart();

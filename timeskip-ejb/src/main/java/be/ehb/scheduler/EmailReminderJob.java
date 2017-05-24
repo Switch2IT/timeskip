@@ -62,33 +62,15 @@ public class EmailReminderJob implements Job {
                     UsersWorkLoadActivityBO first = value.get(0);
                     reminder.setUserName(first.getFirstName());
                     reminder.setTo(first.getEmail());
-                    StringBuilder worklogList = new StringBuilder("<table bgcolor=\"#f6f6f6\">");
-                    worklogList.append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\">")
-                            .append("<td style=\"padding-right:20px\">")
-                            .append("<b><i>Date</i></b>")
-                            .append("</td>")
-                            .append("<td style=\"padding-right:20px\">")
-                            .append("<b><i>Hours logged</i></b>")
-                            .append("</td>")
-                            .append("<td>")
-                            .append("<b><i>Project/Action</i></b>")
-                            .append("</td>")
-                            .append("</tr>");
+                    StringBuilder worklogList = new StringBuilder("<table bgcolor=\"#f6f6f6\"><tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\"><td style=\"padding-right:20px\"><b><i>Date</i></b></td><td style=\"padding-right:20px\"><b><i>Hours logged</i></b></td><td><b><i>Project/Action</i></b></td></tr>");
                     value.forEach(entry -> worklogList
-                            .append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\">")
-                            .append("<td style=\"padding-right:20px\">")
+                            .append("<tr style=\"clear: both !important; display: block !important; Margin: 0 auto !important; max-width: 600px !important\"><td style=\"padding-right:20px\">")
                             .append(new SimpleDateFormat("dd/MM/yyyy").format(entry.getDay()))
-                            .append("</td>")
-                            .append("<td style=\"padding-right:20px\">")
-                            .append("<b>")
+                            .append("</td><td style=\"padding-right:20px\"><b>")
                             .append(new BigDecimal(entry.getLoggedMinutes().doubleValue() / 60).setScale(2, BigDecimal.ROUND_HALF_UP))
-                            .append("</b>")
-                            .append("</td>")
-                            .append("<td>")
+                            .append("</b></td><td>")
                             .append(entry.getDescription())
-                            .append("</td>")
-                            .append("</tr>"));
-                    worklogList.append("</table>");
+                            .append("</td></tr></table>"));
                     reminder.setRequiredWorklogConfirmations(worklogList.toString());
                     mailService.sendConfirmationReminder(reminder);
                 });
