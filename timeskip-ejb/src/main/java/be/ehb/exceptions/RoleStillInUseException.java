@@ -12,6 +12,6 @@ public class RoleStillInUseException extends AbstractInvalidInputException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ROLE_STILL_IN_USE;
+        return ErrorCodes.getRoleStillInUse();
     }
 }

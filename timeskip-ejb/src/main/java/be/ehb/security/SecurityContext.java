@@ -71,7 +71,7 @@ public class SecurityContext extends AbstractSecurityContext {
                 userFacade.initNewUser(claims);
                 return currentUser;
             } catch (Exception e) {
-                log.error("Unable to create new user: {}", e.getMessage());
+                getLog().error("Unable to create new user: {}", e.getMessage());
                 throw ExceptionFactory.userNotFoundException(currentUser);
             }
         }

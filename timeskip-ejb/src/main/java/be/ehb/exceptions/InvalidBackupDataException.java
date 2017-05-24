@@ -12,6 +12,6 @@ public class InvalidBackupDataException extends AbstractInvalidInputException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.INVALID_BACKUP;
+        return ErrorCodes.getInvalidBackup();
     }
 }

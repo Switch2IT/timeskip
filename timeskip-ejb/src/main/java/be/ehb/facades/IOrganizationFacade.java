@@ -195,12 +195,13 @@ public interface IOrganizationFacade {
     WorklogResponse createWorkLog(String organizationId, Long projectId, Long activityId, NewAdminWorklogRequest request);
 
     /**
-     * prefill an worklog
+     * prefill a worklog
      *
      * @param worklogBean    the object
      * @return true or false the response
      */
     Boolean createPrefillWorklog(WorklogBean worklogBean);
+
     /**
      * Update a worklog
      *

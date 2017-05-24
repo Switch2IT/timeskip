@@ -1,21 +1,13 @@
 package be.ehb.exceptions;
 
 /**
- * @author Patrick Van den Bussche
+ * @author Patrick Van den Bussche/Guillaume Vandecasteele
  * @since 2017
  */
-public class SchedulerNotFoundException extends AbstractNotFoundException {
-
-    public SchedulerNotFoundException(String message) {
-        super(message);
-    }
-
-    public SchedulerNotFoundException(Throwable cause) {
-        super(cause);
-    }
+public class SchedulerNotFoundException extends AbstractSystemException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.SCHEDULER_NOT_FOUND;
+        return ErrorCodes.getSchedulerNotFound();
     }
 }

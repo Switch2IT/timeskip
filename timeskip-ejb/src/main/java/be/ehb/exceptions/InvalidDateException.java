@@ -12,6 +12,6 @@ public class InvalidDateException extends AbstractInvalidInputException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.INVALID_DATE;
+        return ErrorCodes.getInvalidDate();
     }
 }

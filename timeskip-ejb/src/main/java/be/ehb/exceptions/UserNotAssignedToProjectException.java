@@ -12,10 +12,6 @@ public class UserNotAssignedToProjectException extends AbstractUserException {
         super(message);
     }
 
-    public UserNotAssignedToProjectException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public Response.Status getHttpCode() {
         return Response.Status.PRECONDITION_FAILED;
@@ -23,6 +19,6 @@ public class UserNotAssignedToProjectException extends AbstractUserException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.USER_NOT_ASSIGNED_TO_PROJECT;
+        return ErrorCodes.getUserNotAssignedToProject();
     }
 }

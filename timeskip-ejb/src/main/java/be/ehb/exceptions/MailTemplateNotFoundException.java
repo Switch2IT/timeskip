@@ -10,12 +10,8 @@ public class MailTemplateNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public MailTemplateNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.MAIL_TEMPLATE_NOT_FOUND;
+        return ErrorCodes.getMailTemplateNotFound();
     }
 }

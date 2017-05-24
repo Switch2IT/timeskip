@@ -12,6 +12,6 @@ public class ActivityAlreadyExistsException extends AbstractAlreadyExistsExcepti
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ACTIVITY_ALREADY_EXISTS;
+        return ErrorCodes.getActivityAlreadyExists();
     }
 }

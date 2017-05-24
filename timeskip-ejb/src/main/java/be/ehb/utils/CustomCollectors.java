@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class CustomCollectors {
+public final class CustomCollectors {
+
+    private CustomCollectors() {
+    }
 
     public static <T> Collector<T, ?, T> getSingleResult() {
         return Collectors.collectingAndThen(

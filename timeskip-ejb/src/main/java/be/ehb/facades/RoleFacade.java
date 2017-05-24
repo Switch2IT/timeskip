@@ -9,8 +9,6 @@ import be.ehb.model.responses.RoleResponse;
 import be.ehb.storage.IStorageService;
 import be.ehb.utils.ConventionUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
@@ -29,8 +27,6 @@ import java.util.stream.Collectors;
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Default
 public class RoleFacade implements IRoleFacade {
-
-    private static final Logger log = LoggerFactory.getLogger(RoleFacade.class);
 
     @Inject
     private IStorageService storage;

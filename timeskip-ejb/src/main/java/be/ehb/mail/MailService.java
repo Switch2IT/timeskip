@@ -14,6 +14,8 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -22,6 +24,8 @@ import java.util.Map;
  * @author Guillaume Vandecasteele / Patrick Van den Bussche
  * @since 2017
  */
+@ApplicationScoped
+@Default
 public class MailService implements IMailService {
 
     private static final Logger log = LoggerFactory.getLogger(MailService.class);

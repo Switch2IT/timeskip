@@ -10,12 +10,8 @@ public class UserAlreadyExistsException extends AbstractAlreadyExistsException {
         super(message);
     }
 
-    public UserAlreadyExistsException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.USER_ALREADY_EXISTS;
+        return ErrorCodes.getUserAlreadyExists();
     }
 }

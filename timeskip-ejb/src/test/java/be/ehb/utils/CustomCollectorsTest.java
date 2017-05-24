@@ -8,12 +8,14 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Christophe on 20/05/2017.
+ *
+ * @author Guillaume Vandecasteele/Christophe Devos
+ * @since 2017
  */
 public class CustomCollectorsTest {
 
     @Test
-    public void getSingleResult() throws Exception {
+    public void getSingleResult() {
         List<Integer> integerList = new ArrayList<>();
         integerList.add(5);
         int singleResult = integerList.stream().collect(CustomCollectors.getSingleResult());
@@ -21,7 +23,7 @@ public class CustomCollectorsTest {
     }
 
     @Test
-    public void getSingleResultNull() throws Exception {
+    public void getSingleResultNull() {
         List<Integer> integerList = new ArrayList<>();
 
         Object singleResult = integerList.stream().collect(CustomCollectors.getSingleResult());
@@ -30,17 +32,16 @@ public class CustomCollectorsTest {
 
 
     @Test(expected = IllegalStateException.class)
-    public void getSingleResultListToBig() throws Exception {
+    public void getSingleResultListToBig() {
         List<Integer> integerList = new ArrayList<>();
         integerList.add(5);
         integerList.add(6);
-        int singleResult = integerList.stream().collect(CustomCollectors.getSingleResult());
-
+        integerList.stream().collect(CustomCollectors.getSingleResult());
     }
 
 
     @Test
-    public void getFirstResult() throws Exception {
+    public void getFirstResult() {
         List<Integer> integerList = new ArrayList<>();
         integerList.add(5);
         int singleResult = integerList.stream().collect(CustomCollectors.getFirstResult());
@@ -48,7 +49,7 @@ public class CustomCollectorsTest {
     }
 
     @Test
-    public void getFirstResultEmptyList() throws Exception {
+    public void getFirstResultEmptyList() {
         List<Integer> integerList = new ArrayList<>();
         Object singleResult = integerList.stream().collect(CustomCollectors.getFirstResult());
         assertEquals(null, singleResult);
@@ -56,7 +57,7 @@ public class CustomCollectorsTest {
 
 
     @Test
-    public void getFirstResultBiggerList() throws Exception {
+    public void getFirstResultBiggerList() {
         List<Integer> integerList = new ArrayList<>();
         integerList.add(5);
         integerList.add(6);
