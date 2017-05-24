@@ -25,8 +25,6 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
@@ -52,8 +50,6 @@ import static com.itextpdf.kernel.geom.PageSize.A4;
 @TransactionManagement(TransactionManagementType.CONTAINER)
 @Default
 public class ReportsFacade implements IReportsFacade {
-
-    private static final Logger log = LoggerFactory.getLogger(ReportsFacade.class);
 
     private static final String OVERTIME_KEY = "overtime";
     private static final String UNDERTIME_KEY = "undertime";

@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public abstract class AbstractSecurityContext implements ISecurityContext, Serializable {
 
-    static Logger log = LoggerFactory.getLogger(AbstractSecurityContext.class);
+    protected static Logger log = LoggerFactory.getLogger(AbstractSecurityContext.class);
 
     private IndexedPermissions permissions;
 
@@ -38,7 +38,7 @@ public abstract class AbstractSecurityContext implements ISecurityContext, Seria
         return new IndexedPermissions(getStorage().getPermissions(getCurrentUser()));
     }
 
-    void clearPermissions() {
+    protected void clearPermissions() {
         permissions = null;
     }
 

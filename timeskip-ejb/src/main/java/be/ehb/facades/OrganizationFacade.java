@@ -319,8 +319,8 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
     @Override
     public Boolean createPrefillWorklog(WorklogBean worklogBean) {
-        WorklogBean worklogBean1 = storage.createWorklog(worklogBean);
-        return worklogBean1.getId() > 0;
+        WorklogBean worklog = storage.createWorklog(worklogBean);
+        return worklog.getId() != null;
     }
 
     @Override

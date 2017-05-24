@@ -193,10 +193,13 @@ public class AppConfig implements Serializable, IAppConfig {
                     break;
                 case 2:
                     rval.append("nd");
+                    break;
                 case 3:
                     rval.append("rd");
+                    break;
                 default:
                     rval.append("th");
+                    break;
             }
             rval.append(" day of the month");
         }

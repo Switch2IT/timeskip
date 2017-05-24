@@ -8,15 +8,8 @@ import javax.ws.rs.core.Response;
  */
 public class IdpException extends AbstractSystemException {
 
-    public IdpException(Throwable cause) {
-        super(cause);
-    }
-
     public IdpException(String message) {
         super(message);
-    }
-
-    public IdpException() {
     }
 
     @Override
@@ -26,6 +19,6 @@ public class IdpException extends AbstractSystemException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.IDP_ERROR;
+        return ErrorCodes.getIdpError();
     }
 }

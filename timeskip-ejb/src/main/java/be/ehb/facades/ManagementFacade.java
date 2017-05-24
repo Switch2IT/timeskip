@@ -15,10 +15,9 @@ import be.ehb.model.responses.DayOfMonthlyReminderResponse;
 import be.ehb.model.responses.MailTemplateResponse;
 import be.ehb.model.responses.MembershipResponse;
 import be.ehb.model.responses.PaygradeResponse;
+import be.ehb.scheduler.IScheduleService;
 import be.ehb.storage.IStorageService;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
@@ -38,10 +37,10 @@ import java.util.stream.Collectors;
 @Default
 public class ManagementFacade implements IManagementFacade {
 
-    private static final Logger log = LoggerFactory.getLogger(ManagementFacade.class);
-
     @Inject
     private IStorageService storage;
+    @Inject
+    private IScheduleService scheduleService;
 
     @Override
     public MembershipResponse updateOrCreateMembership(String userId, String organizationId, String roleId) {
@@ -117,7 +116,7 @@ public class ManagementFacade implements IManagementFacade {
         }
         if (changed) {
             config = storage.updateConfig(config);
-            //TODO - Update the schedule service
+            scheduleService.restartEmailReminderJob();
             return ResponseFactory.createDayOfMonthlyReminderResponse(config.getDayOfMonthlyReminderEmail(), config.getLastDayOfMonth());
         } else return null;
     }

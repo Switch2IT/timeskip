@@ -14,17 +14,8 @@ public class UnauthorizedException extends AbstractSecurityException {
         super(message);
     }
 
-    public UnauthorizedException(Throwable cause) {
-        super(cause);
-    }
-
-
-    public UnauthorizedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.UNAUTHORIZED_FOR_ORGANIZATION;
+        return ErrorCodes.getUnauthorizedForOrganization();
     }
 }

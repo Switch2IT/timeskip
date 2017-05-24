@@ -11,14 +11,6 @@ public class NoUserContextException extends AbstractUserException {
     public NoUserContextException() {
     }
 
-    public NoUserContextException(String message) {
-        super(message);
-    }
-
-    public NoUserContextException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public Response.Status getHttpCode() {
         return Response.Status.UNAUTHORIZED;
@@ -26,6 +18,6 @@ public class NoUserContextException extends AbstractUserException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.NO_USER_CONTEXT_FOUND;
+        return ErrorCodes.getNoUserContextFound();
     }
 }

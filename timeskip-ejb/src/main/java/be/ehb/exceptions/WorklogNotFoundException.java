@@ -10,12 +10,8 @@ public class WorklogNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public WorklogNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.WORKLOG_NOT_FOUND;
+        return ErrorCodes.getWorklogNotFound();
     }
 }

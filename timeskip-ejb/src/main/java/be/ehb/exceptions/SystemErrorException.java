@@ -16,6 +16,6 @@ public class SystemErrorException extends AbstractSystemException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.SYSTEM_ERROR;
+        return ErrorCodes.getSystemError();
     }
 }

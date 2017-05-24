@@ -17,9 +17,12 @@ import java.util.List;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class DateUtils {
+public final class DateUtils {
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+    private DateUtils() {
+    }
 
     public static LocalDate convertStringToDate(String dateString) {
         try {
@@ -30,11 +33,10 @@ public class DateUtils {
     }
 
     public static Long convertHoursToMinutes(Double hours) {
-        try {
+        if (hours != null) {
             return Math.round(hours * 60);
-        } catch (NullPointerException ex) {
-            return 0L;
-        }
+        } else return 0L;
+
     }
 
     public static List<Date> getDatesBetween(String from, String to) {
@@ -60,10 +62,8 @@ public class DateUtils {
     }
 
     public static BigDecimal convertMinutesToHours(Long minutes) {
-        try {
+        if (minutes != null) {
             return new BigDecimal(minutes.doubleValue() / 60).setScale(1, BigDecimal.ROUND_HALF_UP);
-        } catch (NullPointerException ex) {
-            return BigDecimal.ZERO;
-        }
+        } else return BigDecimal.ZERO;
     }
 }

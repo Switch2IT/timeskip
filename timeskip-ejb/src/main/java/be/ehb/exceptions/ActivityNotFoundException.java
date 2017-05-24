@@ -12,6 +12,6 @@ public class ActivityNotFoundException extends AbstractNotFoundException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ACTIVITY_NOT_FOUND;
+        return ErrorCodes.getActivityNotFound();
     }
 }

@@ -1,8 +1,7 @@
 package be.ehb.startup;
 
 import be.ehb.mail.IMailService;
-import be.ehb.scheduler.ScheduleService;
-import be.ehb.storage.IStorageService;
+import be.ehb.scheduler.IScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,18 +23,16 @@ public class StartupService {
     private static final Logger log = LoggerFactory.getLogger(StartupService.class);
 
     @Inject
-    private IStorageService storage;
-    @Inject
     private IMailService mailService;
     @Inject
-    private ScheduleService schedServ;
+    private IScheduleService scheduleService;
 
     @PostConstruct
     public void init() {
         try {
-            // Insert startup tasks here, such as mailing tasks
+            // Insert startup tasks here, such as mailing tasks, schedules
             sendStartupMail();
-            schedServ.ScheduleStart();
+            scheduleService.startAll();
         } catch (Exception ex) {
             log.error("Error occured during startup: {}", ex);
         }

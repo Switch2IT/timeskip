@@ -12,6 +12,6 @@ public class OrganizationAlreadyExistsException extends AbstractAlreadyExistsExc
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ORGANIZATION_ALREADY_EXISTS;
+        return ErrorCodes.getOrganizationAlreadyExists();
     }
 }

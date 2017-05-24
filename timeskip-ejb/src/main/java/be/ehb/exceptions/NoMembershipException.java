@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 public class NoMembershipException extends AbstractUserException {
 
     public NoMembershipException(String noMembership) {
+        super(noMembership);
     }
 
     @Override
@@ -18,6 +19,6 @@ public class NoMembershipException extends AbstractUserException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.NO_MEMBERSHIP;
+        return ErrorCodes.getNoMembership();
     }
 }

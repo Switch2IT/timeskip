@@ -10,12 +10,8 @@ public class PaygradeNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public PaygradeNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.PAYGRADE_NOT_FOUND;
+        return ErrorCodes.getPaygradeNotFound();
     }
 }

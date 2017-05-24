@@ -10,12 +10,8 @@ public class JwtValidationException extends AbstractSecurityException {
         super(message);
     }
 
-    public JwtValidationException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.JWT_VALIDATION_ERROR;
+        return ErrorCodes.getJwtValidationError();
     }
 }

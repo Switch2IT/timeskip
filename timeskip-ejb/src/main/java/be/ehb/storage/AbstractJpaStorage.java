@@ -19,12 +19,12 @@ abstract class AbstractJpaStorage {
     @PersistenceContext
     private EntityManager em;
 
-    EntityManager getActiveEntityManager() {
+    protected EntityManager getActiveEntityManager() {
         return em;
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    <T> T create(T bean) {
+    protected <T> T create(T bean) {
         log.trace("create:" + bean.toString());
         em.persist(bean);
         em.flush();
@@ -32,7 +32,7 @@ abstract class AbstractJpaStorage {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    <T> T update(T bean) {
+    protected <T> T update(T bean) {
         log.trace("update:" + bean.toString());
         T result = em.merge(bean);
         em.flush();
@@ -40,25 +40,25 @@ abstract class AbstractJpaStorage {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    <T> void delete(T bean) {
+    protected <T> void delete(T bean) {
         log.trace("delete:" + bean);
         em.remove(em.merge(bean));
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    <T> T get(Long id, Class<T> type) {
+    protected <T> T get(Long id, Class<T> type) {
         log.trace("get(long:id):" + id);
         return em.find(type, id);
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    <T> T get(String id, Class<T> type) {
+    protected <T> T get(String id, Class<T> type) {
         log.trace("get(string:id):" + id);
         return em.find(type, id);
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    <T> T get(Enum id, Class<T> type) {
+    protected <T> T get(Enum id, Class<T> type) {
         log.trace("get(enum:id:" + id);
         return em.find(type, id);
     }

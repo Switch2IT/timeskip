@@ -26,7 +26,10 @@ import java.util.stream.Collectors;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class BackupUtil {
+public final class BackupUtil {
+
+    private BackupUtil() {
+    }
 
     public static BackUpResponse createBackupResponse(List<OrganizationBean> organizations, List<ProjectBean> projects, List<ActivityBean> activities, List<PaygradeBean> paygrades, List<UserBean> users, List<RoleBean> roles, List<MembershipBean> memberships, List<MailTemplateBean> mailTemplates, List<ConfigBean> configurations, List<WorklogBean> worklogs) {
         BackUpResponse rval = null;

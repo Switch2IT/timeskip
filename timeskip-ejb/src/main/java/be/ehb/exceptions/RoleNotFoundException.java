@@ -10,12 +10,8 @@ public class RoleNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public RoleNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ROLE_NOT_FOUND;
+        return ErrorCodes.getRoleNotFound();
     }
 }

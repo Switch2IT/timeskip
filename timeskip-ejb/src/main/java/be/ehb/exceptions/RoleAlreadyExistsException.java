@@ -12,6 +12,6 @@ public class RoleAlreadyExistsException extends AbstractAlreadyExistsException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ROLE_ALREADY_EXISTS;
+        return ErrorCodes.getRoleAlreadyExists();
     }
 }

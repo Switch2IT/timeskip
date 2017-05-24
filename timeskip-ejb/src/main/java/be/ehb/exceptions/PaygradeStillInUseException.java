@@ -12,6 +12,6 @@ public class PaygradeStillInUseException extends AbstractInvalidInputException {
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.PAYGRADE_STILL_IN_USE;
+        return ErrorCodes.getPaygradeStillInUse();
     }
 }

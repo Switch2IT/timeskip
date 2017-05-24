@@ -5,11 +5,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Christophe on 20/05/2017.
+ *
+ * @author Christophe
+ * @since 2017
  */
 public class ConventionUtilTest {
     @Test
-    public void idFromName() throws Exception {
+    public void idFromName() {
         String name = "CHRiStopHE";
         String expected = "christophe";
         assertEquals(expected, ConventionUtil.idFromName(name));
@@ -17,21 +19,19 @@ public class ConventionUtilTest {
 
 
     @Test
-    public void idFromNameNull() throws Exception {
-        String name;
-        String expected;
+    public void idFromNameNull() {
         assertEquals(null, ConventionUtil.idFromName(null));
     }
 
 
     @Test
-    public void idFromNameWhiteSpace() throws Exception {
+    public void idFromNameWhiteSpace() {
         String name = "  ";
         assertEquals(null, ConventionUtil.idFromName(name));
     }
 
     @Test
-    public void idFromNameWithNumbers() throws Exception {
+    public void idFromNameWithNumbers() {
         String name = "123";
         String expected = "123";
         assertEquals(expected, ConventionUtil.idFromName(name));

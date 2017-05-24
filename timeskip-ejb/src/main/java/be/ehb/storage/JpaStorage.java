@@ -22,8 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Default;
 import javax.persistence.NoResultException;
@@ -187,11 +185,6 @@ public class JpaStorage extends AbstractJpaStorage implements IStorageService {
         } else {
             return createMembership(membership);
         }
-    }
-
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    private void deleteAll() {
-
     }
 
     @Override
