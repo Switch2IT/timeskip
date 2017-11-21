@@ -110,8 +110,8 @@
         <cdi-api.version>1.2</cdi-api.version>
         <servlet-api.version>2.5</servlet-api.version>
         <mail-api.version>1.5.3</mail-api.version>
-
-        <version.keycloak>2.5.1.Final</version.keycloak>
+        <httpcomp.version>4.5.3</httpcomp.version>
+        <version.keycloak>3.4.0.Final</version.keycloak>
         <version.resteasy>3.1.4.Final</version.resteasy>
 
         <version.org.hibernate>4.3.7.Final</version.org.hibernate>
@@ -419,6 +419,11 @@
                 <version>${itext.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpcomp.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
