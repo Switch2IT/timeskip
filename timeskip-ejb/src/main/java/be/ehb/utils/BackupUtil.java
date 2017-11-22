@@ -26,7 +26,10 @@ import java.util.stream.Collectors;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class BackupUtil {
+public final class BackupUtil {
+
+    private BackupUtil() {
+    }
 
     public static BackUpResponse createBackupResponse(List<OrganizationBean> organizations, List<ProjectBean> projects, List<ActivityBean> activities, List<PaygradeBean> paygrades, List<UserBean> users, List<RoleBean> roles, List<MembershipBean> memberships, List<MailTemplateBean> mailTemplates, List<ConfigBean> configurations, List<WorklogBean> worklogs) {
         BackUpResponse rval = null;
@@ -40,7 +43,9 @@ public class BackupUtil {
         // Projects
         Set<ProjecAssignmentBackup> assignments = new HashSet<>();
         if (CollectionUtils.isNotEmpty(projects)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setProjects(projects.parallelStream().map(project -> {
                 assignments.addAll(project.getAssignedUsers().parallelStream().map(user -> BackupUtil.createProjectAssignmentBackup(user.getId(), project.getId())).filter(Objects::nonNull).collect(Collectors.toSet()));
                 return BackupUtil.createProjectBackup(project);
@@ -50,57 +55,77 @@ public class BackupUtil {
 
         // Activities
         if (CollectionUtils.isNotEmpty(activities)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setActivities(activities.parallelStream().map(BackupUtil::createActivityBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         // Paygrades
         if (CollectionUtils.isNotEmpty(paygrades)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setPaygrades(paygrades.parallelStream().map(BackupUtil::createPaygradeBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         // Users
         if (CollectionUtils.isNotEmpty(users)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setUsers(users.parallelStream().map(BackupUtil::createUserBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         if (!assignments.isEmpty()) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setAssignments(assignments);
         }
 
         // Roles
         if (CollectionUtils.isNotEmpty(roles)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setRoles(roles.parallelStream().map(BackupUtil::createRoleBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         // Memberships
         if (CollectionUtils.isNotEmpty(memberships)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setMemberships(memberships.parallelStream().map(BackupUtil::createMembershipBackup).collect(Collectors.toSet()));
         }
 
         // Mail Templates
         if (CollectionUtils.isNotEmpty(mailTemplates)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setMailTemplates(mailTemplates.parallelStream().map(BackupUtil::createMailTemplateBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         // Configurations
         if (CollectionUtils.isNotEmpty(configurations)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setConfigurations(configurations.parallelStream().map(BackupUtil::createConfigurationBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
 
         // Worklogs
         if (CollectionUtils.isNotEmpty(worklogs)) {
-            if (rval == null) rval = new BackUpResponse();
+            if (rval == null) {
+                rval = new BackUpResponse();
+            }
             rval.setWorklogs(worklogs.parallelStream().map(BackupUtil::createWorklogBackup).filter(Objects::nonNull).collect(Collectors.toSet()));
         }
-        if (rval != null) rval.setDateOfBackup(new Date());
+        if (rval != null) {
+            rval.setDateOfBackup(new Date());
+        }
         return rval;
     }
 

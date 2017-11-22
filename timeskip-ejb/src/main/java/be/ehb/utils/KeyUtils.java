@@ -10,7 +10,10 @@ import java.security.spec.X509EncodedKeySpec;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class KeyUtils {
+public final class KeyUtils {
+
+    private KeyUtils() {
+    }
 
     public static PublicKey getPublicKey(String key) {
         try {

@@ -13,12 +13,16 @@ import java.io.Serializable;
  */
 public abstract class AbstractSecurityContext implements ISecurityContext, Serializable {
 
-    static Logger log = LoggerFactory.getLogger(AbstractSecurityContext.class);
+    private static Logger log = LoggerFactory.getLogger(AbstractSecurityContext.class);
 
     private IndexedPermissions permissions;
 
     @Inject
     private IStorageService storage;
+
+    public static Logger getLog() {
+        return log;
+    }
 
     @Override
     public boolean hasPermission(PermissionType permission, String organizationId) {
@@ -38,12 +42,11 @@ public abstract class AbstractSecurityContext implements ISecurityContext, Seria
         return new IndexedPermissions(getStorage().getPermissions(getCurrentUser()));
     }
 
-    void clearPermissions() {
+    protected void clearPermissions() {
         permissions = null;
     }
 
     private IStorageService getStorage() {
         return storage;
     }
-
 }

@@ -10,12 +10,8 @@ public class OrganizationNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public OrganizationNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.ORGANIZATION_NOT_FOUND;
+        return ErrorCodes.getOrganizationNotFound();
     }
 }

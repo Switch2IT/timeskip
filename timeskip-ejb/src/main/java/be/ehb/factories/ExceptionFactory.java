@@ -8,7 +8,10 @@ import be.ehb.mail.MailTopic;
  * @author Guillaume Vandecasteele/Patrick Van den Bussche
  * @since 2017
  */
-public class ExceptionFactory {
+public final class ExceptionFactory {
+
+    private ExceptionFactory() {
+    }
 
     public static UnauthorizedException unauthorizedException(String message) {
         return new UnauthorizedException(Messages.i18n.format("notAuthorizedForResouce", message));
@@ -74,20 +77,16 @@ public class ExceptionFactory {
         return new ActivityNotFoundException(id.toString());
     }
 
-    public static SchedulerNotFoundException schedulerNotFoundException(String name) {
-        return new SchedulerNotFoundException(name);
+    public static SchedulerNotFoundException schedulerNotFoundException() {
+        return new SchedulerNotFoundException();
     }
 
-    public static SchedulerUnableToAddJobException schedulerUnableToAddJobException(String name) {
-        return new SchedulerUnableToAddJobException(name);
+    public static SchedulerUnableToStartException schedulerUnableToStartException() {
+        return new SchedulerUnableToStartException();
     }
 
-    public static SchedulerUnableToStartException schedulerUnableToStartException(String name) {
-        return new SchedulerUnableToStartException(name);
-    }
-
-    public static SchedulerUnableToScheduleException schedulerUnableToScheduleException(String name) {
-        return new SchedulerUnableToScheduleException(name);
+    public static MissingScheduledJobDependenciesException missingScheduledJobDependenciesException(String name) {
+        return new MissingScheduledJobDependenciesException(name);
     }
 
     public static InvalidDateException invalidDateException(String message) {
@@ -136,10 +135,6 @@ public class ExceptionFactory {
 
     public static InvalidBackupDataException invalidBackupDataException(String message) {
         return new InvalidBackupDataException(message);
-    }
-
-    public static UnavailableException unavailableException() {
-        return new UnavailableException();
     }
 
     public static RoleAlreadyExistsException roleAlreadyExistsException(String name) {

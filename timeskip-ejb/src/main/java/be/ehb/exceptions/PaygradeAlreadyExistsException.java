@@ -10,12 +10,8 @@ public class PaygradeAlreadyExistsException extends AbstractAlreadyExistsExcepti
         super(message);
     }
 
-    public PaygradeAlreadyExistsException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.PAYGRADE_ALREADY_EXISTS;
+        return ErrorCodes.getPaygradeAlreadyExists();
     }
 }

@@ -10,12 +10,8 @@ public class NoOverTimeAllowedException extends AbstractInvalidInputException {
         super(message);
     }
 
-    public NoOverTimeAllowedException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.PROJEC_OVERTIME_EXCEEDED;
+        return ErrorCodes.getProjecOvertimeExceeded();
     }
 }

@@ -10,12 +10,8 @@ public class MailServiceException extends AbstractSystemException {
         super(message);
     }
 
-    public MailServiceException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.MAIL_SERVICE_ERROR;
+        return ErrorCodes.getMailServiceError();
     }
 }

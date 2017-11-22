@@ -10,12 +10,8 @@ public class UserNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public UserNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.USER_NOT_FOUND;
+        return ErrorCodes.getUserNotFound();
     }
 }

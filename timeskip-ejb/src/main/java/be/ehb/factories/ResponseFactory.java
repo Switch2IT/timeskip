@@ -26,7 +26,10 @@ import java.util.stream.Collectors;
  * @author Guillaume Vandecasteele
  * @since 2017
  */
-public class ResponseFactory {
+public final class ResponseFactory {
+
+    private ResponseFactory() {
+    }
 
     public static Response buildResponse(Response.Status httpCode, String headerName, String headerValue, Object entity, String contentType) {
         Response.ResponseBuilder builder = Response.status(httpCode.getStatusCode());

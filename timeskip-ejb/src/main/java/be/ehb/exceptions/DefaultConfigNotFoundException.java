@@ -6,19 +6,8 @@ package be.ehb.exceptions;
  */
 public class DefaultConfigNotFoundException extends AbstractSystemException {
 
-    public DefaultConfigNotFoundException() {
-    }
-
-    public DefaultConfigNotFoundException(String message) {
-        super(message);
-    }
-
-    public DefaultConfigNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.SYSTEM_ERROR;
+        return ErrorCodes.getSystemError();
     }
 }

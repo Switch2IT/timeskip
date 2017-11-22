@@ -10,12 +10,8 @@ public class MembershipNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public MembershipNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.MEMBERSHIP_NOT_FOUND;
+        return ErrorCodes.getMembershipNotFound();
     }
 }

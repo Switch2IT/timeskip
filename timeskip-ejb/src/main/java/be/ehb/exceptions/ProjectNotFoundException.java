@@ -10,12 +10,8 @@ public class ProjectNotFoundException extends AbstractNotFoundException {
         super(message);
     }
 
-    public ProjectNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public int getErrorCode() {
-        return ErrorCodes.PROJECT_NOT_FOUND;
+        return ErrorCodes.getProjectNotFound();
     }
 }

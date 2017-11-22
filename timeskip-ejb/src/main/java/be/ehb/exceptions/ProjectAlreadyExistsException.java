@@ -12,6 +12,6 @@ public class ProjectAlreadyExistsException extends AbstractAlreadyExistsExceptio
 
     @Override
     public int getErrorCode() {
-        return ErrorCodes.PROJECT_ALREADY_EXISTS;
+        return ErrorCodes.getProjectAlreadyExists();
     }
 }

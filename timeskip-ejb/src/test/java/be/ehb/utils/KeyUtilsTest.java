@@ -7,19 +7,21 @@ import java.security.PublicKey;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Christophe on 20/05/2017.
+ *
+ * @author Christophe
+ * @since 2017
  */
 public class KeyUtilsTest {
 
     @Test
-    public void getPublicKeyWhiteSpace() throws Exception {
+    public void getPublicKeyWhiteSpace() {
         String whiteSpace = " ";
         PublicKey value = KeyUtils.getPublicKey(whiteSpace);
         assertEquals(null, value);
     }
 
     @Test
-    public void getPublicKeyNull() throws Exception {
+    public void getPublicKeyNull() {
         PublicKey value = KeyUtils.getPublicKey(null);
         assertEquals(null, value);
     }

@@ -187,7 +187,9 @@ public class OrganizationFacade implements IOrganizationFacade {
         }
         if (changed) {
             return ResponseFactory.createProjectResponse(storage.updateProject(project));
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -319,8 +321,8 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
     @Override
     public Boolean createPrefillWorklog(WorklogBean worklogBean) {
-        WorklogBean worklogBean1 = storage.createWorklog(worklogBean);
-        return worklogBean1.getId() > 0;
+        WorklogBean worklog = storage.createWorklog(worklogBean);
+        return worklog.getId() != null;
     }
 
     @Override
@@ -329,7 +331,7 @@ public class OrganizationFacade implements IOrganizationFacade {
         if (!(worklog.getUserId().equals(securityContext.getCurrentUser()) || securityContext.hasPermission(PermissionType.WORKLOG_EDIT_ALL, organizationId))) {
             throw ExceptionFactory.unauthorizedException();
         }
-        return ResponseFactory.createWorklogResponse(updateWorklog(worklog, userFacade.get(securityContext.getCurrentUser()), request.getDay(), request.getLoggedMinutes(), request
+        return ResponseFactory.createWorklogResponse(updateWorklogInternal(worklog, userFacade.get(securityContext.getCurrentUser()), request.getDay(), request.getLoggedMinutes(), request
                 .getConfirmed()));
     }
 
@@ -359,7 +361,7 @@ public class OrganizationFacade implements IOrganizationFacade {
                     && worklogToUpdate.getActivity().getProject().getAssignedUsers().contains(user);
         }).map(req -> {
             WorklogBean worklog = storage.getWorklog(req.getId());
-            return ResponseFactory.createWorklogResponse(updateWorklog(worklog, user, req.getDay(), req.getLoggedMinutes(), req.getConfirmed()));
+            return ResponseFactory.createWorklogResponse(updateWorklogInternal(worklog, user, req.getDay(), req.getLoggedMinutes(), req.getConfirmed()));
         }).collect(Collectors.toList());
     }
 
@@ -377,7 +379,7 @@ public class OrganizationFacade implements IOrganizationFacade {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    private WorklogBean updateWorklog(WorklogBean worklogToUpdate, UserBean user, String day, Long loggedMinutes, Boolean confirmed) {
+    private WorklogBean updateWorklogInternal(WorklogBean worklogToUpdate, UserBean user, String day, Long loggedMinutes, Boolean confirmed) {
         boolean changed = false;
         if (confirmed != null && confirmed.equals(worklogToUpdate.getConfirmed())) {
             worklogToUpdate.setConfirmed(confirmed);
@@ -385,8 +387,11 @@ public class OrganizationFacade implements IOrganizationFacade {
         }
         Date newDate;
         try {
-            if (StringUtils.isNotEmpty(day)) newDate = DateUtils.convertStringToDate(day).toDate();
-            else newDate = null;
+            if (StringUtils.isNotEmpty(day)) {
+                newDate = DateUtils.convertStringToDate(day).toDate();
+            } else {
+                newDate = null;
+            }
         } catch (InvalidDateException ex) {
             newDate = null;
         }
@@ -407,6 +412,8 @@ public class OrganizationFacade implements IOrganizationFacade {
         }
         if (changed) {
             return storage.updateWorklog(worklogToUpdate);
-        } else return worklogToUpdate;
+        } else {
+            return worklogToUpdate;
+        }
     }
 }
