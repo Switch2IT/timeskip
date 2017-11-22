@@ -4,6 +4,8 @@ Author: Christophe Devos, Stephan Ghequiere, Timothy Pecceu, Patrick Van den Bus
 Level: Intermediate
 Technologies: EAR, JPA, Swagger
 Summary: Based on the Wildfly EE Web Application archetype
+[ ![Codeship Status for Switch2IT/timeskip-api](https://app.codeship.com/projects/ba7d3e20-b1fa-0135-65f8-2a2cb9ee228b/status?branch=master)](https://app.codeship.com/projects/257991)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e3b950eaefc3405db14fc9d2f55a6707)](https://www.codacy.com/app/Switch2IT/timeskip-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Switch2IT/timeskip-api&amp;utm_campaign=Badge_Grade)
 
 What is it?
 -----------
