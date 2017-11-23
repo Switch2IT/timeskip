@@ -15,7 +15,7 @@ import be.ehb.model.responses.MailTemplateResponse;
 import be.ehb.model.responses.PaygradeResponse;
 import be.ehb.security.ISecurityContext;
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.*;
+import v2.io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
 import org.apache.commons.lang3.StringUtils;
 

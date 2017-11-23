@@ -9,8 +9,8 @@ import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionType;
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
+import v2.io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.ApplicationScoped;

@@ -23,6 +23,8 @@ import be.ehb.rest.mappers.RestExceptionMapper;
 import be.ehb.rest.resources.*;
 import be.ehb.servlets.CORSFilter;
 import be.ehb.servlets.RequestFilter;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -49,8 +51,8 @@ public class JaxRsActivator extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> resources = new java.util.HashSet<>();
         addRestResourceClasses(resources);
-        resources.add(io.swagger.jaxrs.listing.ApiListingResource.class);
-        resources.add(io.swagger.jaxrs.listing.SwaggerSerializers.class);
+        resources.add(ApiListingResource.class);
+        resources.add(SwaggerSerializers.class);
         return resources;
     }
 

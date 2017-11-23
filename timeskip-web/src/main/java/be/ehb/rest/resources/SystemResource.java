@@ -10,7 +10,7 @@ import be.ehb.model.responses.ErrorResponse;
 import be.ehb.model.responses.SystemStatusResponse;
 import be.ehb.security.ISecurityContext;
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.*;
+import v2.io.swagger.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

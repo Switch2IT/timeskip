@@ -8,12 +8,12 @@ import be.ehb.model.responses.*;
 import be.ehb.security.ISecurityContext;
 import be.ehb.security.PermissionType;
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
+import v2.io.swagger.annotations.Api;
+import v2.io.swagger.annotations.ApiOperation;
+import v2.io.swagger.annotations.ApiResponse;
+import v2.io.swagger.annotations.ApiResponses;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
