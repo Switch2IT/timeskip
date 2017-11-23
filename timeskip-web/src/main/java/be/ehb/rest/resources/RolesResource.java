@@ -10,7 +10,7 @@ import be.ehb.model.responses.ErrorResponse;
 import be.ehb.model.responses.RoleResponse;
 import be.ehb.security.ISecurityContext;
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.*;
+import v2.io.swagger.annotations.*;
 import io.swagger.jaxrs.PATCH;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

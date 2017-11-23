@@ -27,7 +27,7 @@ public class ConventionUtilTest {
     @Test
     public void idFromNameWhiteSpace() {
         String name = "  ";
-        assertEquals(null, ConventionUtil.idFromName(name));
+        assertEquals("", ConventionUtil.idFromName(name));
     }
 
     @Test

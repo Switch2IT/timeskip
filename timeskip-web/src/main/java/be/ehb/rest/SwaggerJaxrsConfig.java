@@ -1,7 +1,6 @@
 package be.ehb.rest;
 
-import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.models.*;
+import v2.io.swagger.models.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -20,13 +19,6 @@ public class SwaggerJaxrsConfig extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         try {
             super.init(config);
-            //Scanner
-            BeanConfig beanConfig = new BeanConfig();
-            beanConfig.setTitle("Timeskip API");
-            beanConfig.setVersion("v0.7-SNAPSHOT");
-            beanConfig.setBasePath("timeskip-web/api");
-            beanConfig.setResourcePackage("be.ehb.rest.resources");
-            beanConfig.setScan(true);
 
             //information
             Info info = new Info()
