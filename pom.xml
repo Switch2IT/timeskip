@@ -113,12 +113,14 @@
         <mail-api.version>1.6.0</mail-api.version>
         <httpcomp.version>4.5.3</httpcomp.version>
         <version.keycloak>3.4.0.Final</version.keycloak>
-        <version.resteasy>3.1.4.Final</version.resteasy>
+        <version.resteasy>4.0.0.Beta1</version.resteasy>
 
         <version.org.hibernate>5.2.12.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>4.0.4.Final</version.org.hibernate.commons.annotations>
         <version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>1.0.0.Final
         </version.org.hibernate.javax.persistence.hibernate-jpa-2.1-api>
+        <hibernate.em.version>5.2.12.Final</hibernate.em.version>
+        <hibernate.validator.version>6.0.5.Final</hibernate.validator.version>
         <guava.version>23.4-jre</guava.version>
         <jodatime.version>2.9.9</jodatime.version>
         <itext.version>7.0.5</itext.version>
